@@ -1,0 +1,83 @@
+:root {
+  color-scheme: light;
+
+  --font-sans:
+    'Segoe UI', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  --font-mono: 'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+  --color-canvas: #f6f1e7;
+  --color-canvas-deep: #efe6d7;
+  --color-surface: #fffdf9;
+  --color-surface-raised: #ffffff;
+  --color-surface-muted: #f1eadf;
+  --color-surface-sunken: #eae0d0;
+
+  --color-border: #e4dac9;
+  --color-border-strong: #cfc0aa;
+
+  --color-text: #1e2a24;
+  --color-text-soft: #556259;
+  --color-text-muted: #79827b;
+  --color-text-inverse: #f8f3e8;
+
+  --color-evergreen-950: #0b241d;
+  --color-evergreen-900: #102f26;
+  --color-evergreen-800: #163b30;
+  --color-evergreen-700: #1d4f40;
+  --color-evergreen-600: #256754;
+  --color-evergreen-200: #c8ddd3;
+  --color-evergreen-100: #dcebe4;
+  --color-evergreen-50: #edf5f1;
+
+  --color-burgundy-800: #63232e;
+  --color-burgundy-700: #7a2e3a;
+  --color-burgundy-200: #e8c7cc;
+  --color-burgundy-100: #f2dfe2;
+  --color-burgundy-50: #f9eff1;
+
+  --color-gold-700: #8a6327;
+  --color-gold-600: #a9792f;
+  --color-gold-500: #bd9146;
+  --color-gold-300: #e3c98f;
+  --color-gold-200: #efdcb4;
+  --color-gold-100: #f5ead0;
+  --color-gold-50: #fbf5e8;
+
+  --color-critical: #9f3535;
+  --color-critical-soft: #f8e5e2;
+  --color-success: #2e6b4f;
+  --color-success-soft: #e2f0e8;
+
+  --shadow-xs: 0 1px 2px rgb(30 42 36 / 5%);
+  --shadow-sm: 0 2px 8px rgb(30 42 36 / 5%), 0 1px 2px rgb(30 42 36 / 4%);
+  --shadow-md: 0 14px 36px rgb(30 42 36 / 8%), 0 2px 8px rgb(30 42 36 / 4%);
+  --shadow-lg: 0 28px 70px rgb(16 47 38 / 16%);
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 80px;
+
+  --container-max: 1180px;
+  --sidebar-width: 278px;
+  --header-height: 76px;
+
+  --transition-fast: 140ms ease;
+  --transition-base: 220ms ease;
+}

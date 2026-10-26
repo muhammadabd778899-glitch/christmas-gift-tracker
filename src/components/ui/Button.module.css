@@ -1,0 +1,103 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-weight: 650;
+  letter-spacing: 0.005em;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.md {
+  min-height: 46px;
+  padding: 0 22px;
+  font-size: 0.93rem;
+}
+
+.sm {
+  min-height: 38px;
+  padding: 0 15px;
+  font-size: 0.82rem;
+}
+
+.primary {
+  background: var(--color-evergreen-800);
+  color: var(--color-text-inverse);
+  box-shadow: 0 10px 22px rgb(16 47 38 / 16%);
+}
+
+.primary:not(:disabled):hover {
+  background: var(--color-evergreen-950);
+  box-shadow: 0 12px 26px rgb(16 47 38 / 22%);
+}
+
+.secondary {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-evergreen-800);
+  box-shadow: var(--shadow-xs);
+}
+
+.secondary:not(:disabled):hover {
+  border-color: var(--color-evergreen-600);
+  background: var(--color-evergreen-50);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--color-evergreen-700);
+}
+
+.ghost:not(:disabled):hover {
+  background: var(--color-evergreen-50);
+}
+
+.danger {
+  background: var(--color-burgundy-700);
+  color: var(--color-text-inverse);
+  box-shadow: 0 10px 22px rgb(122 46 58 / 15%);
+}
+
+.danger:not(:disabled):hover {
+  background: var(--color-burgundy-800);
+}
+
+.inverse {
+  background: var(--color-gold-100);
+  color: var(--color-evergreen-950);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 16%);
+}
+
+.inverse:not(:disabled):hover {
+  background: #fff8e7;
+}
+
+.ghost-inverse {
+  border-color: rgb(248 243 232 / 22%);
+  background: rgb(248 243 232 / 6%);
+  color: var(--color-text-inverse);
+}
+
+.ghost-inverse:not(:disabled):hover {
+  background: rgb(248 243 232 / 13%);
+}

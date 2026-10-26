@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestone 0 complete, awaiting owner approval · Version 0.1 · 2026-10-26
+> Status: Milestone 1 complete and verified; Milestone 2 not started · Version 0.2 · 2026-10-26
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -9,14 +9,14 @@
 
 | Item | State |
 | --- | --- |
-| Repository | Initialized for documentation; no application code |
-| Current milestone | **Milestone 0 — Specification** (deliverables created, awaiting approval) |
-| Application runnable | No |
-| Tests | None yet (no code) |
-| Next milestone | Milestone 1 — Application foundation and shell |
-| Next action | Owner reviews the specification and approves Milestones 0/1 scope |
+| Repository | Runnable React/TypeScript/Vite application plus approved specification |
+| Current milestone | **Milestone 1 — Foundation and shell** (complete; awaiting owner review before M2) |
+| Application runnable | Yes — development server, tests, and production build pass |
+| Tests | 7 Vitest smoke tests passing; no Playwright suite yet |
+| Next milestone | Milestone 2 — Data model and persistent storage (not started) |
+| Next action | Owner reviews `docs/MILESTONE_1_REPORT.md`, confirms M2-blocking decisions, and authorizes M2 |
 
-**Do not start Milestone 1 until the specification is approved and the stack decisions are confirmed.**
+**Do not start Milestone 2 until the owner authorizes it and the M2-blocking decisions are confirmed.**
 
 ---
 
@@ -24,8 +24,8 @@
 
 | # | Milestone | Primary capability | Status |
 | --- | --- | --- | --- |
-| 0 | Specification | Approved product, architecture, data model, criteria, decisions | Delivered — awaiting approval |
-| 1 | Foundation | Runnable shell, navigation, design tokens, quality tooling | Not started |
+| 0 | Specification | Approved product, architecture, data model, criteria, decisions | Complete — approved |
+| 1 | Foundation | Runnable shell, navigation, design tokens, quality tooling | Complete — verified |
 | 2 | Persistent storage | IndexedDB schema, repositories, migrations, validation | Not started |
 | 3 | Recipients | Recipient management with caps and summaries | Not started |
 | 4 | Gifts | Gift records, costs, statuses, deletion | Not started |
@@ -49,7 +49,7 @@ Order rationale:
 
 ## 3. Milestone 0 — Specification
 
-**Status:** Delivered; awaiting owner approval.
+**Status:** Complete and approved by the owner on 2026-10-26.
 
 **Objective:** Give implementation a precise, reviewable definition and a permanent working protocol.
 
@@ -77,7 +77,9 @@ Order rationale:
 
 ## 4. Milestone 1 — Application foundation and shell
 
-**Depends on:** M0 approval.
+**Status:** Complete and verified on 2026-10-26. See `docs/MILESTONE_1_REPORT.md`.
+
+**Depends on:** M0 approval (satisfied).
 
 **Objective:** A runnable React/TypeScript/Vite application with a professional, responsive shell and reliable development tooling.
 
@@ -107,7 +109,20 @@ Order rationale:
 - Manual desktop/mobile navigation verified.
 - No placeholder numbers presented as user data.
 
-**Git checkpoint:** `feat: establish application foundation`
+**Git checkpoint:** `feat: establish application foundation` — committed and tagged `milestone-1` after verification.
+
+**Implementation notes**
+
+- Installed with the locked tree: React 19.3, Vite 8.3, React Router 7.18, Lucide 1.61, Vitest 5.0.
+- Native `<dialog>` supplies modal focus containment, Escape handling, and focus restoration. The mobile navigation and About panel share this primitive.
+- Desktop navigation uses a persistent sidebar. Mobile uses a drawer; a bottom navigation bar was not needed and is not included.
+- The light-theme placeholder is the explicit “Light theme only — dark mode in Milestone 9” note in Settings. No theme toggle is presented.
+- The toast/announcer primitive was deferred until the first feature that needs transient feedback (Milestone 3/4). Inline errors and the shared error states exist now.
+- Playwright remains deferred to Milestone 4; `e2e/` is reserved but no end-to-end suite has run.
+- ESLint is pinned to 9.39.5 because `eslint-plugin-jsx-a11y` 6.10.2 does not support ESLint 10 yet. Revisit after the release milestone.
+- System font stacks are used until self-hosted brand fonts are introduced in Milestone 9. No remote font or CDN request is made.
+- GitHub Actions verifies formatting, type checking, linting, tests, and the production build on pushes and pull requests.
+- No storage, domain calculations, onboarding, sample records, charts, or PWA registration were added.
 
 ---
 
@@ -524,10 +539,11 @@ Order rationale:
 
 ## 17. Verification commands
 
-Available from Milestone 1 (names may be adjusted then, but the gates remain):
+Established in Milestone 1:
 
 ```
 npm ci
+npm run format:check
 npm run typecheck
 npm run lint
 npm run test
@@ -608,13 +624,9 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews this specification, especially:
-   - The offline delivery recommendation (D-011 / O-1).
-   - The budget model and status rules.
-   - The data model and deletion behavior.
-   - The launch scope and exclusions.
-2. Owner approves or overrides open decisions.
-3. Commit/tag the specification.
-4. Authorize Milestone 1 with the prompt and `AI_DEVELOPMENT_PROTOCOL.md`.
+1. Owner reviews the running shell and `docs/MILESTONE_1_REPORT.md`.
+2. Owner confirms the Milestone 2 blocking decisions: D-002, D-003, D-004, D-005, D-018, D-019, O-3, O-7, and O-8.
+3. Owner authorizes Milestone 2.
+4. Only then begin persistent storage work.
 
-Until then: **stop.**
+Milestone 2 is **not started**. Until authorization: **stop.**

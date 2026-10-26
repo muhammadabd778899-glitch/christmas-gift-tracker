@@ -1,0 +1,68 @@
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  border-radius: var(--radius-md);
+}
+
+.text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.tagline {
+  font-size: 0.7rem;
+  font-weight: 550;
+  letter-spacing: 0.02em;
+  opacity: 0.66;
+}
+
+.dark {
+  color: var(--color-text-inverse);
+}
+
+.dark:hover .name {
+  color: var(--color-gold-200);
+}
+
+.light {
+  color: var(--color-evergreen-950);
+}
+
+.compact .mark {
+  width: 36px;
+  height: 36px;
+}
+
+.compact .name {
+  font-size: 0.94rem;
+  white-space: normal;
+  line-height: 1.12;
+}
+
+.compact .tagline {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .compact .name {
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .compact .name {
+    font-size: 0.82rem;
+  }
+}

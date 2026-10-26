@@ -1,8 +1,8 @@
 # Christmas Gift Tracker — Decision Log
 
-> Status: Draft for owner approval · Version 0.1 · 2026-10-26
+> Status: Approved for Milestone 1; later decisions remain proposed · Version 0.2 · 2026-10-26
 > Format: lightweight ADRs. Statuses: **Proposed**, **Accepted**, **Superseded**, **Rejected**.
-> Decisions marked Proposed become binding when the owner approves this specification.
+> Decisions marked Proposed become binding when the owner approves the milestone that depends on them.
 
 ---
 
@@ -20,7 +20,7 @@
 
 ### D-001 — React + TypeScript + Vite stack
 
-**Status:** Proposed · **Milestone:** 1
+**Status:** Accepted 2026-10-26 · **Milestone:** 1
 
 **Context:** The product needs a polished, interactive interface, fast iteration, and a static build that can run offline.
 
@@ -172,7 +172,7 @@
 
 ### D-013 — No runtime CDN or third-party assets
 
-**Status:** Proposed · **Milestone:** 1/10
+**Status:** Accepted 2026-10-26 for Milestone 1 · **Milestone:** 1/10
 
 **Context:** Remote fonts, icons, scripts, or analytics break offline use and leak requests.
 
@@ -184,7 +184,7 @@
 
 ### D-014 — Verification gates are mandatory per milestone
 
-**Status:** Proposed · **Milestone:** 1 onward
+**Status:** Accepted 2026-10-26 · **Milestone:** 1 onward
 
 **Context:** AI-generated work can look complete while failing to build or losing data.
 
@@ -280,7 +280,7 @@
 
 ### D-022 — No analytics or telemetry in the offline edition
 
-**Status:** Proposed · **Milestone:** 1/10
+**Status:** Accepted 2026-10-26 for Milestone 1 · **Milestone:** 1/10
 
 **Context:** Recipient names, addresses, and notes are sensitive, and offline use must not depend on tracking services.
 
@@ -352,7 +352,7 @@ Each row states the recommendation. Approving this specification approves the re
 | O-11 | Add a “does not need wrapping” exemption? | No for launch; document the limitation (D-024) | M5 | Open |
 | O-12 | Support a standalone desktop wrapper for Etsy? | Only if M10 proves PWA delivery insufficient | M10/M12 | Open |
 
-**Approval needed before Milestone 1:** D-001, D-013, D-014, D-022 (stack and working rules). All other decisions can be confirmed before their blocking milestone.
+**Approval needed before Milestone 1:** Resolved 2026-10-26. The owner authorized Milestone 1; D-001, D-013, D-014, and D-022 are accepted. All other decisions can be confirmed before their blocking milestone.
 
 **Approval needed before Milestone 2:** D-002 through D-005, D-018, D-019, O-3, O-7, O-8.
 
@@ -396,3 +396,5 @@ Each row states the recommendation. Approving this specification approves the re
 | Date | Change | By |
 | --- | --- | --- |
 | 2026-10-26 | Initial decision log created for Milestone 0 | AI |
+| 2026-10-26 | D-001, D-013, D-014, and D-022 accepted when the owner authorized Milestone 1 | AI |
+| 2026-10-26 | Milestone 1 implementation notes recorded in `MILESTONE_1_REPORT.md`; no new architecture decision required | AI |

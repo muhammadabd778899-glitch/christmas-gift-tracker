@@ -1,0 +1,26 @@
+.page {
+  min-height: 100dvh;
+  padding: clamp(20px, 4vw, 36px);
+  background:
+    radial-gradient(circle at 8% 0%, rgb(189 145 70 / 10%), transparent 26rem),
+    radial-gradient(circle at 96% 16%, rgb(122 46 58 / 6%), transparent 22rem), var(--color-canvas);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(var(--container-max), 100%);
+  margin: 0 auto;
+}
+
+.brand {
+  display: inline-flex;
+  gap: 11px;
+  align-items: center;
+  color: var(--color-evergreen-950);
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}

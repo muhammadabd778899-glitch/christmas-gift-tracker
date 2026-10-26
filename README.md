@@ -2,50 +2,114 @@
 
 A local-first Christmas gift planning application: recipients, gifts, budgets, ideas, shopping lists, seasons, backups, and offline use.
 
-> **Status: Milestone 0 — specification complete, awaiting approval.**
-> There is no runnable application yet. Application code starts in Milestone 1, after the specification is approved.
+> **Status: Milestone 1 — application foundation complete and verified.**
+> The shell is runnable, responsive, and tested. It does **not** create, store, or transmit customer data yet. Milestone 2 has not started.
 
 ---
 
-## What this repository contains
+## What works today
+
+- A React + TypeScript + Vite application with a locked dependency tree.
+- Seven working destinations: Dashboard, Gifts, Recipients, Idea Bank, Shopping List, Archives, and Settings.
+- A responsive application shell with a desktop sidebar, mobile navigation drawer, skip link, and visible focus states.
+- Warm design tokens for typography, spacing, surfaces, borders, radii, shadows, and brand/status colors.
+- Reusable primitives: Button, IconButton, Input, Select, Card, Badge, Dialog, Table, EmptyState, PageHeader, and error states.
+- A desktop header with the product name and an honest season placeholder.
+- Route-level and application-level error boundaries, plus a friendly not-found page.
+- Seven automated smoke tests covering navigation, every destination, the dialog, the 404 page, and both error boundaries.
+- GitHub Actions CI for formatting, type checking, linting, tests, and the production build.
+
+Every feature page is a deliberate placeholder. There are no sample recipients, invented totals, hidden calculations, or fake persistence.
+
+---
+
+## Quick start
+
+Requires Node.js **20.19 or newer** (Node 22 LTS is used in CI) and npm.
+
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`.
+
+### Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Vite development server |
+| `npm run typecheck` | Run the TypeScript project build check |
+| `npm run lint` | Run ESLint across the repository |
+| `npm run test` | Run the Vitest suite once |
+| `npm run test:watch` | Run Vitest in watch mode |
+| `npm run test:coverage` | Run tests with V8 coverage |
+| `npm run build` | Type-check and produce the production bundle in `dist/` |
+| `npm run preview` | Serve the production bundle locally |
+| `npm run format` | Format code and configuration with Prettier |
+| `npm run format:check` | Verify formatting without changing files |
+
+---
+
+## Current technology
+
+Installed for Milestone 1:
+
+- React 19 + TypeScript
+- Vite 8
+- React Router 7
+- Lucide icons
+- CSS Modules with design tokens
+- Vitest 5, Testing Library, `jsdom`
+- ESLint 9, Prettier
+- GitHub Actions
+
+Not installed yet — each arrives with the milestone that needs it:
+
+- Dexie 4 and `dexie-react-hooks` (Milestone 2)
+- Zod and React Hook Form (Milestones 2–3)
+- fake-indexeddb (Milestone 2)
+- Recharts (Milestone 5)
+- Playwright (Milestone 4, when the first end-to-end workflow exists)
+- `vite-plugin-pwa` (Milestone 10)
+
+No runtime CDN assets, remote fonts, analytics, or telemetry are used. The interface uses a local system font stack until self-hosted brand fonts are introduced in Milestone 9.
+
+---
+
+## Repository map
 
 | Path | Purpose |
 | --- | --- |
-| `docs/PRODUCT_SPEC.md` | Product definition, scope, pages, business rules, privacy, claims guardrails |
-| `docs/ARCHITECTURE.md` | Stack, layering, folder structure, storage design, offline strategy, testing, risks |
-| `docs/DATA_MODEL.md` | Entities, fields, invariants, calculations, IndexedDB schema, migrations, backup/CSV formats |
+| `src/app/` | Composition root, router, shell, navigation metadata, and error boundaries |
+| `src/pages/` | Route-level pages and deliberate feature placeholders |
+| `src/components/ui/` | Reusable interface primitives with no domain knowledge |
+| `src/components/layout/` | Brand, sidebar, header, navigation, and mobile drawer |
+| `src/lib/` | Generic utilities |
+| `src/styles/` | Design tokens and global base styles |
+| `src/test/` | Test setup and the memory-router render helper |
+| `src/features/` | Reserved for feature UI from later milestones |
+| `src/domain/` | Reserved for the pure domain layer starting in Milestone 2 |
+| `src/storage/` | Reserved for IndexedDB and repositories starting in Milestone 2 |
+| `e2e/` | Reserved for Playwright tests from Milestone 4 |
+| `docs/` | Product, architecture, data, decisions, acceptance criteria, and reports |
+| `.github/workflows/ci.yml` | Continuous verification on push and pull request |
+
+### Documentation
+
+| Document | Purpose |
+| --- | --- |
+| `docs/PRODUCT_SPEC.md` | Product definition, scope, pages, rules, privacy, and claims guardrails |
+| `docs/ARCHITECTURE.md` | Stack, layering, folder structure, storage design, offline strategy, and risks |
+| `docs/DATA_MODEL.md` | Entities, invariants, calculations, IndexedDB schema, backup, and CSV formats |
 | `docs/ACCEPTANCE_CRITERIA.md` | Testable completion criteria for every milestone |
-| `docs/DECISIONS.md` | Architecture decisions, assumptions, open owner decisions |
-| `docs/IMPLEMENTATION_PLAN.md` | Milestone sequence, gates, status, Git checkpoints |
-| `docs/MILESTONE_0_REPORT.md` | Completion report for the specification milestone |
-| `AI_DEVELOPMENT_PROTOCOL.md` | Rules for how the AI agent works on this project |
+| `docs/DECISIONS.md` | Architecture decisions, assumptions, and open owner decisions |
+| `docs/IMPLEMENTATION_PLAN.md` | Milestone sequence, gates, status, and Git checkpoints |
+| `docs/MILESTONE_0_REPORT.md` | Specification milestone report |
+| `docs/MILESTONE_1_REPORT.md` | Foundation milestone report and verification evidence |
+| `AI_DEVELOPMENT_PROTOCOL.md` | Permanent working rules for the AI agent |
 
-**Reading order for a new session:** protocol → product spec → architecture → data model → acceptance criteria → decisions → implementation plan.
-
----
-
-## Product in one paragraph
-
-Customers plan Christmas gifts for family, friends, and colleagues, track planned and actual spending, move gift ideas into a real shopping list, reuse the product across years with seasons and archives, and protect their data with complete backups. The launch edition is account-free and offline-first. An online edition with accounts and synchronization is a later, separate milestone.
-
-**Important:** the offline edition is an installable offline-first web application (PWA), with the exact delivery method validated in Milestone 10. A raw HTML file opened from `file://` is **not** assumed to persist data reliably and will not be advertised as such without passing the browser test matrix.
-
----
-
-## Planned technology
-
-- React 19 + TypeScript
-- Vite
-- IndexedDB via Dexie 4
-- React Router
-- Zod, React Hook Form
-- Recharts
-- CSS Modules with design tokens
-- Vitest, Testing Library, fake-indexeddb
-- Playwright
-- `vite-plugin-pwa`
-
-Nothing is installed yet. Dependency choices and rationale are in `docs/ARCHITECTURE.md` §3 and `docs/DECISIONS.md`.
+**Reading order for a new session:** protocol → product spec → architecture → data model → acceptance criteria → decisions → implementation plan → latest milestone report.
 
 ---
 
@@ -53,8 +117,8 @@ Nothing is installed yet. Dependency choices and rationale are in `docs/ARCHITEC
 
 | # | Milestone | Status |
 | --- | --- | --- |
-| 0 | Specification | Complete — awaiting approval |
-| 1 | Foundation and shell | Not started |
+| 0 | Specification | Complete — approved |
+| 1 | Foundation and shell | Complete — verified |
 | 2 | Data model and persistent storage | Not started |
 | 3 | Recipients | Not started |
 | 4 | Gifts | Not started |
@@ -67,37 +131,29 @@ Nothing is installed yet. Dependency choices and rationale are in `docs/ARCHITEC
 | 11 | Online edition and sync | Not started |
 | 12 | QA, packaging, Etsy launch | Not started |
 
-Do not start a milestone without owner authorization.
+Do not start Milestone 2 without owner authorization. Its blocking decisions are listed in `docs/DECISIONS.md`.
 
 ---
 
-## Development commands
+## Data, privacy, and offline status
 
-Available after Milestone 1 scaffolding:
+- **Storage:** not implemented. Refreshing the preview cannot lose planning data because none can be entered.
+- **Accounts and sync:** not implemented.
+- **Analytics/telemetry:** none.
+- **Offline delivery:** not built or verified. The intended launch edition is an installable offline-first PWA, with the actual artifact validated in Milestone 10. A raw `file://` HTML file is not assumed to persist data and will not be advertised without passing the browser test matrix.
+- **Customer data:** no customer data is created or transmitted by this build.
 
-```bash
-npm install
-npm run dev
-npm run typecheck
-npm run lint
-npm run test
-npm run build
-npm run preview
-npm run test:e2e
-```
-
-The exact scripts will be confirmed in Milestone 1 and documented here.
+The interface copy is intentionally conservative until storage, backup, and offline behavior are implemented and tested.
 
 ---
 
 ## Current next step
 
-1. Review the specification and decisions — start with `docs/PRODUCT_SPEC.md` §20 (the seven review questions), then offline delivery (D-011/O-1), the budget model, status rules, and deletion behavior.
-2. Approve or override the open decisions.
-3. Commit/tag the specification.
-4. Authorize Milestone 1.
+1. Owner reviews `docs/MILESTONE_1_REPORT.md` and the running shell.
+2. Owner authorizes Milestone 2.
+3. Before Milestone 2 begins, confirm D-002 through D-005, D-018, D-019, O-3, O-7, and O-8 in `docs/DECISIONS.md`.
 
-Until then, no application code should be written.
+Until authorized: **do not start Milestone 2.**
 
 ---
 

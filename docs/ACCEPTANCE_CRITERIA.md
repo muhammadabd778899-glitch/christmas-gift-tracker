@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Acceptance Criteria
 
-> Status: Draft for owner approval · Version 0.1 · 2026-10-26
+> Status: Approved; Milestone 1 criteria verified · Version 0.2 · 2026-10-26
 > A milestone is complete only when every criterion marked for it passes. Verification methods: **U** = unit, **I** = integration (fake-indexeddb), **C** = component, **E** = Playwright E2E, **M** = manual/real browser, **D** = document review.
 
 ---

@@ -1,0 +1,47 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 2px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.075em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.neutral {
+  background: var(--color-surface-muted);
+  color: var(--color-text-soft);
+}
+
+.evergreen {
+  background: var(--color-evergreen-100);
+  color: var(--color-evergreen-800);
+}
+
+.gold {
+  background: var(--color-gold-100);
+  color: var(--color-gold-700);
+}
+
+.burgundy {
+  background: var(--color-burgundy-100);
+  color: var(--color-burgundy-700);
+}
+
+.success {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.outline {
+  border-color: var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-soft);
+}

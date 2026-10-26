@@ -1,0 +1,122 @@
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { describe, expect, it, vi } from 'vitest';
+import { AppErrorBoundary } from './boundaries/AppErrorBoundary';
+import { RouteErrorPage } from './boundaries/RouteErrorPage';
+import { renderApp } from '../test/render';
+
+function Explodes(): never {
+  throw new Error('Test explosion');
+}
+
+const destinations = [
+  { link: 'Dashboard', heading: 'Dashboard' },
+  { link: 'Gifts', heading: 'Gifts' },
+  { link: 'Recipients', heading: 'Recipients' },
+  { link: 'Idea Bank', heading: 'Idea Bank' },
+  { link: 'Shopping List', heading: 'Shopping List' },
+  { link: 'Archives', heading: 'Archives' },
+  { link: 'Settings', heading: 'Settings' },
+];
+
+describe('application shell', () => {
+  it('renders the dashboard with all primary destinations', () => {
+    renderApp();
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument();
+
+    const primaryNavigation = screen.getByRole('navigation', { name: 'Primary navigation' });
+    for (const destination of destinations) {
+      expect(
+        within(primaryNavigation).getByRole('link', { name: destination.link }),
+      ).toBeInTheDocument();
+    }
+  });
+
+  it('navigates to every primary destination', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const primaryNavigation = screen.getByRole('navigation', { name: 'Primary navigation' });
+
+    for (const destination of destinations) {
+      await user.click(within(primaryNavigation).getByRole('link', { name: destination.link }));
+
+      expect(
+        await screen.findByRole('heading', { level: 1, name: destination.heading }),
+      ).toBeInTheDocument();
+    }
+  });
+
+  it('shows the honest season placeholder in the header', () => {
+    renderApp();
+
+    expect(screen.getByText('No active season')).toBeInTheDocument();
+    expect(screen.getByText('Setup in M3')).toBeInTheDocument();
+  });
+
+  it('opens and closes the about dialog', async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.click(screen.getByRole('button', { name: 'About this build' }));
+
+    const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
+    expect(within(dialog).getByText('Milestone 1 of 12: the interface foundation.')).toBeVisible();
+    expect(within(dialog).getByText(/No customer data yet/i)).toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole('button', { name: 'Close dialog' }));
+    expect(screen.queryByRole('dialog', { name: 'About this preview' })).not.toBeInTheDocument();
+  });
+
+  it('renders a friendly not-found page for unknown routes', () => {
+    renderApp(['/this-route-does-not-exist']);
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'This page slipped out of the stocking.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Back to dashboard/i })).toBeInTheDocument();
+  });
+
+  it('shows recovery UI when a render error escapes the app', () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    render(
+      <AppErrorBoundary>
+        <Explodes />
+      </AppErrorBoundary>,
+    );
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'The app hit an unexpected problem.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reload app' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to dashboard' })).toBeInTheDocument();
+
+    consoleError.mockRestore();
+  });
+
+  it('shows recovery UI when a route render error is caught', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: <Explodes />,
+          errorElement: <RouteErrorPage />,
+        },
+      ],
+      { initialEntries: ['/'] },
+    );
+
+    render(<RouterProvider router={router} />);
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'This page could not be displayed.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reload app' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to dashboard' })).toBeInTheDocument();
+
+    consoleError.mockRestore();
+  });
+});

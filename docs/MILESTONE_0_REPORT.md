@@ -49,11 +49,11 @@
 
 ## Limitations
 
-- The specifications are unexercised by code; implementation may reveal clarifications that require documented amendments.
+- The specifications were unexercised by code at the end of Milestone 0. Milestone 1 has since exercised the shell only; storage, domain calculations, and data-integrity rules remain untested until later milestones.
 - Offline delivery is not yet proven. The PWA-first recommendation and the `file://` caveat are honest, not tested claims. Milestone 10 must validate the actual artifact.
-- Open decisions remain. Milestone 1 can proceed only after owner approval of the stack and working rules; later milestones have their own approval gates.
+- Open decisions remain for later milestones. Milestone 1 was authorized by the owner on 2026-10-26; later milestones retain their own approval gates.
 - No UX prototype, wireframe, or visual mockup exists; visual direction is defined in prose and tokens, to be implemented in Milestones 1 and 9.
-- No Git commit has been made, by design, so the owner can review the documents first.
+- The specification was committed after approval as `b5377ee` and tagged `milestone-0`.
 
 ## Decisions / assumptions
 
@@ -79,6 +79,8 @@
 
 **Milestone 1 — Application foundation and shell.**
 
+Status: Authorized on 2026-10-26 and completed; see `docs/MILESTONE_1_REPORT.md`.
+
 Dependencies:
 
 - Owner approval of this specification.
@@ -89,14 +91,13 @@ Milestone 1 must not implement storage, calculations, onboarding, or fake data.
 
 ## Git checkpoint
 
-- Repository initialized on `main`; all files are currently untracked.
-- Recommended first commit after review: `docs: define product specification and architecture`
-- Recommended tag: `milestone-0`
-- No commit was made automatically, so the owner can review the complete diff first.
+- Committed as `b5377ee` — `docs: define product specification and architecture`.
+- Tagged `milestone-0`.
+- No application code was included in that commit.
 
 ## Blockers / questions
 
-Approval is requested on:
+Approval was requested at the Milestone 0 review for:
 
 1. **O-1 / D-011** — PWA-first offline delivery, with a standalone-file spike in Milestone 10 and no unsupported `file://` promise.
 2. **D-007 / O-4** — recipient deletion requires reassign or explicit cascade.
@@ -105,4 +106,4 @@ Approval is requested on:
 5. **D-018 / O-8** — zero or one active season.
 6. **O-2** — final product name and brand before Milestone 9.
 
-Nothing else is required to begin Milestone 1.
+Status: Milestone 1 was authorized and completed. The remaining items above still require owner confirmation before the milestones they block.

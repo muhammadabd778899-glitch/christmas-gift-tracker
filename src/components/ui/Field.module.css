@@ -1,0 +1,80 @@
+.field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.label {
+  display: inline-flex;
+  gap: 4px;
+  align-items: baseline;
+  color: var(--color-text);
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.required {
+  color: var(--color-burgundy-700);
+}
+
+.control {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 13px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-size: 0.94rem;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.control::placeholder {
+  color: var(--color-text-muted);
+}
+
+.control:hover {
+  border-color: var(--color-evergreen-600);
+}
+
+.control:focus {
+  border-color: var(--color-evergreen-700);
+  outline: none;
+  box-shadow: 0 0 0 4px rgb(37 103 84 / 14%);
+}
+
+.control:disabled {
+  cursor: not-allowed;
+  background: var(--color-surface-muted);
+  opacity: 0.7;
+}
+
+.controlInvalid {
+  border-color: var(--color-critical);
+}
+
+.controlInvalid:focus {
+  box-shadow: 0 0 0 4px rgb(159 53 53 / 12%);
+}
+
+.select {
+  appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23556259' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.hint {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.error {
+  color: var(--color-critical);
+  font-size: 0.78rem;
+  font-weight: 600;
+}

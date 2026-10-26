@@ -1,0 +1,160 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  min-height: var(--header-height);
+  padding: 12px clamp(18px, 3vw, 34px);
+  border-bottom: 1px solid rgb(207 192 170 / 55%);
+  background: rgb(246 241 231 / 82%);
+  backdrop-filter: blur(16px);
+}
+
+.left,
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.menu {
+  display: none;
+}
+
+.mobileBrand {
+  display: none;
+}
+
+.desktopName {
+  color: var(--color-evergreen-950);
+  font-family: var(--font-display);
+  font-size: 1.04rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.headerDivider {
+  width: 1px;
+  height: 22px;
+  margin: 0 4px;
+  background: var(--color-border-strong);
+}
+
+.seasonBlock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.seasonLabel {
+  color: var(--color-text-muted);
+  font-size: 0.64rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.seasonChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 5px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: rgb(255 253 249 / 72%);
+  color: var(--color-text-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.seasonChip svg {
+  color: var(--color-gold-600);
+}
+
+.seasonText {
+  color: var(--color-text);
+}
+
+.seasonHint {
+  padding-left: 8px;
+  border-left: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 550;
+}
+
+.preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.previewDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-gold-500);
+  box-shadow: 0 0 0 4px rgb(189 145 70 / 12%);
+}
+
+@media (max-width: 1024px) {
+  .header {
+    min-height: 68px;
+  }
+
+  .menu {
+    display: inline-grid;
+  }
+
+  .mobileBrand {
+    display: block;
+  }
+
+  .desktopName,
+  .headerDivider {
+    display: none;
+  }
+
+  .seasonLabel {
+    display: none;
+  }
+
+  .preview {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .header {
+    gap: var(--space-3);
+    padding-inline: 14px;
+  }
+
+  .seasonHint {
+    display: none;
+  }
+
+  .seasonChip {
+    min-height: 32px;
+    padding-inline: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .seasonBlock {
+    display: none;
+  }
+}

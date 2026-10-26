@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Christmas Gift Tracker">
+  <rect width="48" height="48" rx="13" fill="#102f26" />
+  <path d="M24 15v19M14 24h20" stroke="#f5ead0" stroke-width="2.4" stroke-linecap="round" />
+  <rect x="14" y="18" width="20" height="16" rx="2.5" stroke="#f5ead0" stroke-width="2.2" />
+  <path d="M24 18c-3.8 0-6.2-1.7-6.2-4.1 0-2 2.5-3.2 4.2-1.6 1.2 1.1 2 3.3 2 5.7Z" fill="#c96a72" />
+  <path d="M24 18c3.8 0 6.2-1.7 6.2-4.1 0-2-2.5-3.2-4.2-1.6-1.2 1.1-2 3.3-2 5.7Z" fill="#c96a72" />
+</svg>
