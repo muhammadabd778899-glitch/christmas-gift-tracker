@@ -1,0 +1,620 @@
+# Christmas Gift Tracker — Implementation Plan
+
+> Status: Milestone 0 complete, awaiting owner approval · Version 0.1 · 2026-10-26
+> Build order is deliberately capability-based. Each milestone must leave a working, verified application.
+
+---
+
+## 1. Current position
+
+| Item | State |
+| --- | --- |
+| Repository | Initialized for documentation; no application code |
+| Current milestone | **Milestone 0 — Specification** (deliverables created, awaiting approval) |
+| Application runnable | No |
+| Tests | None yet (no code) |
+| Next milestone | Milestone 1 — Application foundation and shell |
+| Next action | Owner reviews the specification and approves Milestones 0/1 scope |
+
+**Do not start Milestone 1 until the specification is approved and the stack decisions are confirmed.**
+
+---
+
+## 2. Milestone sequence
+
+| # | Milestone | Primary capability | Status |
+| --- | --- | --- | --- |
+| 0 | Specification | Approved product, architecture, data model, criteria, decisions | Delivered — awaiting approval |
+| 1 | Foundation | Runnable shell, navigation, design tokens, quality tooling | Not started |
+| 2 | Persistent storage | IndexedDB schema, repositories, migrations, validation | Not started |
+| 3 | Recipients | Recipient management with caps and summaries | Not started |
+| 4 | Gifts | Gift records, costs, statuses, deletion | Not started |
+| 5 | Budget engine + dashboard | Central calculations and live dashboard | Not started |
+| 6 | Idea Bank + Shopping List | Ideas convert to gifts; derived shopping list | Not started |
+| 7 | Search, filters, details | Find and review data at scale | Not started |
+| 8 | Seasons, archives, backup | Reuse yearly; protect and export data | Not started |
+| 9 | Professional UI | Themes, responsive polish, accessibility, print | Not started |
+| 10 | Offline delivery | Validated offline artifact and customer setup | Not started |
+| 11 | Online edition | Accounts, cloud, sync, conflicts | Not started |
+| 12 | QA + packaging + launch | Tested, documented Etsy release | Not started |
+
+Order rationale:
+
+- Storage and calculations come before the dashboard so the UI is not built on a weak foundation.
+- Offline is proven before cloud sync.
+- The offline product is sellable before investing in the online edition.
+- Packaging and claims come last, based on tested reality.
+
+---
+
+## 3. Milestone 0 — Specification
+
+**Status:** Delivered; awaiting owner approval.
+
+**Objective:** Give implementation a precise, reviewable definition and a permanent working protocol.
+
+**Deliverables**
+
+- `docs/PRODUCT_SPEC.md`
+- `docs/ARCHITECTURE.md`
+- `docs/DATA_MODEL.md`
+- `docs/ACCEPTANCE_CRITERIA.md`
+- `docs/DECISIONS.md`
+- `docs/IMPLEMENTATION_PLAN.md`
+- `AI_DEVELOPMENT_PROTOCOL.md`
+- `README.md` (project orientation)
+
+**Exit gate**
+
+- All AC-0 criteria pass.
+- Owner answers the review questions in PRODUCT_SPEC §17 / DECISIONS open decisions relevant to Milestone 1.
+- No application code exists.
+- Git checkpoint recommended after review.
+
+**Not in scope:** scaffolding, installing dependencies, writing components.
+
+---
+
+## 4. Milestone 1 — Application foundation and shell
+
+**Depends on:** M0 approval.
+
+**Objective:** A runnable React/TypeScript/Vite application with a professional, responsive shell and reliable development tooling.
+
+**Build**
+
+- Vite/React/TypeScript project with a locked lockfile.
+- Typecheck, lint, format, unit-test, build, and preview scripts.
+- Folder structure from Architecture §5.
+- Router with Dashboard, Gifts, Recipients, Idea Bank, Shopping List, Archives, Settings.
+- Responsive app shell: sidebar/drawer/bottom navigation, header, season placeholder, theme placeholder.
+- Design tokens and base styles (warm ivory, evergreen, burgundy, gold, type/spacing scale).
+- Reusable primitives: Button, Input, Select, Card, Badge, Dialog, DataTable shell, EmptyState, PageHeader, toast/announcer.
+- Not-found page, app/route error boundaries, and a recovery placeholder.
+- Vitest setup with a smoke test.
+- GitHub Actions CI (install, typecheck, lint, test, build).
+- README with commands and status.
+- Placeholder pages that state what is coming without fake data.
+
+**Not in scope**
+
+- Storage, calculations, onboarding, real seasons, charts, PWA registration.
+
+**Exit gate**
+
+- AC-1.01–AC-1.21 pass.
+- `npm run typecheck`, `npm run lint`, `npm run test`, `npm run build` all pass.
+- Manual desktop/mobile navigation verified.
+- No placeholder numbers presented as user data.
+
+**Git checkpoint:** `feat: establish application foundation`
+
+---
+
+## 5. Milestone 2 — Data model and persistent storage
+
+**Depends on:** M1; decisions D-002, D-003, D-004, D-005, D-018, D-019; O-3, O-7, O-8.
+
+**Objective:** A reliable local database with typed repositories, validation, migrations, and tests. This is the foundation for every later feature.
+
+**Build**
+
+- Dexie database v1 with stores/indexes from DATA_MODEL §4.2.
+- Entity types, branded IDs, Zod schemas.
+- Money parse/format and date utilities.
+- Repositories for seasons, settings, recipients, gifts, ideas.
+- Transactions for multi-record operations.
+- Typed error classes and mapping.
+- Settings singleton and meta diagnostics.
+- Migration harness and v1 initialization.
+- Storage health check.
+- Test builders/fixtures and `fake-indexeddb` integration tests.
+- Explicit reset mechanism (no UI required yet; no automatic reset).
+- Documentation updates.
+
+**Not in scope**
+
+- Full management UIs, dashboard, charts, backup/restore UI, PWA.
+
+**Exit gate**
+
+- AC-2.01–AC-2.22 pass.
+- A record created through a test/console flow survives refresh and browser restart.
+- Invalid data and cross-season references are rejected.
+- A failed transaction leaves no partial writes.
+- Migration fixture preserves data.
+- Storage layer has no React dependency.
+
+**Git checkpoint:** `feat: implement persistent local storage`
+
+**Risk gate:** Do not build recipient/gift UI until storage tests are green and the schema is stable.
+
+---
+
+## 6. Milestone 3 — Recipients
+
+**Depends on:** M2; D-007; O-4.
+
+**Objective:** Complete recipient management backed by real storage and domain calculations.
+
+**Build**
+
+- Minimal first-season creation when no active season exists (name, holiday date, optional budget), so recipients are usable before the full season/archive milestone.
+- Recipients list with responsive cards/table.
+- Create/edit forms with validation.
+- Budget cap, relationship, notes.
+- Spending summary placeholders computed through the domain layer (zero until gifts exist).
+- Empty/loading/error/no-season/archived states.
+- Delete flow: reassign or explicit cascade, with gift counts and confirmation.
+- Recipient detail route stub if useful (full detail in M7).
+- Tests for CRUD, validation, persistence, deletion policy, and zero-state calculations.
+- Documentation updates.
+
+**Not in scope**
+
+- Gift creation (except test fixtures), dashboard charts, idea bank.
+
+**Exit gate**
+
+- AC-3.01–AC-3.18 pass.
+- Recipient changes persist across refresh.
+- No recipient totals are stored; all are derived.
+- A user with no season can create one explicitly; the app never invents one.
+- No fake spending numbers.
+
+**Git checkpoint:** `feat: implement recipient management`
+
+---
+
+## 7. Milestone 4 — Gifts
+
+**Depends on:** M2, M3; D-006, D-020; O-10.
+
+**Objective:** The core gift workflow: create, edit, assign, cost, status, delete.
+
+**Build**
+
+- Gifts list/table with responsive mobile representation.
+- Gift form with all approved fields.
+- Recipient selection constrained to the active season.
+- Money and URL validation.
+- Bought/wrapped/sent controls and combined transitions.
+- Un-buy confirmation and status-date handling.
+- Delete confirmation and idea-link handling (idea UI arrives in M6; repository behavior is ready).
+- Empty/loading/error/archived states.
+- Recipient summaries update through shared domain logic.
+- Tests for CRUD, validation, status transitions, persistence, and failures.
+- Documentation updates.
+
+**Not in scope**
+
+- Dashboard charts, Idea Bank UI, Shopping List, search/filter, backup UI.
+
+**Exit gate**
+
+- AC-4.01–AC-4.19 pass.
+- Full create/edit/delete workflow survives refresh.
+- Invalid status transitions are rejected safely.
+- Bought-without-cost is flagged, not fabricated.
+
+**Git checkpoint:** `feat: implement gift management`
+
+**Risk gate:** Status invariants and money handling must be green before dashboard work.
+
+---
+
+## 8. Milestone 5 — Budget engine and dashboard
+
+**Depends on:** M4; D-021, D-024; O-11.
+
+**Objective:** One authoritative calculation layer and a live dashboard using real data.
+
+**Build**
+
+- Domain calculations: season summary, recipient metrics, progress, data-quality findings, chart series, countdown.
+- Season budget editing surface (minimal; polished later).
+- Dashboard cards: budget, planned, spent, remaining, unallocated.
+- Progress indicators for bought/wrapped/sent.
+- Budget-vs-actual chart with accessible table alternative.
+- Countdown.
+- Alerts and empty states.
+- Live updates via Dexie queries.
+- Comprehensive unit tests, including boundary fixtures.
+- Documentation updates.
+
+**Not in scope**
+
+- Idea Bank, Shopping List, search/filter, seasons/backup UI.
+
+**Exit gate**
+
+- AC-5.01–AC-5.20 pass.
+- Changing a cost/status/budget updates the dashboard without reload.
+- Empty data yields no NaN and a useful empty state.
+- Archived data cannot affect current totals.
+- One calculation implementation, no component-level totals.
+
+**Git checkpoint:** `feat: implement budget engine and dashboard`
+
+---
+
+## 9. Milestone 6 — Idea Bank and Shopping List
+
+**Depends on:** M5; D-008; O-9.
+
+**Objective:** Convert early ideas into gifts and turn unbought gifts into a practical shopping workflow.
+
+**Build**
+
+- Idea Bank CRUD, search, list, converted state.
+- Conversion flow with recipient selection, atomicity, idempotency, and duplicate prevention.
+- Reopen/delete behavior consistent with the data model.
+- Shopping List derived from unbought gifts.
+- Store grouping, subtotals, links, optional mark-bought action.
+- Print styles and print verification.
+- Empty states and reactive updates.
+- Tests for conversion, duplicates, grouping, exclusion, print, reactivity.
+- Documentation updates.
+
+**Not in scope**
+
+- Full cross-entity search/filters (M7), seasons/backup (M8).
+
+**Exit gate**
+
+- AC-6.01–AC-6.20 pass.
+- Double-clicking Convert creates one gift.
+- Marking bought removes the item from shopping and updates budgets.
+- Print output excludes UI chrome.
+- No separately stored shopping list.
+
+**Git checkpoint:** `feat: add idea bank and shopping list`
+
+---
+
+## 10. Milestone 7 — Search, filters, and recipient details
+
+**Depends on:** M6.
+
+**Objective:** Make a large gift list navigable and give each recipient a complete view.
+
+**Build**
+
+- Search across gift name, recipient, category, store.
+- Filters and tri-state statuses; combined semantics.
+- Sorting and deterministic defaults.
+- Clear-all and no-results states.
+- Recipient detail page with metrics and gifts.
+- Accessible filter controls.
+- Tests for matching, combining, sorting, details, and mutation safety.
+- Documentation updates.
+
+**Not in scope**
+
+- Season management, backup UI, visual polish pass.
+
+**Exit gate**
+
+- AC-7.01–AC-7.16 pass.
+- Filters compose; clearing restores defaults.
+- Recipient detail matches dashboard/domain totals.
+- Search/filter never mutates data.
+
+**Git checkpoint:** `feat: add search, filters, and recipient details`
+
+---
+
+## 11. Milestone 8 — Seasons, archives, backup, and export
+
+**Depends on:** M7; D-009, D-010, D-023; O-6.
+
+**Objective:** Make the product reusable every Christmas and protect customer data.
+
+**Build**
+
+- Season management UI: create, switch, edit, copy recipients, archive, restore, delete.
+- Zero-active-season state.
+- Archived read-only behavior across pages.
+- Versioned JSON backup export.
+- Validated replace-all restore with pre-restore backup and atomic transaction.
+- CSV export with options and escaping.
+- Load/remove sample data, labeled and isolated; removal touches only sample records.
+- Reset-all-data flow with typed confirmation.
+- Tests for isolation, archive/restore, backup round-trip, invalid files, CSV edge cases, and sample isolation.
+- Documentation updates.
+
+**Not in scope**
+
+- Online sync, merge restore, encryption.
+
+**Exit gate**
+
+- AC-8.01–AC-8.27 pass.
+- Two seasons never mix.
+- Backup → clear → restore matches exactly.
+- Invalid imports change nothing.
+- CSV opens correctly in Excel/Numbers/Sheets.
+- Sample data is isolated, labeled, idempotent, and removable.
+- No destructive action runs without confirmation.
+
+**Git checkpoint:** `feat: add seasons, archives, and data portability`
+
+**Risk gate:** Backup/restore must be green before visual polish and packaging.
+
+---
+
+## 12. Milestone 9 — Professional UI, themes, accessibility
+
+**Depends on:** M8; D-015, D-017; O-2.
+
+**Objective:** Turn the working app into a premium, comfortable, accessible product.
+
+**Build**
+
+- Visual consistency audit across all pages.
+- Refined warm/evergreen/burgundy/gold design system.
+- Light/dark/system themes with persistence and pre-paint application.
+- Currency settings and formatting.
+- Responsive refinements, touch targets, mobile forms, table handling.
+- Keyboard access, focus styles, labels, error messaging.
+- Empty/error/loading/read-only consistency.
+- Settings page: currency, theme, data tools, diagnostics (PII-free), privacy, about/version.
+- First-run onboarding polish, including optional sample data.
+- Chart accessibility and tooltips.
+- Shopping list print polish.
+- Accessibility and responsive regression tests.
+- Documentation updates.
+
+**Not in scope**
+
+- New business features, offline packaging.
+
+**Exit gate**
+
+- AC-9.01–AC-9.23 pass.
+- Every route verified at 360/768/1024/1440.
+- Themes persist and do not flash.
+- Keyboard-only workflows succeed.
+- No working logic replaced by mockups.
+
+**Git checkpoint:** `feat: polish interface, themes, and accessibility`
+
+---
+
+## 13. Milestone 10 — Offline delivery
+
+**Depends on:** M9; D-011; O-1, O-12.
+
+**Objective:** Prove the product works offline as delivered and document the exact setup.
+
+**Build**
+
+- PWA service worker with precache, SPA fallback, update prompt.
+- Manifest, icons, install guidance.
+- Remove any remote runtime dependency.
+- Persistent storage request and storage-error recovery.
+- Offline/online messaging appropriate to the edition.
+- Standalone `file://` spike and browser test matrix.
+- Actual artifact tests: install, offline launch, CRUD, persistence, exports.
+- Delivery package draft and setup instructions.
+- Update listing claims to tested reality.
+- Documentation updates.
+
+**Not in scope**
+
+- Cloud accounts or sync.
+
+**Exit gate**
+
+- AC-10.01–AC-10.18 pass.
+- Offline launch and all core workflows verified with the network disabled.
+- Data survives reload and browser restart.
+- Tested browsers and limitations documented.
+- A standalone file is either proven or explicitly not shipped.
+
+**Git checkpoint:** `feat: implement validated offline delivery`
+
+**Risk gate:** Do not start Milestone 11 until the offline edition passes its acceptance tests.
+
+---
+
+## 14. Milestone 11 — Online edition and cloud synchronization
+
+**Depends on:** M10; D-012; O-5; owner approval to build it at all.
+
+**Objective:** Add optional accounts and cross-device access without weakening the offline product.
+
+**Build**
+
+- Backend project with Auth, Postgres schema, RLS policies.
+- Registration, login, logout, password recovery, account deletion, data export.
+- Cloud repository/sync adapter and outbox/tombstones migration.
+- Sync status and conflict UI.
+- Offline queue, retry, duplicate protection.
+- Security tests for cross-account isolation and invalid input.
+- Regression of all offline workflows.
+- Deployment, architecture, privacy, and setup documentation.
+
+**Not in scope**
+
+- Payments, subscriptions, collaboration, public sharing.
+
+**Exit gate**
+
+- AC-11.01–AC-11.17 pass.
+- User A cannot access User B's data.
+- Conflicts are surfaced, never silently overwritten.
+- Offline edition remains account-free and functional.
+- No secrets in the client.
+
+**Git checkpoint:** `feat: add online accounts and synchronization`
+
+**Note:** This milestone is optional for the first Etsy release. It must not delay selling the validated offline edition if the offline product is ready.
+
+---
+
+## 15. Milestone 12 — Final QA, packaging, and Etsy launch
+
+**Depends on:** all shipped milestones; owner approval to release.
+
+**Objective:** A tested, documented, legally and practically complete digital product.
+
+**Build**
+
+- Full regression and manual browser matrix.
+- Offline artifact re-verification.
+- Production readiness audit: types, lint, build, routes, console, assets, empty/error states, placeholder scan, claims, privacy.
+- Customer package:
+  - `START-HERE.pdf`
+  - `Offline-Edition/` (validated artifact or install instructions)
+  - `User-Guide.pdf`
+  - `Sample-Data/Sample-Backup.json`
+  - `License-and-Support.pdf`
+- Select and document a PDF generation method; verify text, links, page size, and accessibility of the exported documents.
+- Screenshots from the real product.
+- Listing copy aligned with verified behavior.
+- Release report with features, tests, build, offline results, online results (if any), limitations, package contents, deployment, unresolved issues.
+- Git tag for the release candidate.
+
+**Exit gate**
+
+- AC-12.01–AC-12.18 pass.
+- No unresolved critical data-loss, security, calculation, or core-workflow defect.
+- Instructions match the tested artifact.
+- Claims are defensible.
+
+**Git checkpoint:** `release: prepare Christmas Gift Tracker`
+
+---
+
+## 16. Cross-cutting workstreams
+
+| Workstream | Applies from | Practice |
+| --- | --- | --- |
+| Documentation | M0 | Update spec/plan/decisions after each milestone |
+| Testing | M1 | Add tests with every feature; run all gates before reporting |
+| Data safety | M2 | Transactions, validation, no silent destructive actions |
+| Accessibility | M1 | jsx-a11y, keyboard checks, focus, labels; full audit in M9 |
+| Privacy | M1 | No telemetry/CDN; sensitive-data warnings; no secrets |
+| Performance | M5 | Scoped queries, lazy charts, measure before optimizing |
+| Git checkpoints | M0 | Commit only verified states; tag milestones; no destructive resets |
+| Claims accuracy | M9–M12 | Screenshots and copy only after verification |
+
+---
+
+## 17. Verification commands
+
+Available from Milestone 1 (names may be adjusted then, but the gates remain):
+
+```
+npm ci
+npm run typecheck
+npm run lint
+npm run test
+npm run test:coverage
+npm run build
+npm run preview
+npm run test:e2e        # from Milestone 4
+```
+
+Manual checks supplement automation:
+
+- Refresh and browser-restart persistence.
+- Network-disabled launch from the production artifact.
+- Mobile viewport and touch use.
+- Keyboard-only workflow.
+- Light/dark theme and print preview.
+- Real browser matrix from `ACCEPTANCE_CRITERIA.md`.
+
+Every milestone report states which commands ran, their outcomes, and which manual checks were performed.
+
+---
+
+## 18. Git checkpoint policy
+
+| Checkpoint | Suggested message |
+| --- | --- |
+| M0 | `docs: define product specification and architecture` |
+| M1 | `feat: establish application foundation` |
+| M2 | `feat: implement persistent local storage` |
+| M3 | `feat: implement recipient management` |
+| M4 | `feat: implement gift management` |
+| M5 | `feat: implement budget engine and dashboard` |
+| M6 | `feat: add idea bank and shopping list` |
+| M7 | `feat: add search, filters, and recipient details` |
+| M8 | `feat: add seasons, archives, and data portability` |
+| M9 | `feat: polish interface, themes, and accessibility` |
+| M10 | `feat: implement validated offline delivery` |
+| M11 | `feat: add online accounts and synchronization` |
+| M12 | `release: prepare Christmas Gift Tracker` |
+
+Rules:
+
+- Commit only after the milestone gate passes.
+- Review diffs before committing, especially data, security, config, and deletion logic.
+- Never commit `node_modules`, build output, coverage, test artifacts, real customer backups, or secrets.
+- Never use a destructive reset or force-push without explicit owner approval.
+- Tag verified milestones for easy recovery.
+
+---
+
+## 19. Scope-change protocol
+
+A proposed change is classified before work:
+
+1. **Bug fix within the milestone** — proceed, test, report.
+2. **Small low-risk improvement** — implement only if it does not expand the milestone; document it.
+3. **New feature or architectural change** — stop, explain impact, add a decision entry, and wait for approval.
+4. **Data-model or security change** — always requires approval and a migration/compatibility plan.
+
+The roadmap is a sequence of gates, not a checklist to rush. Shipping a smaller, correct product is preferable to shipping a large, unverifiable one.
+
+---
+
+## 20. Definition of milestone complete
+
+A milestone is complete only when:
+
+1. Every acceptance criterion for that milestone is verified.
+2. Typecheck, lint, tests, and production build pass.
+3. E2E tests pass once available.
+4. Manual checks are performed and recorded.
+5. No known critical data, security, or core-workflow defect remains.
+6. Documentation and the implementation plan are updated.
+7. The completion report is honest about failures and limitations.
+8. The next milestone has not been started without authorization.
+
+---
+
+## 21. Immediate next step
+
+1. Owner reviews this specification, especially:
+   - The offline delivery recommendation (D-011 / O-1).
+   - The budget model and status rules.
+   - The data model and deletion behavior.
+   - The launch scope and exclusions.
+2. Owner approves or overrides open decisions.
+3. Commit/tag the specification.
+4. Authorize Milestone 1 with the prompt and `AI_DEVELOPMENT_PROTOCOL.md`.
+
+Until then: **stop.**
