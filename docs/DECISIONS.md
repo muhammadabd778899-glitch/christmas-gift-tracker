@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Decision Log
 
-> Status: Approved through Milestone 2; later decisions remain proposed · Version 0.3 · 2026-10-26
+> Status: Approved through Milestone 3; later decisions remain proposed · Version 0.3 · 2026-10-26
 > Format: lightweight ADRs. Statuses: **Proposed**, **Accepted**, **Superseded**, **Rejected**.
 > Decisions marked Proposed become binding when the owner approves the milestone that depends on them.
 
@@ -44,11 +44,11 @@
 
 ### D-003 — Dexie as the IndexedDB access layer
 
-**Status:** Accepted 2026-10-26 for Milestone 2 · **Milestone:** 2
+**Status:** Accepted 2026-10-26 for Milestone 2 · **Milestone:** 2 · The reactive-hook portion is superseded by D-025; Dexie remains the access layer.
 
 **Context:** The storage layer needs migrations, transactions, indexes, and reactive updates. A hand-written wrapper would require custom code for each.
 
-**Decision:** Use Dexie 4 with `dexie-react-hooks`. Validate all writes with Zod in the domain layer before they reach Dexie.
+**Decision:** Use Dexie 4. Validate all writes with Zod in the domain layer before they reach Dexie. The React live-query hook choice is recorded in D-025.
 
 **Consequences:** Less custom storage code and reliable live queries. Dexie’s upgrade model must be tested with fixtures. Raw IndexedDB is accessed only inside the storage layer.
 
@@ -314,6 +314,18 @@
 
 ---
 
+### D-025 — Reactive reads use Dexie `liveQuery` through a typed hook
+
+**Status:** Accepted 2026-10-26 for Milestone 3 · **Milestone:** 3 onward
+
+**Context:** D-003 named `dexie-react-hooks`, but the first data screens need explicit loading and error states, typed repository access, and compatibility with the existing React 19 test stack. A separate hooks package would add a dependency without resolving those presentation concerns.
+
+**Decision:** Use Dexie's own `liveQuery` through the small typed `useLiveQueryState` hook in `src/app/providers/`. Pages read typed repositories through `StorageProvider`; they never import the Dexie instance. `dexie-react-hooks` is not installed.
+
+**Consequences:** One fewer dependency, explicit loading/error recovery states, and a single place to manage subscription cleanup. The project owns the subscription lifecycle and error mapping. Future reactive screens should use the same hook unless a documented limitation requires a change. This supersedes only the reactive-hook portion of D-003; Dexie and Zod remain required.
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Confidence | Impact if wrong |
@@ -356,7 +368,7 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 2:** Resolved 2026-10-26. The owner authorized Milestone 2 and asked for decisions optimized for a non-technical customer. D-002 through D-009, D-016, D-018, D-019, O-3, O-4, O-7, and O-8 are accepted or decided.
 
-**Approval needed before Milestone 3:** None. D-007 and O-4 were accepted with Milestone 2 because the recipient deletion service is already implemented.
+**Approval needed before Milestone 3:** Resolved 2026-10-26. The owner authorized Milestone 3; D-007 and O-4 were already accepted with Milestone 2.
 
 **Approval needed before Milestone 4:** D-020, O-10.
 
@@ -399,3 +411,4 @@ Each row states the recommendation. Approving this specification approves the re
 | 2026-10-26 | D-001, D-013, D-014, and D-022 accepted when the owner authorized Milestone 1 | AI |
 | 2026-10-26 | Milestone 1 implementation notes recorded in `MILESTONE_1_REPORT.md`; no new architecture decision required | AI |
 | 2026-10-26 | D-002 through D-009, D-016, D-018, D-019, O-3, O-4, O-7, and O-8 accepted/decided for Milestone 2; storage implementation recorded in `MILESTONE_2_REPORT.md` | AI |
+| 2026-10-26 | D-025 accepted for Milestone 3; the reactive-hook portion of D-003 is superseded; recipient implementation recorded in `MILESTONE_3_REPORT.md` | AI |

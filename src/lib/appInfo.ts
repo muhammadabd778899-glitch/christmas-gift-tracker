@@ -1,3 +1,3 @@
-export const APP_VERSION = '0.2.0';
-export const APP_MILESTONE = 2;
-export const APP_MILESTONE_LABEL = 'Persistent local storage';
+export const APP_VERSION = '0.3.0';
+export const APP_MILESTONE = 3;
+export const APP_MILESTONE_LABEL = 'Recipients and first-season setup';

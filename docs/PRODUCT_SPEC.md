@@ -544,7 +544,7 @@ A ZIP containing the built app and simple instructions, or a single HTML file. A
 
 ### Data persistence expectations
 
-- The app requests persistent storage (`navigator.storage.persist()`) where supported and explains the result.
+- The app requests persistent storage (`navigator.storage.persist()`) where supported and explains the result. This is not implemented in Milestone 3; the request timing and wording remain open.
 - Backups are the ultimate recovery path; the UI recommends them, especially before clearing browser data or changing devices.
 - The app does not promise that clearing browser data, using private browsing, or storage eviction by the browser preserves records.
 - iOS storage eviction and install behavior are documented limitations.

@@ -1,13 +1,21 @@
 import { RouterProvider } from 'react-router-dom';
+import type { Repositories } from '../storage/repositories';
 import { AppErrorBoundary } from './boundaries/AppErrorBoundary';
+import { StorageProvider } from './providers/StorageProvider';
 import { createAppRouter } from './router';
 
 const router = createAppRouter();
 
-export function App() {
+interface AppProps {
+  repositories: Repositories;
+}
+
+export function App({ repositories }: AppProps) {
   return (
     <AppErrorBoundary>
-      <RouterProvider router={router} />
+      <StorageProvider repositories={repositories}>
+        <RouterProvider router={router} />
+      </StorageProvider>
     </AppErrorBoundary>
   );
 }

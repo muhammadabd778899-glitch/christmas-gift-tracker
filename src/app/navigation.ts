@@ -54,6 +54,7 @@ const pageTitles: Record<string, string> = {
   '/shopping': 'Shopping List',
   '/seasons': 'Archives',
   '/settings': 'Settings',
+  '/onboarding': 'Set up your season',
 };
 
 export function getPageTitle(pathname: string): string {

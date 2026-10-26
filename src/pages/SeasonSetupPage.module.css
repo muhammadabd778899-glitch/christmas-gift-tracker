@@ -1,0 +1,238 @@
+.page {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.formCard {
+  overflow: hidden;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.formError {
+  padding: 12px 14px;
+  border: 1px solid var(--color-burgundy-200);
+  border-radius: var(--radius-sm);
+  background: var(--color-burgundy-50);
+  color: var(--color-burgundy-800);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+  align-items: center;
+  padding-top: var(--space-2);
+}
+
+.safeNote {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.safeNote svg {
+  flex: none;
+  color: var(--color-evergreen-600);
+}
+
+.aside {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  border: 1px solid rgb(248 243 232 / 12%);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 100% 0%, rgb(189 145 70 / 18%), transparent 18rem),
+    var(--color-evergreen-900);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-md);
+}
+
+.asideTop {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.asideIcon {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  margin-bottom: var(--space-2);
+  place-items: center;
+  border: 1px solid rgb(248 243 232 / 18%);
+  border-radius: 50%;
+  background: rgb(248 243 232 / 8%);
+  color: var(--color-gold-200);
+}
+
+.asideIcon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.asideEyebrow {
+  color: var(--color-gold-200);
+  font-size: 0.67rem;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.aside h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.45rem, 2.4vw, 1.9rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+
+.asideTop > p:last-child {
+  color: rgb(248 243 232 / 72%);
+  font-size: 0.9rem;
+}
+
+.steps {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.steps li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.stepIcon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(248 243 232 / 9%);
+  color: var(--color-gold-200);
+}
+
+.steps strong {
+  display: block;
+  color: var(--color-text-inverse);
+  font-size: 0.86rem;
+}
+
+.steps span:not(.stepIcon) {
+  display: block;
+  margin-top: 2px;
+  color: rgb(248 243 232 / 64%);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.asideFoot {
+  padding-top: var(--space-4);
+  border-top: 1px solid rgb(248 243 232 / 12%);
+  color: rgb(248 243 232 / 58%);
+  font-size: 0.76rem;
+}
+
+.readyCard {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+  max-width: 760px;
+}
+
+.readyIcon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-gold-100);
+  color: var(--color-gold-700);
+}
+
+.readyIcon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.readyCopy {
+  display: grid;
+  gap: 4px;
+}
+
+.readyEyebrow {
+  color: var(--color-text-muted);
+  font-size: 0.67rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.readyCopy h2 {
+  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+}
+
+.readyCopy p:last-child {
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+}
+
+.smallPrint {
+  max-width: 760px;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.loading {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 110px;
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+}
+
+.loadingDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-gold-500);
+  box-shadow: 0 0 0 5px rgb(189 145 70 / 12%);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .readyCard {
+    align-items: flex-start;
+  }
+
+  .formActions > :first-child {
+    width: 100%;
+  }
+
+  .safeNote {
+    font-size: 0.74rem;
+  }
+}

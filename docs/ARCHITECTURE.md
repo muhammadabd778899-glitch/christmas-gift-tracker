@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Architecture
 
-> Status: Version 0.2 · 2026-10-26 · Milestone 2 storage implementation recorded
-> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell and version-1 storage now exist; later sections remain target architecture.
+> Status: Version 0.3 · 2026-10-26 · Milestone 3 recipients and first-season setup recorded
+> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, and recipient workflow now exist; later sections remain target architecture.
 
 ---
 
@@ -49,10 +49,10 @@ External services at launch: none required. Optional static hosting for initial 
 | UI | React 19 + TypeScript | Mature ecosystem, strong typing, broad component knowledge |
 | Build | Vite | Fast dev server, static production build, first-class PWA plugin |
 | Persistence | IndexedDB via Dexie 4 | Versioned migrations, transactions, compound indexes, live queries |
-| Reactive data | `dexie-react-hooks` (`useLiveQuery`) | Dashboard and lists update automatically without a bespoke event bus |
+| Reactive data | Dexie `liveQuery` through a typed `useLiveQueryState` | Dashboard and lists update automatically with explicit loading and error states; no separate hooks package or bespoke event bus (D-025) |
 | Routing | React Router | Standard client routing, lazy routes, error boundaries |
 | Validation | Zod | One schema source for forms, storage writes, and backup import |
-| Forms | React Hook Form + `@hookform/resolvers` | Accessible form state, low re-render cost, Zod integration |
+| Forms | Shared React state + Zod schemas | Small forms stay explicit, avoid another dependency, and reuse the same validation as storage. Revisit React Hook Form only if form complexity grows |
 | Charts | Recharts | Declarative, responsive, accessible table fallback possible |
 | Icons | Lucide React | Tree-shakeable SVGs bundled locally, no icon CDN |
 | Styling | CSS Modules + CSS custom properties | Design tokens, no runtime CSS-in-JS, no utility-framework lock-in |
@@ -149,7 +149,7 @@ christmas-gift-tracker/
 │   │   ├── dates.ts
 │   │   ├── locale.ts
 │   │   ├── errors.ts
-│   │   ├── calculations/         # Milestone 5
+│   │   ├── calculations/         # Pure derived summaries (recipient metrics now; season totals in M5)
 │   │   └── rules/                # as feature rules arrive
 │   ├── storage/
 │   │   ├── db.ts
@@ -230,7 +230,7 @@ Implemented in `src/main.tsx` and `src/storage/initialize.ts`:
 7. Render the application only after initialization succeeds. On failure, render `StorageRecoveryPage` with recovery guidance outside the router.
 8. Never create a season, seed sample data, or delete records during startup.
 
-Routing to `/onboarding` with zero active seasons arrives in Milestone 3. The current recovery screen is deliberately outside the router so a router render cannot mask a storage failure.
+Routing to `/onboarding` is available in Milestone 3, but it is a normal route reached from explicit links. Startup does not redirect, choose a season, or create one. The recovery screen remains deliberately outside the router so a router render cannot mask a storage failure.
 
 ### 7.2 Repositories
 
@@ -247,11 +247,13 @@ Bulk operations (restore, season delete, recipient cascade, conversion) are sing
 
 ### 7.3 Live data
 
-- `useLiveQuery` subscribes to queries scoped by `seasonId`.
-- Dashboard and lists re-render after writes without manual invalidation.
-- A settings provider exposes the active season and formatting preferences.
+- **Implemented in Milestone 3:** a typed `useLiveQueryState` wraps Dexie's `liveQuery`, returning explicit `loading`, `data`, and `error` states. Pages consume repositories through `StorageProvider`; they never import the Dexie instance directly.
+- Queries are scoped by the active season and re-run after writes.
+- Recipient cards re-render after create, edit, reassign, and cascade deletion without a manual reload.
+- A settings/active-season hook exposes the selected season and formatting preferences.
 - No duplicate in-memory copy of records; query results are the source for rendering.
-- Cross-tab updates arrive naturally through Dexie's change events.
+- Cross-tab updates are expected through Dexie's change events. This has not been added to the browser test matrix yet, and the current milestone makes no cross-tab guarantee.
+- External raw IndexedDB writes are not a supported integration path. Only repository writes are verified to refresh the UI.
 
 ### 7.4 Settings and theme
 
@@ -262,10 +264,12 @@ Bulk operations (restore, season delete, recipient cascade, conversion) are sing
 
 ### 7.5 Storage persistence and health
 
-- Request `navigator.storage.persist()` during onboarding or after the first save, explaining the result; never block the workflow.
-- Settings → Diagnostics runs `healthCheck()` and can copy a PII-free report.
+- **Deferred:** request `navigator.storage.persist()` during onboarding or after the first save, explain the result, and never block the workflow. Milestone 3 does **not** call it. Persistence timing and the buyer-facing explanation remain open.
+- Settings → Diagnostics is planned: `healthCheck()` exists in the storage layer and can produce a PII-free report, but the Settings diagnostics UI does not exist yet.
 - Quota errors are caught and surfaced with backup guidance.
 - The app never clears storage on its own.
+
+Milestone 3 implements seasons and recipients on top of the health engine. It does not add a persistence request, diagnostics UI, backup, or eviction protection. Browser cleanup can still remove local records, and the interface does not claim otherwise.
 
 Milestone 2 implements the health engine (`src/storage/health.ts`) but not the Settings diagnostics UI. It returns typed counts, storage estimate/persistence fields, and stable issue codes without names, addresses, or notes. It performs reads only.
 
@@ -287,8 +291,8 @@ Milestone 2 implements the health engine (`src/storage/health.ts`) but not the S
 - Route-level pages are thin: resolve the active season, fetch data, render feature components.
 - Feature modules own forms, dialogs, and feature-specific tables.
 - UI primitives are domain-agnostic, keyboard-accessible, and theme-token driven.
-- A single dialog primitive handles focus trap, Escape, labelled titles, and destructive emphasis.
-- A single toast/announcer pattern handles errors and confirmations; routine saves are silent.
+- A single dialog primitive handles focus trap, Escape, labelled titles, destructive emphasis, and focus restoration.
+- Inline notices and shared error states handle routine confirmations and failures. A dedicated toast/announcer remains deferred.
 
 ### 8.2 Routing
 
@@ -301,11 +305,11 @@ Milestone 2 implements the health engine (`src/storage/health.ts`) but not the S
 
 ### 8.3 Forms
 
-- React Hook Form + Zod resolver; labels are always visible, not placeholder-only.
-- Money inputs use `inputMode="decimal"`, keep raw text in form state, and parse at submit/blur via `money.ts`.
+- Milestone 3 forms use typed local React state, visible labels, inline errors, and the shared Zod rules. Submissions call repositories; the repository validates again before writing.
+- Money inputs use `inputMode="decimal"`, keep raw text in form state, and parse at submit via `money.ts`.
 - Status toggles enforce transitions in the UI and re-check in the repository.
 - Destructive dialogs require an explicit action and, where specified, typed confirmation.
-- Unsaved changes prompt before closing a dialog or navigating away when meaningful.
+- Unsaved-changes prompting is not implemented yet; dialogs close on explicit cancel and do not save partial values.
 
 ### 8.4 Tables and mobile
 
@@ -559,6 +563,11 @@ Required platform features: IndexedDB, service workers, `crypto.randomUUID`, ES2
 | Zero active seasons | D-018 |
 | `sourceIdeaId` omission | D-019 |
 | Gift requires recipient | D-020 |
+| Countdown calendar days | D-021 |
+| No offline telemetry | D-022 |
+| CSV privacy defaults | D-023 |
+| Wrapped progress denominator | D-024 |
+| Typed liveQuery hook | D-025 |
 
 The full rationale and open questions are in `docs/DECISIONS.md`.
 
@@ -593,3 +602,28 @@ Milestone 2 implements the storage foundation only:
 - Documentation and status copy updates.
 
 Milestone 2 does **not** implement season onboarding, management screens, dashboard data, backup/restore UI, CSV export, sample-data UI, themes, PWA, or an installable offline package. Pages remain honest about those gaps. No sample season is loaded and startup never chooses a season on the customer's behalf.
+
+---
+
+## 21. Milestone 3 implementation boundaries
+
+Milestone 3 implements the first usable planning workflow:
+
+- A minimal `/onboarding` page for season name, holiday date, and optional overall budget.
+- A dashboard that distinguishes loading, error, no-season, active-season, and archived-season states.
+- Recipient cards, create/edit dialogs, optional cap/relationship/notes, duplicate names, and validation.
+- Derived planned, spent, remaining-cap, and utilization metrics from gift records through pure domain functions.
+- Delete-with-policy dialogs for no gifts, reassignment, and explicit cascade deletion with typed confirmation.
+- Archived-season recipient views that are read-only and explanatory.
+- Repository access through `StorageProvider`, plus a typed `useLiveQueryState` and active-season hook.
+- Component/integration coverage with StrictMode, a stable async-test timeout, and `fake-indexeddb`.
+
+Milestone 3 does **not** implement gift entry, season switching/editing/restoring, archive management, dashboard charts, search, backup/restore, CSV, sample data, themes, persistent-storage requests, service workers, or an offline package. Gifts, ideas, shopping, and archive screens remain honest placeholders.
+
+### 21.1 Known M3 limitations
+
+- Season and recipient data can be removed by browser site-data clearing or storage eviction. No persistence request or backup exists yet.
+- Chromium 152 (OpenCode browser) on Windows has been exercised manually; Microsoft Edge 156 opened the production build headlessly. Firefox, Safari, mobile browsers, and cross-tab updates remain unverified.
+- Archived behavior is implemented defensively, but the normal archive-selection workflow arrives in Milestone 8.
+- The gift metrics are covered by tests and verified with seeded records; customers cannot create gifts until Milestone 4.
+- A production chunk-size warning remains. It is not a functional failure and is revisited with route splitting in a later milestone.

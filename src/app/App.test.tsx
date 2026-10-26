@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
@@ -21,8 +21,9 @@ const destinations = [
 ];
 
 describe('application shell', () => {
-  it('renders the dashboard with all primary destinations', () => {
-    renderApp();
+  it('renders the dashboard with all primary destinations', async () => {
+    await renderApp();
+    expect(await screen.findByText('No active season')).toBeInTheDocument();
 
     expect(screen.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument();
 
@@ -36,7 +37,8 @@ describe('application shell', () => {
 
   it('navigates to every primary destination', async () => {
     const user = userEvent.setup();
-    renderApp();
+    await renderApp();
+    expect(await screen.findByText('No active season')).toBeInTheDocument();
     const primaryNavigation = screen.getByRole('navigation', { name: 'Primary navigation' });
 
     for (const destination of destinations) {
@@ -46,31 +48,39 @@ describe('application shell', () => {
         await screen.findByRole('heading', { level: 1, name: destination.heading }),
       ).toBeInTheDocument();
     }
+
+    await waitFor(() => {
+      expect(document.getElementById('main-content')).toHaveFocus();
+    });
   });
 
-  it('shows the honest season placeholder in the header', () => {
-    renderApp();
+  it('shows an honest no-season state in the header', async () => {
+    await renderApp();
 
-    expect(screen.getByText('No active season')).toBeInTheDocument();
-    expect(screen.getByText('Setup in M3')).toBeInTheDocument();
+    expect(await screen.findByText('No active season')).toBeInTheDocument();
+    expect(screen.getByText('Set up season')).toBeInTheDocument();
   });
 
   it('opens and closes the about dialog', async () => {
     const user = userEvent.setup();
-    renderApp();
+    await renderApp();
+    expect(await screen.findByText('No active season')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'About this build' }));
 
     const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
-    expect(within(dialog).getByText('Milestone 2 of 12: persistent local storage.')).toBeVisible();
-    expect(within(dialog).getByText(/No customer plans yet/i)).toBeInTheDocument();
+    expect(
+      within(dialog).getByText('Milestone 3 of 12: recipients and first-season setup.'),
+    ).toBeVisible();
+    expect(within(dialog).getByText(/Local and account-free/i)).toBeInTheDocument();
 
     await user.click(within(dialog).getByRole('button', { name: 'Close dialog' }));
     expect(screen.queryByRole('dialog', { name: 'About this preview' })).not.toBeInTheDocument();
   });
 
-  it('renders a friendly not-found page for unknown routes', () => {
-    renderApp(['/this-route-does-not-exist']);
+  it('renders a friendly not-found page for unknown routes', async () => {
+    await renderApp(['/this-route-does-not-exist']);
+    expect(await screen.findByText('No active season')).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'This page slipped out of the stocking.' }),

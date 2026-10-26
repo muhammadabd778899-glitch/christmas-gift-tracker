@@ -23,16 +23,23 @@ root.render(
 
 async function startApplication() {
   try {
-    const { initializeStorage } = await import('./storage/initialize');
+    const [{ initializeStorage }, { createRepositories }] = await Promise.all([
+      import('./storage/initialize'),
+      import('./storage/repositories'),
+    ]);
 
-    await initializeStorage({
+    const storage = await initializeStorage({
       appVersion: APP_VERSION,
       locale: typeof navigator === 'undefined' ? undefined : navigator.language,
+    });
+    const repositories = createRepositories(storage.db, {
+      locale: storage.settings.locale,
+      appVersion: APP_VERSION,
     });
 
     root.render(
       <StrictMode>
-        <App />
+        <App repositories={repositories} />
       </StrictMode>,
     );
   } catch (error) {

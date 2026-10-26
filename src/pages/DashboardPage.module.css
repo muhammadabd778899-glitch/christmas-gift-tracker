@@ -304,6 +304,84 @@
   box-shadow: none;
 }
 
+.seasonReady {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.seasonIcon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-gold-100);
+  color: var(--color-gold-700);
+}
+
+.seasonIcon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.seasonCopy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.seasonEyebrow {
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.seasonCopy h2 {
+  color: var(--color-evergreen-950);
+  font-size: 1.3rem;
+}
+
+.seasonCopy p:last-child {
+  color: var(--color-text-soft);
+  font-size: 0.8rem;
+}
+
+.seasonReady > a {
+  margin-left: auto;
+}
+
+@media (max-width: 560px) {
+  .seasonReady {
+    flex-wrap: wrap;
+  }
+
+  .seasonReady > a {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+.seasonLoading {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 84px;
+  color: var(--color-text-soft);
+  font-size: 0.85rem;
+}
+
+.seasonLoadingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold-500);
+  box-shadow: 0 0 0 5px rgb(189 145 70 / 12%);
+}
+
 @media (max-width: 1024px) {
   .hero {
     grid-template-columns: minmax(0, 1fr) minmax(220px, 0.55fr);

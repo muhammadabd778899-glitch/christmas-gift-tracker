@@ -11,11 +11,14 @@ import {
   Wallet,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useActiveSeason } from '../app/providers/useActiveSeason';
 import { Badge } from '../components/ui/Badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { EmptyState } from '../components/ui/EmptyState';
 import { PageHeader } from '../components/ui/PageHeader';
 import { buttonStyles } from '../components/ui/buttonStyles';
+import { formatDateOnly } from '../domain/dates';
+import { formatMoney } from '../domain/money';
 import { APP_MILESTONE } from '../lib/appInfo';
 import styles from './DashboardPage.module.css';
 
@@ -36,10 +39,10 @@ const capabilities = [
   },
   {
     icon: Users,
-    milestone: 'M3',
+    milestone: 'Available now',
     title: 'Recipient view',
     description:
-      'Give every person an optional budget cap and a clear list of what they are receiving.',
+      'Give every person an optional budget cap; planned, spent, and remaining values fill in from gifts.',
   },
   {
     icon: Lightbulb,
@@ -51,19 +54,14 @@ const capabilities = [
 ];
 
 const foundation = [
-  'Responsive shell with seven working destinations',
+  'Explicit first-season setup that never invents a season',
+  'Recipient profiles with caps, notes, and safe deletion',
+  'Planned and spent totals derived from gift records (gifts arrive in M4)',
   'Warm design tokens and reusable, accessible components',
-  'Keyboard access, focus handling, and mobile navigation',
   'Validated local storage with typed repositories and transactions',
-  'Startup diagnostics, recovery guidance, and automated tests',
 ];
 
 const nextSteps = [
-  {
-    number: '03',
-    title: 'Recipients',
-    description: 'People, budget caps, and the first season setup.',
-  },
   {
     number: '04',
     title: 'Gifts',
@@ -79,16 +77,25 @@ const nextSteps = [
     title: 'Idea Bank and Shopping List',
     description: 'Turn saved ideas into gifts and group errands by store.',
   },
+  {
+    number: '07',
+    title: 'Search and details',
+    description: 'Find people and records as the planner grows.',
+  },
 ];
 
 export function DashboardPage() {
+  const active = useActiveSeason();
+  const season = active.data?.season ?? null;
+  const settings = active.data?.settings ?? null;
+
   return (
     <div className={styles.page}>
       <PageHeader
         eyebrow="Overview"
         title="Dashboard"
         description="Your Christmas plan, at a glance."
-        badge={<Badge tone="gold">Milestone 2 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 3 preview</Badge>}
         actions={
           <Link className={buttonStyles({ variant: 'secondary', size: 'sm' })} to="/settings">
             View build roadmap
@@ -100,16 +107,17 @@ export function DashboardPage() {
         <div className={styles.heroCopy}>
           <p className={styles.heroEyebrow}>
             <Sparkles size={15} aria-hidden="true" />
-            The local foundation is ready
+            Recipient planning is ready
           </p>
           <h2 id="hero-title">Make room for a calmer Christmas.</h2>
           <p className={styles.heroText}>
-            One place for recipients, budgets, gift ideas, and the quiet satisfaction of knowing
-            exactly what is left to do.
+            Start with the people on your list, give each person an optional budget cap, and see
+            what is planned, spent, and left as gifts are added. Gift entry and the full budget view
+            build on this next.
           </p>
           <div className={styles.heroActions}>
             <Link className={buttonStyles({ variant: 'inverse' })} to="/recipients">
-              Explore the planner
+              Open recipients
               <ArrowRight size={17} aria-hidden="true" />
             </Link>
             <Link className={buttonStyles({ variant: 'ghost-inverse' })} to="/settings">
@@ -125,12 +133,12 @@ export function DashboardPage() {
             </div>
           </div>
           <span className={styles.floatingTagTop}>
-            <Wallet size={14} />
-            Budget in view
+            <Users size={14} />
+            Recipients ready
           </span>
           <span className={styles.floatingTagBottom}>
-            <PackageCheck size={14} />
-            Progress tracked
+            <Gift size={14} />
+            Gifts next
           </span>
         </div>
       </section>
@@ -138,12 +146,12 @@ export function DashboardPage() {
       <section className={styles.capabilities} aria-labelledby="capabilities-title">
         <div className={styles.sectionIntro}>
           <div>
-            <p className={styles.eyebrow}>What is coming</p>
+            <p className={styles.eyebrow}>The road ahead</p>
             <h2 id="capabilities-title">Built around the way December actually feels.</h2>
           </div>
           <p>
-            The shell holds a private local database now. The planning screens will fill it without
-            turning the season into a spreadsheet.
+            Recipients are available now. Gift tracking, budgets, ideas, and shopping lists arrive
+            in the next milestones — each built on the same tested local foundation.
           </p>
         </div>
 
@@ -177,9 +185,10 @@ export function DashboardPage() {
               <Check size={12} aria-hidden="true" />
               Milestone {APP_MILESTONE}
             </Badge>
-            <CardTitle as="h2">The local foundation is in place</CardTitle>
+            <CardTitle as="h2">Your first season can start here</CardTitle>
             <CardDescription>
-              Verified shell and storage work that the planning screens can stand on.
+              A season and recipient list are live, backed by validated local records and safe
+              deletion.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -202,7 +211,7 @@ export function DashboardPage() {
               <Clock3 size={12} aria-hidden="true" />
               Up next
             </Badge>
-            <CardTitle as="h2">From shell to planner</CardTitle>
+            <CardTitle as="h2">From recipients to gifts</CardTitle>
             <CardDescription>The build advances one verified capability at a time.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -224,16 +233,61 @@ export function DashboardPage() {
       </div>
 
       <Card className={styles.seasonCard}>
-        <EmptyState
-          icon={<CalendarDays />}
-          title="No active season yet"
-          description="Season setup arrives with Milestone 3. Storage is ready, but this build does not create a plan or sample data on your behalf."
-          action={
-            <Link className={buttonStyles({ variant: 'secondary', size: 'sm' })} to="/settings">
-              See what is next
+        {active.loading ? (
+          <CardContent className={styles.seasonLoading} role="status" aria-live="polite">
+            <span className={styles.seasonLoadingDot} aria-hidden="true" />
+            Loading your season…
+          </CardContent>
+        ) : active.error ? (
+          <EmptyState
+            icon={<CalendarDays />}
+            title="Your season could not be loaded"
+            description="Your records have not been changed. Reload the app and try again; do not clear site data while troubleshooting."
+            action={
+              <Link className={buttonStyles({ variant: 'secondary', size: 'sm' })} to="/settings">
+                See data guidance
+              </Link>
+            }
+          />
+        ) : season ? (
+          <CardContent className={styles.seasonReady}>
+            <span className={styles.seasonIcon} aria-hidden="true">
+              <CalendarDays />
+            </span>
+            <div className={styles.seasonCopy}>
+              <p className={styles.seasonEyebrow}>
+                {season.status === 'archived' ? 'Archived season' : 'Active season'}
+              </p>
+              <h2>{season.name}</h2>
+              <p>
+                {formatDateOnly(season.holidayDate, settings?.locale ?? 'en-US')}
+                <span aria-hidden="true"> · </span>
+                {season.budgetMinor === null
+                  ? 'No overall budget set'
+                  : `${formatMoney(season.budgetMinor, {
+                      fractionDigits: settings?.fractionDigits ?? 2,
+                      currencySymbol: settings?.currencySymbol ?? '$',
+                      locale: settings?.locale ?? 'en-US',
+                    })} overall budget`}
+              </p>
+            </div>
+            <Link className={buttonStyles({ variant: 'secondary', size: 'sm' })} to="/recipients">
+              {season.status === 'archived' ? 'View recipients' : 'Manage recipients'}
+              <ArrowRight size={16} aria-hidden="true" />
             </Link>
-          }
-        />
+          </CardContent>
+        ) : (
+          <EmptyState
+            icon={<CalendarDays />}
+            title="No active season yet"
+            description="Create a season to give your recipients, gifts, and budget a home. This build never creates a season or sample person for you."
+            action={
+              <Link className={buttonStyles({ variant: 'secondary', size: 'sm' })} to="/onboarding">
+                Create your first season
+              </Link>
+            }
+          />
+        )}
       </Card>
     </div>
   );

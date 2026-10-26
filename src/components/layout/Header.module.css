@@ -79,6 +79,19 @@
   color: var(--color-gold-600);
 }
 
+.seasonChipLink {
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.seasonChipLink:hover {
+  border-color: var(--color-evergreen-600);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
+}
+
 .seasonText {
   color: var(--color-text);
 }

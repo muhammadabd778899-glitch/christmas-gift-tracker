@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { AboutDialog } from './AboutDialog';
 import { Header } from '../components/layout/Header';
@@ -13,10 +13,25 @@ export function AppShell() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const location = useLocation();
   const pageTitle = getPageTitle(location.pathname);
+  const previousPathRef = useRef(location.pathname);
 
   useEffect(() => {
     document.title = `${pageTitle} · Christmas Gift Tracker`;
   }, [pageTitle]);
+
+  useEffect(() => {
+    if (previousPathRef.current === location.pathname) {
+      return;
+    }
+
+    previousPathRef.current = location.pathname;
+
+    if (window.scrollY > 0) {
+      window.scrollTo(0, 0);
+    }
+
+    document.getElementById('main-content')?.focus({ preventScroll: true });
+  }, [location.pathname]);
 
   return (
     <div className={styles.shell}>

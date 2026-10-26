@@ -44,8 +44,8 @@ const milestones: Milestone[] = [
   {
     number: '3',
     title: 'Recipients',
-    focus: 'People, budget caps, and first-season setup',
-    status: 'Planned',
+    focus: 'People, budget caps, first-season setup, and safe deletion',
+    status: 'Complete',
   },
   {
     number: '4',
@@ -104,17 +104,18 @@ const milestones: Milestone[] = [
 ];
 
 const buildFacts = [
-  ['Version', `v${APP_VERSION} · Milestone 2`],
+  ['Version', `v${APP_VERSION} · Milestone 3`],
   ['Framework', 'React 19 + TypeScript + Vite'],
   ['Styling', 'CSS Modules + design tokens'],
-  ['Storage', 'IndexedDB via Dexie — no management screens yet'],
+  ['Storage', 'IndexedDB via Dexie — seasons and recipients'],
   ['Theme', 'Light theme only — dark mode in Milestone 9'],
   ['Offline', 'Not yet packaged — Milestone 10'],
-  ['Data', 'Settings and diagnostics only; no plan can be entered yet'],
+  ['Data', 'One active season and recipient records; gifts arrive in Milestone 4'],
 ];
 
 const limitations = [
-  'The storage layer is ready, but there are no recipient, gift, or season-management screens yet.',
+  'Gifts, ideas, shopping lists, and archive management are not available yet.',
+  'Season editing, switching, and restore controls arrive in Milestone 8.',
   'No sample records are loaded, and startup never invents a season.',
   'The theme is light only until Milestone 9.',
   'No backup, restore, or CSV export exists yet.',
@@ -132,7 +133,7 @@ export function SettingsPage() {
         eyebrow="Preferences and information"
         title="Settings"
         description="What this build includes, what it deliberately leaves for later, and how the product will protect your data."
-        badge={<Badge tone="gold">Milestone 2 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 3 preview</Badge>}
       />
 
       <Card>
@@ -208,15 +209,16 @@ export function SettingsPage() {
             </span>
             <CardTitle as="h2">Local-first progress</CardTitle>
             <CardDescription>
-              The planner now uses a private, validated local database. Backup and offline delivery
-              are still ahead.
+              The planner now uses a private, validated local database for real season and recipient
+              records. Backup and offline delivery are still ahead.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className={styles.privacyText}>
               IndexedDB opens on this device and startup creates only safe settings and diagnostics.
-              It does not create a season, seed sample gifts, or delete records. No account and no
-              network request are required for storage.
+              It does not create a season, seed sample gifts, or delete records. A season exists
+              only after you explicitly create one. No account and no network request are required
+              for storage.
             </p>
             <div className={styles.claims}>
               <strong>Claims we will not make until verified</strong>

@@ -6,6 +6,7 @@ import { GiftsPage } from '../pages/GiftsPage';
 import { IdeasPage } from '../pages/IdeasPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { RecipientsPage } from '../pages/RecipientsPage';
+import { SeasonSetupPage } from '../pages/SeasonSetupPage';
 import { SeasonsPage } from '../pages/SeasonsPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { ShoppingPage } from '../pages/ShoppingPage';
@@ -23,6 +24,7 @@ export const routes: RouteObject[] = [
       { path: 'shopping', element: <ShoppingPage /> },
       { path: 'seasons', element: <SeasonsPage /> },
       { path: 'settings', element: <SettingsPage /> },
+      { path: 'onboarding', element: <SeasonSetupPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

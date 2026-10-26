@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestones 0–2 complete and verified; Milestone 3 not started · Version 0.3 · 2026-10-26
+> Status: Milestones 0–3 complete and verified; Milestone 4 not started · Version 0.3 · 2026-10-26
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -10,13 +10,13 @@
 | Item | State |
 | --- | --- |
 | Repository | Runnable React/TypeScript/Vite application, approved specification, and tested local storage |
-| Current milestone | **Milestone 2 — Data model and persistent storage** (complete; awaiting owner review before M3) |
-| Application runnable | Yes — development server, tests, and production build pass |
-| Tests | 90 Vitest tests passing; no Playwright suite yet |
-| Next milestone | Milestone 3 — Recipients and first-season setup (not started) |
-| Next action | Owner reviews `docs/MILESTONE_2_REPORT.md` and authorizes Milestone 3 |
+| Current milestone | **Milestone 3 — Recipients and first-season setup** (complete; awaiting owner review before M4) |
+| Application runnable | Yes — development server, tests, coverage, and production build pass |
+| Tests | 120 Vitest tests passing; no Playwright suite yet |
+| Next milestone | Milestone 4 — Gifts and safe deletion (not started) |
+| Next action | Owner reviews `docs/MILESTONE_3_REPORT.md` and authorizes Milestone 4 |
 
-**Do not start Milestone 3 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
+**Do not start Milestone 4 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
 
 ---
 
@@ -26,8 +26,8 @@
 | --- | --- | --- | --- |
 | 0 | Specification | Approved product, architecture, data model, criteria, decisions | Complete — approved |
 | 1 | Foundation | Runnable shell, navigation, design tokens, quality tooling | Complete — verified |
-| 2 | Persistent storage | IndexedDB schema, repositories, migrations, validation | Not started |
-| 3 | Recipients | Recipient management with caps and summaries | Not started |
+| 2 | Persistent storage | IndexedDB schema, repositories, migrations, validation | Complete — verified |
+| 3 | Recipients | Recipient management with caps and summaries | Complete — verified |
 | 4 | Gifts | Gift records, costs, statuses, deletion | Not started |
 | 5 | Budget engine + dashboard | Central calculations and live dashboard | Not started |
 | 6 | Idea Bank + Shopping List | Ideas convert to gifts; derived shopping list | Not started |
@@ -170,6 +170,8 @@ Order rationale:
 
 ## 6. Milestone 3 — Recipients
 
+**Status:** Complete and verified on 2026-10-26. See `docs/MILESTONE_3_REPORT.md`.
+
 **Depends on:** M2; D-007; O-4.
 
 **Objective:** Complete recipient management backed by real storage and domain calculations.
@@ -180,7 +182,7 @@ Order rationale:
 - Recipients list with responsive cards/table.
 - Create/edit forms with validation.
 - Budget cap, relationship, notes.
-- Spending summary placeholders computed through the domain layer (zero until gifts exist).
+- Spending summaries computed through the domain layer (zero until gifts exist).
 - Empty/loading/error/no-season/archived states.
 - Delete flow: reassign or explicit cascade, with gift counts and confirmation.
 - Recipient detail route stub if useful (full detail in M7).
@@ -191,13 +193,22 @@ Order rationale:
 
 - Gift creation (except test fixtures), dashboard charts, idea bank.
 
-**Exit gate**
+**Exit gate — met**
 
-- AC-3.01–AC-3.18 pass.
+- AC-3.01–AC-3.18 pass through automated tests and recorded browser checks; Playwright remains deferred to Milestone 4.
 - Recipient changes persist across refresh.
 - No recipient totals are stored; all are derived.
 - A user with no season can create one explicitly; the app never invents one.
 - No fake spending numbers.
+
+**Implementation notes**
+
+- A minimal `/onboarding` page creates one season from an explicit form. It never redirects automatically, never selects a season on the user's behalf, and never seeds recipients.
+- Pages read typed repositories through `StorageProvider`. A custom `useLiveQueryState` wraps Dexie's `liveQuery` to expose explicit loading, success, and error states. This supersedes D-003's specific `dexie-react-hooks` wording through D-025.
+- Recipient metrics come from pure functions in `src/domain/calculations/recipients.ts`; no selected, planned, spent, or remaining totals are persisted.
+- Archived seasons render read-only. Normal archive selection and restore controls remain Milestone 8.
+- The app does not call `navigator.storage.persist()`. Persistence timing and the buyer-facing browser-storage explanation remain open; no eviction-protection claim is made.
+- Native `<dialog>` supplies modal focus containment and Escape handling. Focus returns to the invoking control after closing, with a fallback to the main content when the invoking control no longer exists.
 
 **Git checkpoint:** `feat: implement recipient management`
 
@@ -626,9 +637,9 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews the running storage foundation and `docs/MILESTONE_2_REPORT.md`.
-2. Owner confirms the Milestone 3 first-season onboarding experience and the browser-persistence request timing.
-3. Owner authorizes Milestone 3.
-4. Only then begin recipient UI and first-season setup work.
+1. Owner reviews the running recipient workflow and `docs/MILESTONE_3_REPORT.md`.
+2. Owner confirms the remaining browser-storage persistence timing and buyer-facing explanation before release packaging.
+3. Owner authorizes Milestone 4.
+4. Only then begin gift records, costs, statuses, and safe gift deletion.
 
-Milestone 3 is **not started**. Until authorization: **stop.**
+Milestone 4 is **not started**. Until authorization: **stop.**

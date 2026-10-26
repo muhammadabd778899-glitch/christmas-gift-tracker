@@ -26,6 +26,7 @@ export function Dialog({
   className,
 }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
   const descriptionId = useId();
 
@@ -37,12 +38,26 @@ export function Dialog({
 
     if (!open) {
       if (dialog.open) {
-        dialog.close();
+        if (typeof dialog.close === 'function') {
+          dialog.close();
+        } else {
+          dialog.removeAttribute('open');
+        }
       }
       return;
     }
 
     if (!dialog.open) {
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLElement &&
+        activeElement !== document.body &&
+        !dialog.contains(activeElement) &&
+        !activeElement.closest('dialog[open]')
+      ) {
+        returnFocusRef.current = activeElement;
+      }
+
       if (typeof dialog.showModal === 'function') {
         dialog.showModal();
       } else {
@@ -56,10 +71,33 @@ export function Dialog({
     return () => {
       document.body.style.overflow = previousOverflow;
       if (dialog.open) {
-        dialog.close();
+        if (typeof dialog.close === 'function') {
+          dialog.close();
+        } else {
+          dialog.removeAttribute('open');
+        }
       } else {
         dialog.removeAttribute('open');
       }
+
+      const returnTarget = returnFocusRef.current;
+      window.setTimeout(() => {
+        if (dialog.open || document.querySelector('dialog[open]')) {
+          return;
+        }
+
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement !== document.body && !dialog.contains(activeElement)) {
+          return;
+        }
+
+        if (returnTarget?.isConnected) {
+          returnTarget.focus();
+          return;
+        }
+
+        document.getElementById('main-content')?.focus();
+      }, 0);
     };
   }, [open]);
 
@@ -72,11 +110,6 @@ export function Dialog({
       onCancel={(event) => {
         event.preventDefault();
         onClose();
-      }}
-      onClose={() => {
-        if (open) {
-          onClose();
-        }
       }}
     >
       <div className={styles.header}>
