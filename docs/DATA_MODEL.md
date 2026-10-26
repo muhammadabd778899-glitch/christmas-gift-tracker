@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Data Model
 
-> Status: Draft for owner approval · Version 0.1 · 2026-10-26
-> Implements the requirements in `docs/PRODUCT_SPEC.md`. No code exists yet; this is a normative specification.
+> Status: Normative; version-1 storage implemented in Milestone 2 · Version 0.2 · 2026-10-26
+> Implements the requirements in `docs/PRODUCT_SPEC.md`. `src/domain` and `src/storage` follow this document; later sections (backup, CSV, sample loader, online sync) remain planned.
 
 ---
 
@@ -301,6 +301,7 @@ Notes:
 - `[seasonId+name]` supports deterministic recipient ordering without enforcing uniqueness.
 - `updatedAt` indexes support future sync and “recently changed” diagnostics.
 - No index is added speculatively without a documented query.
+- Dexie encodes application schema version `1` as IndexedDB version `10` (`verno × 10`). The app and health report expose `db.verno` as `1`; a raw DevTools/`indexedDB.databases()` reading of `10` is expected, not a second schema version.
 
 ### 4.3 IndexedDB transactions
 
@@ -761,6 +762,7 @@ Checks:
 - `settings.activeSeasonId` resolves to an active season or null.
 - Orphan recipients/gifts/ideas (season missing).
 - Gift recipient missing or in a different season.
+- Gift `sourceIdeaId` missing from the idea store.
 - Idea recipient missing or in a different season.
 - Idea converted-gift missing or in a different season.
 - Duplicate `sourceIdeaId` (should be impossible).

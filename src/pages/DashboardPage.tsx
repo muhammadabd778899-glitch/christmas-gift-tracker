@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { EmptyState } from '../components/ui/EmptyState';
 import { PageHeader } from '../components/ui/PageHeader';
 import { buttonStyles } from '../components/ui/buttonStyles';
+import { APP_MILESTONE } from '../lib/appInfo';
 import styles from './DashboardPage.module.css';
 
 const capabilities = [
@@ -53,16 +54,11 @@ const foundation = [
   'Responsive shell with seven working destinations',
   'Warm design tokens and reusable, accessible components',
   'Keyboard access, focus handling, and mobile navigation',
-  'Route error handling and a deliberate not-found page',
-  'Tests, type checking, linting, and a production build',
+  'Validated local storage with typed repositories and transactions',
+  'Startup diagnostics, recovery guidance, and automated tests',
 ];
 
 const nextSteps = [
-  {
-    number: '02',
-    title: 'Persistent local storage',
-    description: 'IndexedDB, validation, migrations, and a tested repository layer.',
-  },
   {
     number: '03',
     title: 'Recipients',
@@ -78,6 +74,11 @@ const nextSteps = [
     title: 'Budget engine and dashboard',
     description: 'One tested calculation layer, live totals, and progress charts.',
   },
+  {
+    number: '06',
+    title: 'Idea Bank and Shopping List',
+    description: 'Turn saved ideas into gifts and group errands by store.',
+  },
 ];
 
 export function DashboardPage() {
@@ -87,7 +88,7 @@ export function DashboardPage() {
         eyebrow="Overview"
         title="Dashboard"
         description="Your Christmas plan, at a glance."
-        badge={<Badge tone="gold">Milestone 1 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 2 preview</Badge>}
         actions={
           <Link className={buttonStyles({ variant: 'secondary', size: 'sm' })} to="/settings">
             View build roadmap
@@ -99,7 +100,7 @@ export function DashboardPage() {
         <div className={styles.heroCopy}>
           <p className={styles.heroEyebrow}>
             <Sparkles size={15} aria-hidden="true" />
-            The foundation is ready
+            The local foundation is ready
           </p>
           <h2 id="hero-title">Make room for a calmer Christmas.</h2>
           <p className={styles.heroText}>
@@ -141,8 +142,8 @@ export function DashboardPage() {
             <h2 id="capabilities-title">Built around the way December actually feels.</h2>
           </div>
           <p>
-            The shell is intentionally quiet. The planning features will fill it without turning the
-            season into a spreadsheet.
+            The shell holds a private local database now. The planning screens will fill it without
+            turning the season into a spreadsheet.
           </p>
         </div>
 
@@ -174,11 +175,11 @@ export function DashboardPage() {
           <CardHeader>
             <Badge tone="success">
               <Check size={12} aria-hidden="true" />
-              Milestone 1
+              Milestone {APP_MILESTONE}
             </Badge>
-            <CardTitle as="h2">The foundation is in place</CardTitle>
+            <CardTitle as="h2">The local foundation is in place</CardTitle>
             <CardDescription>
-              Verified shell work that the rest of the product can stand on.
+              Verified shell and storage work that the planning screens can stand on.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -226,7 +227,7 @@ export function DashboardPage() {
         <EmptyState
           icon={<CalendarDays />}
           title="No active season yet"
-          description="Season setup arrives with Milestone 3. Until then, this build stores nothing and invents nothing."
+          description="Season setup arrives with Milestone 3. Storage is ready, but this build does not create a plan or sample data on your behalf."
           action={
             <Link className={buttonStyles({ variant: 'secondary', size: 'sm' })} to="/settings">
               See what is next

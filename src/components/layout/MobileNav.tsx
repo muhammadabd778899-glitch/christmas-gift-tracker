@@ -21,7 +21,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
       </div>
       <div className={styles.footer}>
         <span className={styles.dot} aria-hidden="true" />
-        <span>Milestone 1 · Interface foundation</span>
+        <span>Milestone 2 · Persistent local storage</span>
       </div>
     </Dialog>
   );

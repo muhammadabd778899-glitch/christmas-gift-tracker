@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestone 1 complete and verified; Milestone 2 not started · Version 0.2 · 2026-10-26
+> Status: Milestones 0–2 complete and verified; Milestone 3 not started · Version 0.3 · 2026-10-26
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -9,14 +9,14 @@
 
 | Item | State |
 | --- | --- |
-| Repository | Runnable React/TypeScript/Vite application plus approved specification |
-| Current milestone | **Milestone 1 — Foundation and shell** (complete; awaiting owner review before M2) |
+| Repository | Runnable React/TypeScript/Vite application, approved specification, and tested local storage |
+| Current milestone | **Milestone 2 — Data model and persistent storage** (complete; awaiting owner review before M3) |
 | Application runnable | Yes — development server, tests, and production build pass |
-| Tests | 7 Vitest smoke tests passing; no Playwright suite yet |
-| Next milestone | Milestone 2 — Data model and persistent storage (not started) |
-| Next action | Owner reviews `docs/MILESTONE_1_REPORT.md`, confirms M2-blocking decisions, and authorizes M2 |
+| Tests | 90 Vitest tests passing; no Playwright suite yet |
+| Next milestone | Milestone 3 — Recipients and first-season setup (not started) |
+| Next action | Owner reviews `docs/MILESTONE_2_REPORT.md` and authorizes Milestone 3 |
 
-**Do not start Milestone 2 until the owner authorizes it and the M2-blocking decisions are confirmed.**
+**Do not start Milestone 3 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
 
 ---
 
@@ -128,6 +128,8 @@ Order rationale:
 
 ## 5. Milestone 2 — Data model and persistent storage
 
+**Status:** Complete and verified 2026-10-26. See `docs/MILESTONE_2_REPORT.md`.
+
 **Depends on:** M1; decisions D-002, D-003, D-004, D-005, D-018, D-019; O-3, O-7, O-8.
 
 **Objective:** A reliable local database with typed repositories, validation, migrations, and tests. This is the foundation for every later feature.
@@ -151,14 +153,14 @@ Order rationale:
 
 - Full management UIs, dashboard, charts, backup/restore UI, PWA.
 
-**Exit gate**
+**Exit gate — met**
 
-- AC-2.01–AC-2.22 pass.
-- A record created through a test/console flow survives refresh and browser restart.
-- Invalid data and cross-season references are rejected.
-- A failed transaction leaves no partial writes.
-- Migration fixture preserves data.
-- Storage layer has no React dependency.
+- AC-2.01–AC-2.22 pass (AC-2.12 verified manually; the Playwright harness is deferred to Milestone 4).
+- A record created through a console flow survived a full page reload; the database identity was preserved.
+- Invalid data and cross-season references are rejected before writes.
+- A forced multi-record failure rolled back every change.
+- The synthetic migration fixture preserved its valid records.
+- The storage layer has no React dependency.
 
 **Git checkpoint:** `feat: implement persistent local storage`
 
@@ -624,9 +626,9 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews the running shell and `docs/MILESTONE_1_REPORT.md`.
-2. Owner confirms the Milestone 2 blocking decisions: D-002, D-003, D-004, D-005, D-018, D-019, O-3, O-7, and O-8.
-3. Owner authorizes Milestone 2.
-4. Only then begin persistent storage work.
+1. Owner reviews the running storage foundation and `docs/MILESTONE_2_REPORT.md`.
+2. Owner confirms the Milestone 3 first-season onboarding experience and the browser-persistence request timing.
+3. Owner authorizes Milestone 3.
+4. Only then begin recipient UI and first-season setup work.
 
-Milestone 2 is **not started**. Until authorization: **stop.**
+Milestone 3 is **not started**. Until authorization: **stop.**

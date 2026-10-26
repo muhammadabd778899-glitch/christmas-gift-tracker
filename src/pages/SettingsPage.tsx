@@ -10,6 +10,7 @@ import {
   TableHeaderCell,
   TableRow,
 } from '../components/ui/Table';
+import { APP_VERSION } from '../lib/appInfo';
 import styles from './SettingsPage.module.css';
 
 type MilestoneStatus = 'Complete' | 'Planned';
@@ -38,7 +39,7 @@ const milestones: Milestone[] = [
     number: '2',
     title: 'Persistent storage',
     focus: 'IndexedDB schema, repositories, migrations, validation',
-    status: 'Planned',
+    status: 'Complete',
   },
   {
     number: '3',
@@ -103,21 +104,21 @@ const milestones: Milestone[] = [
 ];
 
 const buildFacts = [
-  ['Version', 'v0.1.0 · Milestone 1'],
+  ['Version', `v${APP_VERSION} · Milestone 2`],
   ['Framework', 'React 19 + TypeScript + Vite'],
   ['Styling', 'CSS Modules + design tokens'],
-  ['Storage', 'Not implemented — Milestone 2'],
+  ['Storage', 'IndexedDB via Dexie — no management screens yet'],
   ['Theme', 'Light theme only — dark mode in Milestone 9'],
   ['Offline', 'Not yet packaged — Milestone 10'],
-  ['Data', 'No customer data is created or stored in this build'],
+  ['Data', 'Settings and diagnostics only; no plan can be entered yet'],
 ];
 
 const limitations = [
-  'No persistence yet: refreshing the app cannot lose data because none is entered.',
-  'Feature pages are deliberate placeholders with no sample records.',
+  'The storage layer is ready, but there are no recipient, gift, or season-management screens yet.',
+  'No sample records are loaded, and startup never invents a season.',
   'The theme is light only until Milestone 9.',
-  'No installable or offline package has been produced or verified.',
   'No backup, restore, or CSV export exists yet.',
+  'No installable or offline package has been produced or verified.',
 ];
 
 function statusTone(status: MilestoneStatus): BadgeTone {
@@ -131,7 +132,7 @@ export function SettingsPage() {
         eyebrow="Preferences and information"
         title="Settings"
         description="What this build includes, what it deliberately leaves for later, and how the product will protect your data."
-        badge={<Badge tone="gold">Milestone 1 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 2 preview</Badge>}
       />
 
       <Card>
@@ -205,17 +206,17 @@ export function SettingsPage() {
             <span className={styles.privacyIcon} aria-hidden="true">
               <ShieldCheck />
             </span>
-            <CardTitle as="h2">Local-first intent</CardTitle>
+            <CardTitle as="h2">Local-first progress</CardTitle>
             <CardDescription>
-              The launch edition is designed to work without an account and keep planning data in
-              the browser.
+              The planner now uses a private, validated local database. Backup and offline delivery
+              are still ahead.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className={styles.privacyText}>
-              That architecture is defined, but storage, backup, and offline delivery are not
-              implemented yet. This preview makes no claim that the product is offline-capable or
-              that it persists data.
+              IndexedDB opens on this device and startup creates only safe settings and diagnostics.
+              It does not create a season, seed sample gifts, or delete records. No account and no
+              network request are required for storage.
             </p>
             <div className={styles.claims}>
               <strong>Claims we will not make until verified</strong>

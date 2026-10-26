@@ -1,1 +1,0 @@
-This directory will hold the local-first persistence layer (Dexie database, migrations, repositories, backup, CSV) starting in Milestone 2. It is intentionally empty in Milestone 1.

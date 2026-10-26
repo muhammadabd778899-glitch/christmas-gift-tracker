@@ -2,8 +2,8 @@
 
 A local-first Christmas gift planning application: recipients, gifts, budgets, ideas, shopping lists, seasons, backups, and offline use.
 
-> **Status: Milestone 1 — application foundation complete and verified.**
-> The shell is runnable, responsive, and tested. It does **not** create, store, or transmit customer data yet. Milestone 2 has not started.
+> **Status: Milestone 2 — data model and persistent storage complete and verified.**
+> The shell is runnable, responsive, and tested. A private local IndexedDB database is initialized safely, but there are **no data-entry screens yet**. No customer plan or sample records are created, and nothing is transmitted.
 
 ---
 
@@ -16,10 +16,14 @@ A local-first Christmas gift planning application: recipients, gifts, budgets, i
 - Reusable primitives: Button, IconButton, Input, Select, Card, Badge, Dialog, Table, EmptyState, PageHeader, and error states.
 - A desktop header with the product name and an honest season placeholder.
 - Route-level and application-level error boundaries, plus a friendly not-found page.
-- Seven automated smoke tests covering navigation, every destination, the dialog, the 404 page, and both error boundaries.
+- A version-1 Dexie/IndexedDB schema with typed validation for seasons, recipients, gifts, ideas, settings, and diagnostics.
+- Typed repositories with cross-season checks, transactional recipient policies, idea conversion, gift integrity, and explicit season lifecycle operations.
+- Safe startup: settings and meta are created only when absent; startup never creates a season, seeds sample data, or deletes records.
+- A boot screen, a storage recovery screen with guidance, a health-check engine, a migration harness, and an explicit `DELETE`-confirmed reset API.
+- 90 Vitest tests, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, and reset.
 - GitHub Actions CI for formatting, type checking, linting, tests, and the production build.
 
-Every feature page is a deliberate placeholder. There are no sample recipients, invented totals, hidden calculations, or fake persistence.
+Every feature page is still a deliberate placeholder. There are no sample recipients, invented totals, hidden calculations, or storage-management screens.
 
 ---
 
@@ -53,22 +57,23 @@ Open `http://localhost:5173`.
 
 ## Current technology
 
-Installed for Milestone 1:
+Installed through Milestone 2:
 
 - React 19 + TypeScript
 - Vite 8
 - React Router 7
 - Lucide icons
 - CSS Modules with design tokens
-- Vitest 5, Testing Library, `jsdom`
+- Dexie 4 for IndexedDB
+- Zod 4 for boundary validation
+- Vitest 5, Testing Library, `jsdom`, `fake-indexeddb`
 - ESLint 9, Prettier
 - GitHub Actions
 
 Not installed yet — each arrives with the milestone that needs it:
 
-- Dexie 4 and `dexie-react-hooks` (Milestone 2)
-- Zod and React Hook Form (Milestones 2–3)
-- fake-indexeddb (Milestone 2)
+- `dexie-react-hooks` (when live queries arrive with the first data screens)
+- React Hook Form (Milestone 3)
 - Recharts (Milestone 5)
 - Playwright (Milestone 4, when the first end-to-end workflow exists)
 - `vite-plugin-pwa` (Milestone 10)
@@ -87,10 +92,10 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | `src/components/layout/` | Brand, sidebar, header, navigation, and mobile drawer |
 | `src/lib/` | Generic utilities |
 | `src/styles/` | Design tokens and global base styles |
-| `src/test/` | Test setup and the memory-router render helper |
-| `src/features/` | Reserved for feature UI from later milestones |
-| `src/domain/` | Reserved for the pure domain layer starting in Milestone 2 |
-| `src/storage/` | Reserved for IndexedDB and repositories starting in Milestone 2 |
+| `src/test/` | Test setup, memory-router helper, fake-indexeddb storage harness, and fixtures |
+| `src/features/` | Reserved for feature UI from Milestone 3 |
+| `src/domain/` | Branded entities, Zod schemas, money/date/locale utilities, and typed errors |
+| `src/storage/` | Dexie schema, initialization, repositories, migration harness, health, and reset |
 | `e2e/` | Reserved for Playwright tests from Milestone 4 |
 | `docs/` | Product, architecture, data, decisions, acceptance criteria, and reports |
 | `.github/workflows/ci.yml` | Continuous verification on push and pull request |
@@ -107,6 +112,7 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | `docs/IMPLEMENTATION_PLAN.md` | Milestone sequence, gates, status, and Git checkpoints |
 | `docs/MILESTONE_0_REPORT.md` | Specification milestone report |
 | `docs/MILESTONE_1_REPORT.md` | Foundation milestone report and verification evidence |
+| `docs/MILESTONE_2_REPORT.md` | Storage milestone report and verification evidence |
 | `AI_DEVELOPMENT_PROTOCOL.md` | Permanent working rules for the AI agent |
 
 **Reading order for a new session:** protocol → product spec → architecture → data model → acceptance criteria → decisions → implementation plan → latest milestone report.
@@ -119,7 +125,7 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | --- | --- | --- |
 | 0 | Specification | Complete — approved |
 | 1 | Foundation and shell | Complete — verified |
-| 2 | Data model and persistent storage | Not started |
+| 2 | Data model and persistent storage | Complete — verified |
 | 3 | Recipients | Not started |
 | 4 | Gifts | Not started |
 | 5 | Budget engine and dashboard | Not started |
@@ -131,29 +137,30 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | 11 | Online edition and sync | Not started |
 | 12 | QA, packaging, Etsy launch | Not started |
 
-Do not start Milestone 2 without owner authorization. Its blocking decisions are listed in `docs/DECISIONS.md`.
+Do not start Milestone 3 without owner authorization. Its storage-facing decisions are already accepted; remaining M3 work is UI and first-season setup.
 
 ---
 
 ## Data, privacy, and offline status
 
-- **Storage:** not implemented. Refreshing the preview cannot lose planning data because none can be entered.
+- **Storage:** a version-1 local IndexedDB database is implemented and validated. Startup creates settings and diagnostics only when needed; it never creates a season, seeds sample data, or deletes records. There are no data-entry screens yet, so customers cannot enter plan data through the UI.
+- **Backup and reset:** a tested explicit reset API requires the confirmation `DELETE` and preserves `databaseId`; it has no UI and is never called automatically. Backup/restore and CSV export are not implemented.
 - **Accounts and sync:** not implemented.
 - **Analytics/telemetry:** none.
 - **Offline delivery:** not built or verified. The intended launch edition is an installable offline-first PWA, with the actual artifact validated in Milestone 10. A raw `file://` HTML file is not assumed to persist data and will not be advertised without passing the browser test matrix.
-- **Customer data:** no customer data is created or transmitted by this build.
+- **Customer data:** no customer data is entered, transmitted, or seeded by this build. Diagnostic health reports contain counts, codes, and storage estimates only — no names, addresses, or notes.
 
-The interface copy is intentionally conservative until storage, backup, and offline behavior are implemented and tested.
+The interface copy is intentionally conservative until data screens, backup, and offline behavior are implemented and tested.
 
 ---
 
 ## Current next step
 
-1. Owner reviews `docs/MILESTONE_1_REPORT.md` and the running shell.
-2. Owner authorizes Milestone 2.
-3. Before Milestone 2 begins, confirm D-002 through D-005, D-018, D-019, O-3, O-7, and O-8 in `docs/DECISIONS.md`.
+1. Owner reviews `docs/MILESTONE_2_REPORT.md` and the running storage foundation.
+2. Owner authorizes Milestone 3 — recipients and first-season setup.
+3. Milestone 3 must use the existing repositories and must not bypass validation or create sample data.
 
-Until authorized: **do not start Milestone 2.**
+Until authorized: **do not start Milestone 3.**
 
 ---
 

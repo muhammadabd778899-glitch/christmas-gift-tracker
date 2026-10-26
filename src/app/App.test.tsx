@@ -62,8 +62,8 @@ describe('application shell', () => {
     await user.click(screen.getByRole('button', { name: 'About this build' }));
 
     const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
-    expect(within(dialog).getByText('Milestone 1 of 12: the interface foundation.')).toBeVisible();
-    expect(within(dialog).getByText(/No customer data yet/i)).toBeInTheDocument();
+    expect(within(dialog).getByText('Milestone 2 of 12: persistent local storage.')).toBeVisible();
+    expect(within(dialog).getByText(/No customer plans yet/i)).toBeInTheDocument();
 
     await user.click(within(dialog).getByRole('button', { name: 'Close dialog' }));
     expect(screen.queryByRole('dialog', { name: 'About this preview' })).not.toBeInTheDocument();

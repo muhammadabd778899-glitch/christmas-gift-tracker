@@ -1,0 +1,84 @@
+.page {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: clamp(20px, 5vw, 48px);
+  background:
+    radial-gradient(circle at 12% 8%, rgb(189 145 70 / 14%), transparent 28rem),
+    radial-gradient(circle at 88% 88%, rgb(122 46 58 / 8%), transparent 24rem), var(--color-canvas);
+}
+
+.card {
+  width: min(100%, 420px);
+  padding: clamp(30px, 6vw, 46px);
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.mark {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 20px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--color-gold-700);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-evergreen-950);
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 5vw, 2.15rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.description {
+  margin: 13px auto 0;
+  color: var(--color-text-muted);
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.progress {
+  height: 4px;
+  margin-top: 26px;
+  overflow: hidden;
+  background: var(--color-evergreen-100);
+  border-radius: 999px;
+}
+
+.progress span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  background: var(--color-evergreen-700);
+  border-radius: inherit;
+  animation: loading 1.4s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress span {
+    width: 100%;
+    animation: none;
+  }
+}

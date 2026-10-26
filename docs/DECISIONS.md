@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Decision Log
 
-> Status: Approved for Milestone 1; later decisions remain proposed · Version 0.2 · 2026-10-26
+> Status: Approved through Milestone 2; later decisions remain proposed · Version 0.3 · 2026-10-26
 > Format: lightweight ADRs. Statuses: **Proposed**, **Accepted**, **Superseded**, **Rejected**.
 > Decisions marked Proposed become binding when the owner approves the milestone that depends on them.
 
@@ -32,7 +32,7 @@
 
 ### D-002 — Local-first architecture
 
-**Status:** Proposed · **Milestone:** 2
+**Status:** Accepted 2026-10-26 for Milestone 2 · **Milestone:** 2
 
 **Context:** The offline edition must work without an account or network, and the online edition must not block planning during outages.
 
@@ -44,7 +44,7 @@
 
 ### D-003 — Dexie as the IndexedDB access layer
 
-**Status:** Proposed · **Milestone:** 2
+**Status:** Accepted 2026-10-26 for Milestone 2 · **Milestone:** 2
 
 **Context:** The storage layer needs migrations, transactions, indexes, and reactive updates. A hand-written wrapper would require custom code for each.
 
@@ -56,7 +56,7 @@
 
 ### D-004 — Money stored as integer minor units
 
-**Status:** Proposed · **Milestone:** 2
+**Status:** Accepted 2026-10-26 for Milestone 2 · **Milestone:** 2
 
 **Context:** Floating-point money arithmetic produces rounding errors and inconsistent totals.
 
@@ -68,7 +68,7 @@
 
 ### D-005 — Seasons scope all planning records
 
-**Status:** Proposed · **Milestone:** 2
+**Status:** Accepted 2026-10-26 for Milestone 2 · **Milestone:** 2
 
 **Context:** Mixing gifts across years would corrupt budgets and archives.
 
@@ -80,7 +80,7 @@
 
 ### D-006 — Explicit status booleans, not inferred labels
 
-**Status:** Proposed · **Milestone:** 4
+**Status:** Accepted 2026-10-26 for Milestone 2 schema · **Milestone:** 2/4
 
 **Context:** “Wrapped” does not always mean “bought,” and retailer-direct gifts may be sent without being wrapped. Inferring states hides reality.
 
@@ -92,7 +92,7 @@
 
 ### D-007 — Recipient deletion is blocked until the user chooses a policy
 
-**Status:** Proposed · **Milestone:** 3
+**Status:** Accepted 2026-10-26 for Milestone 2 service · **Milestone:** 2/3
 
 **Context:** Deleting a recipient can orphan or destroy gifts. Silent cascades cause data loss.
 
@@ -104,7 +104,7 @@
 
 ### D-008 — Idea conversion uses a unique source link and a status
 
-**Status:** Proposed · **Milestone:** 6
+**Status:** Accepted 2026-10-26 for Milestone 2 storage · **Milestone:** 2/6
 
 **Context:** Repeated clicks or retries must not create duplicate gifts, and the original idea should remain recoverable.
 
@@ -116,7 +116,7 @@
 
 ### D-009 — Archived seasons are read-only
 
-**Status:** Proposed · **Milestone:** 8
+**Status:** Accepted 2026-10-26 for Milestone 2 storage · **Milestone:** 2/8
 
 **Context:** Historical figures should stay stable, and edits to archived data could confuse current-season views.
 
@@ -208,7 +208,7 @@
 
 ### D-016 — Sample data is isolated and removable
 
-**Status:** Proposed · **Milestone:** 2 (storage), 8 (UI), 12 (package)
+**Status:** Accepted 2026-10-26 · **Milestone:** 2 (storage), 8 (UI), 12 (package)
 
 **Context:** Demo data helps customers evaluate the product but must never contaminate real budgets, and it must not look like their data.
 
@@ -232,7 +232,7 @@
 
 ### D-018 — Zero or one active season
 
-**Status:** Proposed · **Milestone:** 2/3
+**Status:** Accepted 2026-10-26 for Milestone 2 · **Milestone:** 2/3
 
 **Context:** A user may archive their only season or delete the last active one. Forcing a season to exist would invent data.
 
@@ -244,7 +244,7 @@
 
 ### D-019 — `sourceIdeaId` is omitted when absent
 
-**Status:** Proposed · **Milestone:** 2/6
+**Status:** Accepted 2026-10-26 for Milestone 2 · **Milestone:** 2/6
 
 **Context:** A unique IndexedDB index must not contain duplicate invalid keys. `null` is not a valid IndexedDB key, and a sentinel value would collide.
 
@@ -341,12 +341,12 @@ Each row states the recommendation. Approving this specification approves the re
 | --- | --- | --- | --- | --- |
 | O-1 | What is the offline delivery method: PWA, standalone HTML, or desktop wrapper? | PWA-first; test standalone in M10; add a wrapper only if commercially necessary and approved | M10, Etsy copy | Open |
 | O-2 | Final product name and visual brand? | Keep “Christmas Gift Tracker” as a working name; finalize before M9 | M9, packaging | Open |
-| O-3 | Currency defaults and presets? | USD `$` 2 decimals default; presets for EUR, GBP, CAD, AUD, JPY (0 decimals); custom symbol/code; no conversion | M2/M9 | Open |
-| O-4 | Recipient deletion behavior? | Block; offer reassign or explicit cascade (D-007) | M3 | Open |
+| O-3 | Currency defaults and presets? | USD `$` 2 decimals default; presets for EUR, GBP, CAD, AUD, JPY (0 decimals); custom symbol/code; no conversion | M2/M9 | Decided 2026-10-26 |
+| O-4 | Recipient deletion behavior? | Block; offer reassign or explicit cascade (D-007) | M3 | Decided 2026-10-26 |
 | O-5 | Include the online edition in the first Etsy release? | No; ship and validate offline first (D-011) | M11, listing | Open |
 | O-6 | Backup restore mode? | Replace-all only with pre-restore backup (D-010) | M8 | Open |
-| O-7 | Sample data behavior when real data exists? | Add as an archived sample season; never mix (D-016) | M2/M8/M12 | Open |
-| O-8 | Allow zero active seasons? | Yes, with a dedicated empty state (D-018) | M2/M3 | Open |
+| O-7 | Sample data behavior when real data exists? | Add as an archived sample season; never mix (D-016) | M2/M8/M12 | Decided 2026-10-26 |
+| O-8 | Allow zero active seasons? | Yes, with a dedicated empty state (D-018) | M2/M3 | Decided 2026-10-26 |
 | O-9 | Include “mark bought” on the Shopping List? | Yes, excluded from print; same status rules | M6 | Open |
 | O-10 | Require actual cost when marking a gift bought? | No; allow and flag missing cost | M4 | Open |
 | O-11 | Add a “does not need wrapping” exemption? | No for launch; document the limitation (D-024) | M5 | Open |
@@ -354,17 +354,17 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 1:** Resolved 2026-10-26. The owner authorized Milestone 1; D-001, D-013, D-014, and D-022 are accepted. All other decisions can be confirmed before their blocking milestone.
 
-**Approval needed before Milestone 2:** D-002 through D-005, D-018, D-019, O-3, O-7, O-8.
+**Approval needed before Milestone 2:** Resolved 2026-10-26. The owner authorized Milestone 2 and asked for decisions optimized for a non-technical customer. D-002 through D-009, D-016, D-018, D-019, O-3, O-4, O-7, and O-8 are accepted or decided.
 
-**Approval needed before Milestone 3:** D-007, O-4.
+**Approval needed before Milestone 3:** None. D-007 and O-4 were accepted with Milestone 2 because the recipient deletion service is already implemented.
 
-**Approval needed before Milestone 4:** D-006, D-020, O-10.
+**Approval needed before Milestone 4:** D-020, O-10.
 
 **Approval needed before Milestone 5:** D-021, D-024, O-11.
 
-**Approval needed before Milestone 6:** D-008, O-9.
+**Approval needed before Milestone 6:** O-9. D-008 is accepted for the storage conversion service.
 
-**Approval needed before Milestone 8:** D-009, D-010, D-023, O-6.
+**Approval needed before Milestone 8:** D-010, D-023, O-6. D-009 and D-016 are accepted for the storage layer.
 
 **Approval needed before Milestone 9:** D-015, D-017, O-2.
 
@@ -398,3 +398,4 @@ Each row states the recommendation. Approving this specification approves the re
 | 2026-10-26 | Initial decision log created for Milestone 0 | AI |
 | 2026-10-26 | D-001, D-013, D-014, and D-022 accepted when the owner authorized Milestone 1 | AI |
 | 2026-10-26 | Milestone 1 implementation notes recorded in `MILESTONE_1_REPORT.md`; no new architecture decision required | AI |
+| 2026-10-26 | D-002 through D-009, D-016, D-018, D-019, O-3, O-4, O-7, and O-8 accepted/decided for Milestone 2; storage implementation recorded in `MILESTONE_2_REPORT.md` | AI |

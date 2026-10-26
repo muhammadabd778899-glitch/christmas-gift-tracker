@@ -4,6 +4,7 @@ import { AboutDialog } from './AboutDialog';
 import { Header } from '../components/layout/Header';
 import { MobileNav } from '../components/layout/MobileNav';
 import { Sidebar } from '../components/layout/Sidebar';
+import { APP_VERSION } from '../lib/appInfo';
 import { getPageTitle } from './navigation';
 import styles from './AppShell.module.css';
 
@@ -36,7 +37,7 @@ export function AppShell() {
           <span>Christmas Gift Tracker</span>
           <span className={styles.footerDivider} aria-hidden="true" />
           <span>Built for calmer Christmases.</span>
-          <span className={styles.footerVersion}>v0.1.0</span>
+          <span className={styles.footerVersion}>v{APP_VERSION}</span>
         </footer>
       </div>
 

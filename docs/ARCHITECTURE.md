@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Architecture
 
-> Status: Draft for owner approval · Version 0.1 · 2026-10-26
-> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. No application code exists yet.
+> Status: Version 0.2 · 2026-10-26 · Milestone 2 storage implementation recorded
+> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell and version-1 storage now exist; later sections remain target architecture.
 
 ---
 
@@ -147,17 +147,22 @@ christmas-gift-tracker/
 │   │   ├── schemas.ts
 │   │   ├── money.ts
 │   │   ├── dates.ts
-│   │   ├── calculations/
-│   │   ├── rules/
-│   │   └── errors.ts
+│   │   ├── locale.ts
+│   │   ├── errors.ts
+│   │   ├── calculations/         # Milestone 5
+│   │   └── rules/                # as feature rules arrive
 │   ├── storage/
 │   │   ├── db.ts
-│   │   ├── migrations/
+│   │   ├── defaults.ts
+│   │   ├── initialize.ts
+│   │   ├── errors.ts
+│   │   ├── migrations.ts
+│   │   ├── health.ts
+│   │   ├── reset.ts
 │   │   ├── repositories/
-│   │   ├── backup/
-│   │   ├── csv/
-│   │   ├── sample/
-│   │   └── health.ts
+│   │   ├── backup/               # Milestone 8
+│   │   ├── csv/                  # Milestone 8
+│   │   └── sample/               # Milestone 8
 │   ├── lib/
 │   ├── styles/
 │   ├── test/
@@ -172,7 +177,7 @@ christmas-gift-tracker/
 └── README.md
 ```
 
-Folder creation happens in Milestone 1. Empty scaffolding for later milestones is allowed only if it does not fake behavior.
+Folders are created only when their milestone needs them. Empty scaffolding is allowed only if it does not fake behavior.
 
 ---
 
@@ -214,13 +219,18 @@ Selectors are memoized by React (`useMemo`) where records are stable; the domain
 
 ### 7.1 Initialization sequence
 
-1. Open the Dexie database.
-2. Run pending versioned migrations.
-3. Ensure the settings singleton exists with defaults **only if absent**.
-4. Ensure meta diagnostics (`databaseId`, version, last opened).
-5. Never create a season, seed data, or delete records automatically.
-6. If onboarding is incomplete and no season exists, route to `/onboarding`.
-7. If the open/migration fails, route to `/recovery` with a diagnostic explanation and no data mutation.
+Implemented in `src/main.tsx` and `src/storage/initialize.ts`:
+
+1. Render a branded boot screen before the router loads.
+2. Dynamically load the storage entry point, then open the Dexie database.
+3. Dexie runs pending schema upgrades. A failed upgrade aborts; the app never clears or recreates the database.
+4. Read an existing settings singleton. Create defaults **only if absent**; validate but never overwrite existing settings.
+5. Read `databaseId`, or generate one when meta is genuinely absent. Invalid identity data is reported, not replaced.
+6. Write/update diagnostics: `schemaVersion`, `databaseId`, `appVersion`, and `lastOpenedAt`.
+7. Render the application only after initialization succeeds. On failure, render `StorageRecoveryPage` with recovery guidance outside the router.
+8. Never create a season, seed sample data, or delete records during startup.
+
+Routing to `/onboarding` with zero active seasons arrives in Milestone 3. The current recovery screen is deliberately outside the router so a router render cannot mask a storage failure.
 
 ### 7.2 Repositories
 
@@ -256,6 +266,17 @@ Bulk operations (restore, season delete, recipient cascade, conversion) are sing
 - Settings → Diagnostics runs `healthCheck()` and can copy a PII-free report.
 - Quota errors are caught and surfaced with backup guidance.
 - The app never clears storage on its own.
+
+Milestone 2 implements the health engine (`src/storage/health.ts`) but not the Settings diagnostics UI. It returns typed counts, storage estimate/persistence fields, and stable issue codes without names, addresses, or notes. It performs reads only.
+
+### 7.6 Explicit reset and error contract
+
+- `resetAllData('DELETE')` is the only full-reset path. It is not called by startup or recovery.
+- Reset clears planning stores and meta, then recreates default settings and four diagnostics records. `databaseId` is preserved so the local database keeps its identity.
+- Reset is transactional. A wrong or partial confirmation raises `ValidationError` before any deletion.
+- Storage failures map to typed `AppError` subclasses: validation, not found, conflict, storage unavailable, quota exceeded, migration, import/export.
+- Dexie may wrap an error thrown inside a transaction. The mapper follows `cause`, `inner`, and aggregate `errors` so the original typed error reaches the UI and tests.
+- The recovery screen offers reload and guidance only. It never offers “clear data”.
 
 ---
 
@@ -556,3 +577,19 @@ Milestone 1 creates the runnable shell only:
 - README with setup and commands.
 
 Milestone 1 must **not** invent storage, calculations, or fake user data. Pages stay honest placeholders until their milestone. The placeholder season label must not masquerade as persisted data.
+
+---
+
+## 20. Milestone 2 implementation boundaries
+
+Milestone 2 implements the storage foundation only:
+
+- Branded entity types, Zod schemas, money and date utilities, locale helpers, and typed errors in `src/domain`.
+- Dexie version 1 with the stores and indexes from `DATA_MODEL.md` §4.2.
+- Typed repositories for seasons, settings, recipients, gifts, ideas, data health, and explicit reset.
+- Cross-season checks, recipient reassignment/cascade policies, gift/idea integrity, and transactional multi-record operations.
+- Settings/meta initialization, a generic data-migration harness, storage health, and explicit reset.
+- `fake-indexeddb` integration tests, boot screen, and a recovery screen.
+- Documentation and status copy updates.
+
+Milestone 2 does **not** implement season onboarding, management screens, dashboard data, backup/restore UI, CSV export, sample-data UI, themes, PWA, or an installable offline package. Pages remain honest about those gaps. No sample season is loaded and startup never chooses a season on the customer's behalf.

@@ -2,6 +2,7 @@ import { Check, Clock3, Sparkles } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Dialog } from '../components/ui/Dialog';
+import { APP_MILESTONE } from '../lib/appInfo';
 import styles from './AboutDialog.module.css';
 
 interface AboutDialogProps {
@@ -13,13 +14,14 @@ const included = [
   'Responsive application shell and navigation',
   'Warm design tokens and reusable interface components',
   'Accessible dialogs, forms, tables, and mobile navigation',
-  'Route error handling and a deliberate not-found page',
+  'Versioned local storage with typed validation and transactions',
+  'Safe startup diagnostics and storage recovery guidance',
   'Automated tests, type checking, linting, and a production build',
 ];
 
 const upcoming = [
-  'Persistent local storage (Milestone 2)',
-  'Recipients and gifts (Milestones 3–4)',
+  'First season and recipient management (Milestone 3)',
+  'Gifts and purchase status (Milestone 4)',
   'Budgets, dashboard charts, and progress (Milestone 5)',
   'Ideas, shopping, archives, and backups (Milestones 6–8)',
 ];
@@ -30,7 +32,7 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
       open={open}
       onClose={onClose}
       title="About this preview"
-      description="Milestone 1 of 12: the interface foundation."
+      description={`Milestone ${APP_MILESTONE} of 12: persistent local storage.`}
       footer={
         <Button variant="secondary" onClick={onClose}>
           Close
@@ -41,11 +43,11 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
         <div className={styles.intro}>
           <Badge tone="gold">
             <Sparkles size={12} aria-hidden="true" />
-            Milestone 1
+            Milestone {APP_MILESTONE}
           </Badge>
           <p>
-            The shell is ready. The screens are wired, the design system is in place, and the
-            application builds as a production web app.
+            The planner can now open and protect a local database. Data-entry screens arrive next;
+            this build does not invent a season or seed sample records.
           </p>
         </div>
 
@@ -75,8 +77,9 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
         </div>
 
         <div className={styles.notice}>
-          <strong>No customer data yet.</strong> This build does not create, store, or transmit gift
-          plans. Placeholder pages contain no sample records or hidden business logic.
+          <strong>No customer plans yet.</strong> The local storage layer is implemented, but there
+          are no recipient or gift screens in this build. No sample records are loaded, and no data
+          is sent anywhere.
         </div>
       </div>
     </Dialog>

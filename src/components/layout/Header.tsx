@@ -40,7 +40,7 @@ export function Header({ onOpenNav, onOpenAbout }: HeaderProps) {
       <div className={styles.right}>
         <span className={styles.preview}>
           <span className={styles.previewDot} aria-hidden="true" />
-          Milestone 1 preview
+          Milestone 2 preview
         </span>
         <IconButton label="About this build" icon={<Info />} onClick={onOpenAbout} />
       </div>
