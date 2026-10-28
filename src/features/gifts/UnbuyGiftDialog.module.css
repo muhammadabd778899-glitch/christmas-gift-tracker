@@ -1,0 +1,41 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.explainer {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+.statusList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem 0.85rem 2rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  list-style: disc;
+}
+
+.error {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-burgundy) 10%, transparent);
+  color: var(--color-brand-burgundy);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.unbuyButton {
+  background: var(--color-brand-burgundy) !important;
+  border-color: var(--color-brand-burgundy) !important;
+}
+
+.unbuyButton:hover:not(:disabled) {
+  filter: brightness(0.9);
+}

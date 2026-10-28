@@ -1,0 +1,114 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Notice banner (success / info toast) */
+.notice {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-evergreen) 12%, transparent);
+  color: var(--color-brand-evergreen);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.errorNotice {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-burgundy) 10%, transparent);
+  color: var(--color-brand-burgundy);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Season strip */
+.seasonStrip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.seasonStripIcon {
+  color: var(--color-brand-gold);
+  display: flex;
+  align-items: center;
+}
+
+.seasonStripDivider {
+  display: inline-block;
+  width: 1px;
+  height: 0.75rem;
+  background: var(--color-border);
+  margin: 0 0.25rem;
+  vertical-align: middle;
+}
+
+.seasonStripCount {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+/* Archived banner */
+.archivedBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.archivedIcon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  display: flex;
+}
+
+.archivedBanner strong {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.2rem;
+}
+
+/* Loading skeleton */
+.skeletonWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeletonRow {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.skeletonCell {
+  height: 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}

@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Architecture
 
-> Status: Version 0.3 · 2026-10-26 · Milestone 3 recipients and first-season setup recorded
-> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, and recipient workflow now exist; later sections remain target architecture.
+> Status: Version 0.4 · 2026-10-28 · Milestone 4 gifts and safe deletion recorded
+> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, recipient workflow, and gift workflow now exist; later sections remain target architecture.
 
 ---
 
@@ -250,6 +250,8 @@ Bulk operations (restore, season delete, recipient cascade, conversion) are sing
 - **Implemented in Milestone 3:** a typed `useLiveQueryState` wraps Dexie's `liveQuery`, returning explicit `loading`, `data`, and `error` states. Pages consume repositories through `StorageProvider`; they never import the Dexie instance directly.
 - Queries are scoped by the active season and re-run after writes.
 - Recipient cards re-render after create, edit, reassign, and cascade deletion without a manual reload.
+- Gift rows and recipient summaries re-render after gift create, edit, status changes, and deletion through repository writes.
+- A gift's status dates follow its boolean states: the quick status controls default a newly set state to the local date, and the edit form can change or clear each optional date.
 - A settings/active-season hook exposes the selected season and formatting preferences.
 - No duplicate in-memory copy of records; query results are the source for rendering.
 - Cross-tab updates are expected through Dexie's change events. This has not been added to the browser test matrix yet, and the current milestone makes no cross-tab guarantee.
@@ -264,12 +266,14 @@ Bulk operations (restore, season delete, recipient cascade, conversion) are sing
 
 ### 7.5 Storage persistence and health
 
-- **Deferred:** request `navigator.storage.persist()` during onboarding or after the first save, explain the result, and never block the workflow. Milestone 3 does **not** call it. Persistence timing and the buyer-facing explanation remain open.
+- **Deferred:** request `navigator.storage.persist()` during onboarding or after the first save, explain the result, and never block the workflow. Milestone 4 does **not** call it. Persistence timing and the buyer-facing explanation remain open.
 - Settings → Diagnostics is planned: `healthCheck()` exists in the storage layer and can produce a PII-free report, but the Settings diagnostics UI does not exist yet.
 - Quota errors are caught and surfaced with backup guidance.
 - The app never clears storage on its own.
 
-Milestone 3 implements seasons and recipients on top of the health engine. It does not add a persistence request, diagnostics UI, backup, or eviction protection. Browser cleanup can still remove local records, and the interface does not claim otherwise.
+Milestone 3 implements seasons and recipients on top of the health engine. Milestone 4 adds gifts and the status rules above. Neither milestone adds a persistence request, diagnostics UI, backup, or eviction protection. Browser cleanup can still remove local records, and the interface does not claim otherwise.
+
+Milestone 4 keeps gift status changes behind repository validation. The row quick controls use `setPurchaseState`, which rejects wrapped or sent without bought and defaults a newly set date. Un-buying through the row requires an explicit confirmation dialog; the edit form uses an inline confirmation and clears all dependent states and dates only after acceptance. Gift deletion runs in one transaction and reopens a converted idea when a source link exists.
 
 Milestone 2 implements the health engine (`src/storage/health.ts`) but not the Settings diagnostics UI. It returns typed counts, storage estimate/persistence fields, and stable issue codes without names, addresses, or notes. It performs reads only.
 
@@ -305,7 +309,7 @@ Milestone 2 implements the health engine (`src/storage/health.ts`) but not the S
 
 ### 8.3 Forms
 
-- Milestone 3 forms use typed local React state, visible labels, inline errors, and the shared Zod rules. Submissions call repositories; the repository validates again before writing.
+- Milestone 3 and 4 forms use typed local React state, visible labels, inline errors, and the shared Zod rules. Submissions call repositories; the repository validates again before writing.
 - Money inputs use `inputMode="decimal"`, keep raw text in form state, and parse at submit via `money.ts`.
 - Status toggles enforce transitions in the UI and re-check in the repository.
 - Destructive dialogs require an explicit action and, where specified, typed confirmation.
@@ -440,7 +444,7 @@ A milestone is not complete if any required check fails. “It builds” is not 
 
 ### 12.4 CI
 
-GitHub Actions from Milestone 1: install with a locked lockfile, typecheck, lint, unit/integration tests, build. Add Playwright with browser caching by Milestone 4. CI must not require secrets for the offline edition.
+GitHub Actions from Milestone 1: install with a locked lockfile, typecheck, lint, unit/integration tests, build. Playwright remains deferred and no end-to-end suite runs yet. CI must not require secrets for the offline edition.
 
 ---
 
@@ -625,5 +629,35 @@ Milestone 3 does **not** implement gift entry, season switching/editing/restorin
 - Season and recipient data can be removed by browser site-data clearing or storage eviction. No persistence request or backup exists yet.
 - Chromium 152 (OpenCode browser) on Windows has been exercised manually; Microsoft Edge 156 opened the production build headlessly. Firefox, Safari, mobile browsers, and cross-tab updates remain unverified.
 - Archived behavior is implemented defensively, but the normal archive-selection workflow arrives in Milestone 8.
-- The gift metrics are covered by tests and verified with seeded records; customers cannot create gifts until Milestone 4.
+- At the end of Milestone 3, gift creation was not yet available; gift metrics were verified with seeded records. Milestone 4 adds the customer-facing gift workflow.
 - A production chunk-size warning remains. It is not a functional failure and is revisited with route splitting in a later milestone.
+
+---
+
+## 22. Milestone 4 implementation boundaries
+
+Milestone 4 implements gift planning and safe deletion:
+
+- A Gifts page for the active season with a responsive table, an empty state, a no-recipient state, loading skeletons, a storage-error state, and an archived read-only state.
+- Gift create, edit, and delete flows. Every gift requires a recipient in the same season.
+- Approved fields: name, recipient, category, store, purchase link, planned budget, actual cost, delivery method, delivery address, notes, bought/wrapped/sent flags, and optional dates for those flags.
+- Purchase links accept only `http` and `https` URLs. Money accepts documented non-negative decimal formats, rejects extra decimals, and is stored as integer minor units.
+- Repository-enforced status invariants: wrapping and sending require a bought gift; direct status changes reject invalid transitions; changing a status clears dependent states and dates when required.
+- Quick status controls with busy and error handling. Un-buying from a row opens a confirmation dialog; un-buying in the edit form uses an inline confirmation. Cancelling changes nothing.
+- A bought gift without an actual cost is accepted, counts as zero spending, and is visibly flagged as "Cost missing."
+- Status dates are displayed in the row and may be cleared independently of their status when editing.
+- Gift deletion requires confirmation. Deleting a gift with a source idea reopens that idea in the same transaction.
+- Recipient planned, spent, remaining-cap, and utilization summaries update live after gift create, edit, status change, and deletion without a reload.
+- A controlled horizontal scroll region keeps the gift table usable at narrow widths without making the page itself scroll horizontally.
+
+Milestone 4 does **not** implement dashboard charts, Idea Bank UI, Shopping List, search or filters, backup/restore, CSV, sample data, archive management, season switching, themes, persistent-storage requests, service workers, or an offline package. Their screens remain honest placeholders.
+
+### 22.1 Known M4 limitations
+
+- Gift data can still be removed by clearing browser site data or by storage eviction. No persistence request, backup, or eviction protection exists.
+- Archived-season gift rendering was exercised by directly changing the season status in IndexedDB because archive management remains Milestone 8.
+- Interactive browser checks used Chromium 152 in the OpenCode browser. No Firefox, Safari, mobile-device, or cross-tab matrix was run.
+- Mobile table behavior was verified at a 390 CSS-pixel iframe viewport by measuring the page and scroll-container widths, not on a physical device.
+- No Playwright suite exists. Criteria that specify E2E verification were verified manually in the production preview; that substitution is disclosed in `MILESTONE_4_REPORT.md`.
+- A production chunk-size warning remains because the main JavaScript chunk exceeds 500 kB.
+- The gift table does not yet support sorting, filtering, or search. Those arrive in Milestone 7.

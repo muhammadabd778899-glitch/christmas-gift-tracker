@@ -1,0 +1,162 @@
+.row {
+  vertical-align: middle;
+}
+
+.row:hover {
+  background: var(--color-surface-raised);
+}
+
+/* Name cell */
+.nameCell {
+  min-width: 10rem;
+  max-width: 18rem;
+}
+
+.giftName {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+
+.purchaseLink {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.35rem;
+  color: var(--color-text-muted);
+  vertical-align: middle;
+  transition: color 150ms ease;
+}
+
+.purchaseLink:hover {
+  color: var(--color-brand-evergreen);
+}
+
+.categoryPill {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: var(--color-surface-overlay);
+  color: var(--color-text-muted);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Recipient + store */
+.recipientCell {
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.storeCell {
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.empty {
+  color: var(--color-text-muted);
+}
+
+/* Money */
+.moneyCell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.moneyValue {
+  display: block;
+}
+
+.missingCost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+  color: var(--color-brand-gold);
+  font-size: 0.68rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+/* Status */
+.statusCell {
+  white-space: nowrap;
+}
+
+.statusDates {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  white-space: normal;
+  max-width: 12rem;
+}
+
+/* Quick-toggle checkboxes */
+.toggleCell {
+  white-space: nowrap;
+}
+
+.toggles {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.toggleLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  cursor: pointer;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.toggleLabel:hover:not(.toggleDisabled) {
+  color: var(--color-brand-evergreen);
+}
+
+.toggleDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  cursor: inherit;
+  accent-color: var(--color-brand-evergreen);
+}
+
+/* Actions */
+.actionsCell {
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.deleteButton {
+  color: var(--color-brand-burgundy);
+}
+
+.deleteButton:hover {
+  background: color-mix(in srgb, var(--color-brand-burgundy) 10%, transparent);
+}

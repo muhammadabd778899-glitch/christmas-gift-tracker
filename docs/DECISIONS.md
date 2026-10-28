@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Decision Log
 
-> Status: Approved through Milestone 3; later decisions remain proposed · Version 0.3 · 2026-10-26
+> Status: Approved through Milestone 4; later decisions remain proposed · Version 0.4 · 2026-10-28
 > Format: lightweight ADRs. Statuses: **Proposed**, **Accepted**, **Superseded**, **Rejected**.
 > Decisions marked Proposed become binding when the owner approves the milestone that depends on them.
 
@@ -256,7 +256,7 @@
 
 ### D-020 — Every gift requires a recipient
 
-**Status:** Proposed · **Milestone:** 4
+**Status:** Accepted 2026-10-28 for Milestone 4 · **Milestone:** 4
 
 **Context:** Unassigned gifts complicate budget attribution, recipient summaries, shopping grouping, and charts.
 
@@ -360,7 +360,7 @@ Each row states the recommendation. Approving this specification approves the re
 | O-7 | Sample data behavior when real data exists? | Add as an archived sample season; never mix (D-016) | M2/M8/M12 | Decided 2026-10-26 |
 | O-8 | Allow zero active seasons? | Yes, with a dedicated empty state (D-018) | M2/M3 | Decided 2026-10-26 |
 | O-9 | Include “mark bought” on the Shopping List? | Yes, excluded from print; same status rules | M6 | Open |
-| O-10 | Require actual cost when marking a gift bought? | No; allow and flag missing cost | M4 | Open |
+| O-10 | Require actual cost when marking a gift bought? | No; allow and flag missing cost | M4 | Decided 2026-10-28 |
 | O-11 | Add a “does not need wrapping” exemption? | No for launch; document the limitation (D-024) | M5 | Open |
 | O-12 | Support a standalone desktop wrapper for Etsy? | Only if M10 proves PWA delivery insufficient | M10/M12 | Open |
 
@@ -370,7 +370,7 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 3:** Resolved 2026-10-26. The owner authorized Milestone 3; D-007 and O-4 were already accepted with Milestone 2.
 
-**Approval needed before Milestone 4:** D-020, O-10.
+**Approval needed before Milestone 4:** Resolved 2026-10-28. The owner authorized Milestone 4; D-020 is accepted and O-10 is decided (allow a bought gift without a cost and flag it).
 
 **Approval needed before Milestone 5:** D-021, D-024, O-11.
 

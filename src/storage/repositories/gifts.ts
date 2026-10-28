@@ -77,6 +77,7 @@ export function createGiftRepository(context: RepositoryContext): GiftRepository
           await assertWritableSeason(context, parsed.seasonId);
           await assertRecipientInSeason(context, parsed.recipientId, parsed.seasonId);
           const timestamp = context.nowIso();
+          const today = localToday(context.now());
           const gift = parseWithSchema(
             giftEntitySchema,
             {
@@ -90,11 +91,14 @@ export function createGiftRepository(context: RepositoryContext): GiftRepository
               plannedBudgetMinor: parsed.plannedBudgetMinor ?? null,
               actualCostMinor: parsed.actualCostMinor ?? null,
               bought: parsed.bought,
-              boughtOn: parsed.boughtOn ?? null,
+              // A newly bought gift defaults to today unless a date was supplied explicitly.
+              boughtOn:
+                parsed.boughtOn === undefined ? (parsed.bought ? today : null) : parsed.boughtOn,
               wrapped: parsed.wrapped,
-              wrappedOn: parsed.wrappedOn ?? null,
+              wrappedOn:
+                parsed.wrappedOn === undefined ? (parsed.wrapped ? today : null) : parsed.wrappedOn,
               sent: parsed.sent,
-              sentOn: parsed.sentOn ?? null,
+              sentOn: parsed.sentOn === undefined ? (parsed.sent ? today : null) : parsed.sentOn,
               deliveryMethod: parsed.deliveryMethod ?? null,
               address: parsed.address ?? null,
               notes: parsed.notes ?? null,
@@ -122,14 +126,37 @@ export function createGiftRepository(context: RepositoryContext): GiftRepository
             await assertRecipientInSeason(context, parsed.recipientId, current.seasonId);
           }
 
-          const next = parseWithSchema(
-            giftEntitySchema,
-            { ...applyDefined(current, parsed), updatedAt: context.nowIso() },
-            'The gift change is invalid.',
-          );
+          const next: Gift = { ...applyDefined(current, parsed), updatedAt: context.nowIso() };
+          const today = localToday(context.now());
 
-          await db.gifts.put(next);
-          return next;
+          // Dates follow their boolean. When a flag is explicitly cleared and its
+          // date is omitted, clear the date too. Dependent statuses are not
+          // cascaded here: the user must confirm an un-buy in the UI first.
+          if (parsed.bought === false && parsed.boughtOn === undefined) {
+            next.boughtOn = null;
+          }
+          if (parsed.wrapped === false && parsed.wrappedOn === undefined) {
+            next.wrappedOn = null;
+          }
+          if (parsed.sent === false && parsed.sentOn === undefined) {
+            next.sentOn = null;
+          }
+
+          // A false-to-true transition defaults to today when no date was sent.
+          if (!current.bought && parsed.bought === true && parsed.boughtOn === undefined) {
+            next.boughtOn = today;
+          }
+          if (!current.wrapped && parsed.wrapped === true && parsed.wrappedOn === undefined) {
+            next.wrappedOn = today;
+          }
+          if (!current.sent && parsed.sent === true && parsed.sentOn === undefined) {
+            next.sentOn = today;
+          }
+
+          const validated = parseWithSchema(giftEntitySchema, next, 'The gift change is invalid.');
+
+          await db.gifts.put(validated);
+          return validated;
         });
       });
     },

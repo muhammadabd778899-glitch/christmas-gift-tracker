@@ -13,18 +13,21 @@ interface AboutDialogProps {
 const included = [
   'Explicit first-season setup — nothing is created automatically',
   'Recipient profiles with optional caps, relationships, and notes',
-  'Planned, spent, and remaining cap calculated from gift records',
-  'Safe recipient deletion with move-or-delete choices for gifts',
+  'Gift records with recipients, stores, links, planned and actual costs',
+  'Independent bought, wrapped, and sent states with optional dates',
+  'Confirmation before un-buying or deleting a gift',
+  'Safe deletion that returns converted ideas to the Idea Bank',
   'Accessible dialogs, forms, tables, and responsive navigation',
   'Versioned local storage with validation and transactions',
   'Automated tests, type checking, linting, and a production build',
 ];
 
 const upcoming = [
-  'Gifts and purchase status (Milestone 4)',
   'Budgets, dashboard charts, and progress (Milestone 5)',
   'Ideas and grouped shopping lists (Milestone 6)',
-  'Search, archives, backup, and offline delivery (Milestones 7–10)',
+  'Search, filters, and recipient details (Milestone 7)',
+  'Season archives, backup, and CSV (Milestone 8)',
+  'Offline delivery and packaging (Milestones 9–10)',
 ];
 
 export function AboutDialog({ open, onClose }: AboutDialogProps) {
@@ -33,7 +36,7 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
       open={open}
       onClose={onClose}
       title="About this preview"
-      description={`Milestone ${APP_MILESTONE} of 12: recipients and first-season setup.`}
+      description={`Milestone ${APP_MILESTONE} of 12: gifts and safe deletion.`}
       footer={
         <Button variant="secondary" onClick={onClose}>
           Close
@@ -47,8 +50,9 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
             Milestone {APP_MILESTONE}
           </Badge>
           <p>
-            The planner can now create a real season and keep a recipient list in a private local
-            database. Gift entry, backup, and offline packaging are not implemented yet.
+            The planner can now create a season, keep a recipient list, and track gifts and their
+            purchase status in a private local database. Backup and offline packaging are not
+            implemented yet.
           </p>
         </div>
 
@@ -78,9 +82,9 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
         </div>
 
         <div className={styles.notice}>
-          <strong>Local and account-free.</strong> Seasons and recipients are stored only in this
-          browser. There is no backup, cloud sync, or proven recovery from cleared browser data, and
-          no data is sent anywhere.
+          <strong>Local and account-free.</strong> Seasons, recipients, and gifts are stored only in
+          this browser. There is no backup, cloud sync, or proven recovery from cleared browser
+          data, and no data is sent anywhere.
         </div>
       </div>
     </Dialog>

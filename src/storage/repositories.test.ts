@@ -466,6 +466,91 @@ describe('gift repository', () => {
     expect(unpurchased.sentOn).toBeNull();
   });
 
+  it('keeps status dates consistent through create and update', async () => {
+    const { season, recipient } = await createActiveSeasonWithRecipient();
+    const gift = await storage.repositories.gifts.create({
+      seasonId: season.id,
+      recipientId: recipient.id,
+      name: 'Dated gift',
+      bought: true,
+    });
+
+    expect(gift.boughtOn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+    const wrapped = await storage.repositories.gifts.update(gift.id, {
+      wrapped: true,
+      wrappedOn: '2026-12-10',
+    });
+    expect(wrapped).toMatchObject({
+      bought: true,
+      wrapped: true,
+      wrappedOn: '2026-12-10',
+      sent: false,
+      sentOn: null,
+    });
+
+    const cleared = await storage.repositories.gifts.update(gift.id, {
+      bought: false,
+      boughtOn: null,
+      wrapped: false,
+      wrappedOn: null,
+      sent: false,
+      sentOn: null,
+    });
+    expect(cleared).toMatchObject({
+      bought: false,
+      boughtOn: null,
+      wrapped: false,
+      wrappedOn: null,
+      sent: false,
+      sentOn: null,
+    });
+  });
+
+  it('rejects direct dependent status changes without bought', async () => {
+    const { season, recipient } = await createActiveSeasonWithRecipient();
+    const gift = await storage.repositories.gifts.create({
+      seasonId: season.id,
+      recipientId: recipient.id,
+      name: 'Not bought yet',
+    });
+
+    await expect(
+      storage.repositories.gifts.update(gift.id, { wrapped: true }),
+    ).rejects.toBeInstanceOf(ValidationError);
+    await expect(
+      storage.repositories.gifts.setPurchaseState(gift.id, { sent: true }),
+    ).rejects.toBeInstanceOf(ValidationError);
+
+    expect(await storage.repositories.gifts.get(gift.id)).toMatchObject({
+      bought: false,
+      wrapped: false,
+      sent: false,
+    });
+  });
+
+  it('rejects moving a gift to a recipient in another season', async () => {
+    const otherSeason = await createActiveSeason('Other season');
+    const otherRecipient = await storage.repositories.recipients.create({
+      seasonId: otherSeason.id,
+      name: 'Other recipient',
+    });
+    await storage.repositories.seasons.archive(otherSeason.id);
+
+    const { season, recipient } = await createActiveSeasonWithRecipient();
+    const gift = await storage.repositories.gifts.create({
+      seasonId: season.id,
+      recipientId: recipient.id,
+      name: 'Warm scarf',
+    });
+
+    await expect(
+      storage.repositories.gifts.update(gift.id, { recipientId: otherRecipient.id }),
+    ).rejects.toBeInstanceOf(ValidationError);
+
+    expect((await storage.repositories.gifts.get(gift.id)).recipientId).toBe(recipient.id);
+  });
+
   it('deletes a gift and leaves its recipient intact', async () => {
     const { season, recipient } = await createActiveSeasonWithRecipient();
     const gift = await storage.repositories.gifts.create({

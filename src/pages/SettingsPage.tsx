@@ -51,7 +51,7 @@ const milestones: Milestone[] = [
     number: '4',
     title: 'Gifts',
     focus: 'Gift records, costs, statuses, stores, and safe deletion',
-    status: 'Planned',
+    status: 'Complete',
   },
   {
     number: '5',
@@ -104,17 +104,18 @@ const milestones: Milestone[] = [
 ];
 
 const buildFacts = [
-  ['Version', `v${APP_VERSION} · Milestone 3`],
+  ['Version', `v${APP_VERSION} · Milestone 4`],
   ['Framework', 'React 19 + TypeScript + Vite'],
   ['Styling', 'CSS Modules + design tokens'],
-  ['Storage', 'IndexedDB via Dexie — seasons and recipients'],
+  ['Storage', 'IndexedDB via Dexie — seasons, recipients, and gifts'],
   ['Theme', 'Light theme only — dark mode in Milestone 9'],
   ['Offline', 'Not yet packaged — Milestone 10'],
-  ['Data', 'One active season and recipient records; gifts arrive in Milestone 4'],
+  ['Data', 'One active season with recipient and gift records'],
 ];
 
 const limitations = [
-  'Gifts, ideas, shopping lists, and archive management are not available yet.',
+  'Ideas, shopping lists, and archive management are not available yet.',
+  'Dashboard charts and full budget reporting arrive in Milestone 5.',
   'Season editing, switching, and restore controls arrive in Milestone 8.',
   'No sample records are loaded, and startup never invents a season.',
   'The theme is light only until Milestone 9.',
@@ -133,7 +134,7 @@ export function SettingsPage() {
         eyebrow="Preferences and information"
         title="Settings"
         description="What this build includes, what it deliberately leaves for later, and how the product will protect your data."
-        badge={<Badge tone="gold">Milestone 3 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 4 preview</Badge>}
       />
 
       <Card>
@@ -209,8 +210,8 @@ export function SettingsPage() {
             </span>
             <CardTitle as="h2">Local-first progress</CardTitle>
             <CardDescription>
-              The planner now uses a private, validated local database for real season and recipient
-              records. Backup and offline delivery are still ahead.
+              The planner now uses a private, validated local database for real season, recipient,
+              and gift records. Backup and offline delivery are still ahead.
             </CardDescription>
           </CardHeader>
           <CardContent>

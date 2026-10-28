@@ -303,8 +303,8 @@ export function SeasonSetupPage() {
             <p className={styles.asideEyebrow}>What comes next</p>
             <h2 id="setup-next">People, then presents.</h2>
             <p>
-              Once the season exists, you can add the people you are planning for. Gifts arrive in
-              the next milestone.
+              Once the season exists, add the people you are planning for. You can then record
+              gifts, costs, and purchase status from the Gifts page.
             </p>
           </div>
 

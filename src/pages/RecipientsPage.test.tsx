@@ -290,6 +290,46 @@ describe('Recipients page', () => {
     expect(card.getByText('2 gifts')).toBeInTheDocument();
   });
 
+  it('updates recipient summaries live when a gift changes without a reload', async () => {
+    const storage = await createTestStorage();
+    const season = await addSeason(storage);
+    const recipient = await addRecipient(storage, season.id, 'Alex', {
+      budgetCapMinor: 10000,
+    });
+    await renderApp(['/recipients'], { storage });
+
+    const card = within(await waitFor(() => cardFor('Alex')));
+    expect(card.getByText('No gifts yet')).toBeInTheDocument();
+
+    const gift = await storage.repositories.gifts.create({
+      seasonId: season.id,
+      recipientId: recipient.id,
+      name: 'Scarf',
+      plannedBudgetMinor: 2500,
+      actualCostMinor: 1999,
+      bought: false,
+    });
+
+    await waitFor(() => {
+      expect(card.getByText('$25.00')).toBeInTheDocument();
+      expect(card.getByText('1 gift')).toBeInTheDocument();
+    });
+    expect(card.queryByText('$19.99')).not.toBeInTheDocument();
+
+    await storage.repositories.gifts.setPurchaseState(gift.id, { bought: true });
+
+    await waitFor(() => {
+      expect(card.getByText('$19.99')).toBeInTheDocument();
+      expect(card.getByText('20% of cap used')).toBeInTheDocument();
+    });
+
+    await storage.repositories.gifts.delete(gift.id);
+
+    await waitFor(() => {
+      expect(card.getByText('No gifts yet')).toBeInTheDocument();
+    });
+  });
+
   it('lists only recipients for the active season', async () => {
     const storage = await createTestStorage();
     const previous = await addSeason(storage, {

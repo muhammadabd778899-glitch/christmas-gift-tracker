@@ -1,0 +1,57 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.giftSummary {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.giftName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+}
+
+.detail {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.label {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-right: 0.25rem;
+}
+
+.ideaNote {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.error {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-burgundy) 10%, transparent);
+  color: var(--color-brand-burgundy);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.deleteButton {
+  background: var(--color-brand-burgundy) !important;
+  border-color: var(--color-brand-burgundy) !important;
+}
+
+.deleteButton:hover:not(:disabled) {
+  filter: brightness(0.9);
+}

@@ -32,7 +32,7 @@ const capabilities = [
   },
   {
     icon: PackageCheck,
-    milestone: 'M4–5',
+    milestone: 'Available now',
     title: 'Gift progress',
     description:
       'See bought, wrapped, and sent at a glance — three explicit states, not one vague checkbox.',
@@ -56,17 +56,12 @@ const capabilities = [
 const foundation = [
   'Explicit first-season setup that never invents a season',
   'Recipient profiles with caps, notes, and safe deletion',
-  'Planned and spent totals derived from gift records (gifts arrive in M4)',
+  'Gift records with costs, links, statuses, and confirmed deletion',
   'Warm design tokens and reusable, accessible components',
   'Validated local storage with typed repositories and transactions',
 ];
 
 const nextSteps = [
-  {
-    number: '04',
-    title: 'Gifts',
-    description: 'Costs, statuses, stores, links, and safe deletion.',
-  },
   {
     number: '05',
     title: 'Budget engine and dashboard',
@@ -82,6 +77,11 @@ const nextSteps = [
     title: 'Search and details',
     description: 'Find people and records as the planner grows.',
   },
+  {
+    number: '08',
+    title: 'Seasons and archives',
+    description: 'Reuse the planner each year and protect past Christmas records.',
+  },
 ];
 
 export function DashboardPage() {
@@ -95,7 +95,7 @@ export function DashboardPage() {
         eyebrow="Overview"
         title="Dashboard"
         description="Your Christmas plan, at a glance."
-        badge={<Badge tone="gold">Milestone 3 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 4 preview</Badge>}
         actions={
           <Link className={buttonStyles({ variant: 'secondary', size: 'sm' })} to="/settings">
             View build roadmap
@@ -107,17 +107,17 @@ export function DashboardPage() {
         <div className={styles.heroCopy}>
           <p className={styles.heroEyebrow}>
             <Sparkles size={15} aria-hidden="true" />
-            Recipient planning is ready
+            Gift tracking is ready
           </p>
           <h2 id="hero-title">Make room for a calmer Christmas.</h2>
           <p className={styles.heroText}>
-            Start with the people on your list, give each person an optional budget cap, and see
-            what is planned, spent, and left as gifts are added. Gift entry and the full budget view
-            build on this next.
+            Start with the people on your list, then record each gift, its costs, and its purchase
+            status. Planned and spent figures update as your gift list grows; the full budget view
+            comes next.
           </p>
           <div className={styles.heroActions}>
-            <Link className={buttonStyles({ variant: 'inverse' })} to="/recipients">
-              Open recipients
+            <Link className={buttonStyles({ variant: 'inverse' })} to="/gifts">
+              Open gifts
               <ArrowRight size={17} aria-hidden="true" />
             </Link>
             <Link className={buttonStyles({ variant: 'ghost-inverse' })} to="/settings">
@@ -138,7 +138,7 @@ export function DashboardPage() {
           </span>
           <span className={styles.floatingTagBottom}>
             <Gift size={14} />
-            Gifts next
+            Gifts ready
           </span>
         </div>
       </section>
@@ -150,8 +150,8 @@ export function DashboardPage() {
             <h2 id="capabilities-title">Built around the way December actually feels.</h2>
           </div>
           <p>
-            Recipients are available now. Gift tracking, budgets, ideas, and shopping lists arrive
-            in the next milestones — each built on the same tested local foundation.
+            Recipients and gifts are available now. Budgets, ideas, and shopping lists arrive in the
+            next milestones — each built on the same tested local foundation.
           </p>
         </div>
 
@@ -185,10 +185,10 @@ export function DashboardPage() {
               <Check size={12} aria-hidden="true" />
               Milestone {APP_MILESTONE}
             </Badge>
-            <CardTitle as="h2">Your first season can start here</CardTitle>
+            <CardTitle as="h2">Your Christmas plan can start here</CardTitle>
             <CardDescription>
-              A season and recipient list are live, backed by validated local records and safe
-              deletion.
+              A season, recipient list, and gift records are live, backed by validated local storage
+              and safe deletion.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -211,7 +211,7 @@ export function DashboardPage() {
               <Clock3 size={12} aria-hidden="true" />
               Up next
             </Badge>
-            <CardTitle as="h2">From recipients to gifts</CardTitle>
+            <CardTitle as="h2">From gifts to budgets</CardTitle>
             <CardDescription>The build advances one verified capability at a time.</CardDescription>
           </CardHeader>
           <CardContent>

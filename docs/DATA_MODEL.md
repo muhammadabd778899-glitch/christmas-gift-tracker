@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Data Model
 
-> Status: Normative; version-1 storage implemented in Milestone 2 · Version 0.2 · 2026-10-26
+> Status: Normative; version-1 storage implemented in Milestone 2 · Version 0.4 · 2026-10-28
 > Implements the requirements in `docs/PRODUCT_SPEC.md`. `src/domain` and `src/storage` follow this document; later sections (backup, CSV, sample loader, online sync) remain planned.
 
 ---
@@ -277,7 +277,7 @@ Meta is device-local and is **not** included in backups.
 - IndexedDB, accessed through **Dexie 4**. Reactive reads use Dexie's `liveQuery` through the typed `useLiveQueryState` hook (D-025), not `dexie-react-hooks`.
 - Database name: `christmas-gift-tracker`.
 - Database version: `1` at launch.
-- All structured data lives here. No `localStorage` is used in Milestone 3. A theme-only pre-paint mirror is planned for Milestone 9 (D-017); it will never be a database.
+- All structured data lives here. No `localStorage` is used. A theme-only pre-paint mirror is planned for Milestone 9 (D-017); it will never be a database.
 
 Rationale for Dexie over a hand-written wrapper: reliable versioned migrations, transactions, compound indexes, and reactive queries reduce the risk of inconsistent data and stale dashboards. See `docs/DECISIONS.md` D-003 and D-025.
 

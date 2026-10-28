@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestones 0–3 complete and verified; Milestone 4 not started · Version 0.3 · 2026-10-26
+> Status: Milestones 0–4 complete and verified; Milestone 5 not started · Version 0.4 · 2026-10-28
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -10,13 +10,13 @@
 | Item | State |
 | --- | --- |
 | Repository | Runnable React/TypeScript/Vite application, approved specification, and tested local storage |
-| Current milestone | **Milestone 3 — Recipients and first-season setup** (complete; awaiting owner review before M4) |
-| Application runnable | Yes — development server, tests, coverage, and production build pass |
-| Tests | 120 Vitest tests passing; no Playwright suite yet |
-| Next milestone | Milestone 4 — Gifts and safe deletion (not started) |
-| Next action | Owner reviews `docs/MILESTONE_3_REPORT.md` and authorizes Milestone 4 |
+| Current milestone | **Milestone 4 - Gifts and safe deletion** (complete; awaiting owner review before M5) |
+| Application runnable | Yes - development server, tests, coverage, and production build pass |
+| Tests | 163 Vitest tests passing; no Playwright suite yet |
+| Next milestone | Milestone 5 - Budget engine and dashboard (not started) |
+| Next action | Owner reviews `docs/MILESTONE_4_REPORT.md` and authorizes Milestone 5 |
 
-**Do not start Milestone 4 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
+**Do not start Milestone 5 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
 
 ---
 
@@ -28,7 +28,7 @@
 | 1 | Foundation | Runnable shell, navigation, design tokens, quality tooling | Complete — verified |
 | 2 | Persistent storage | IndexedDB schema, repositories, migrations, validation | Complete — verified |
 | 3 | Recipients | Recipient management with caps and summaries | Complete — verified |
-| 4 | Gifts | Gift records, costs, statuses, deletion | Not started |
+| 4 | Gifts | Gift records, costs, statuses, deletion | Complete - verified |
 | 5 | Budget engine + dashboard | Central calculations and live dashboard | Not started |
 | 6 | Idea Bank + Shopping List | Ideas convert to gifts; derived shopping list | Not started |
 | 7 | Search, filters, details | Find and review data at scale | Not started |
@@ -118,7 +118,7 @@ Order rationale:
 - Desktop navigation uses a persistent sidebar. Mobile uses a drawer; a bottom navigation bar was not needed and is not included.
 - The light-theme placeholder is the explicit “Light theme only — dark mode in Milestone 9” note in Settings. No theme toggle is presented.
 - The toast/announcer primitive was deferred until the first feature that needs transient feedback (Milestone 3/4). Inline errors and the shared error states exist now.
-- Playwright remains deferred to Milestone 4; `e2e/` is reserved but no end-to-end suite has run.
+- Playwright remains deferred; `e2e/` is reserved but no end-to-end suite has run.
 - ESLint is pinned to 9.39.5 because `eslint-plugin-jsx-a11y` 6.10.2 does not support ESLint 10 yet. Revisit after the release milestone.
 - System font stacks are used until self-hosted brand fonts are introduced in Milestone 9. No remote font or CDN request is made.
 - GitHub Actions verifies formatting, type checking, linting, tests, and the production build on pushes and pull requests.
@@ -155,7 +155,7 @@ Order rationale:
 
 **Exit gate — met**
 
-- AC-2.01–AC-2.22 pass (AC-2.12 verified manually; the Playwright harness is deferred to Milestone 4).
+- AC-2.01-AC-2.22 pass (AC-2.12 verified manually; Playwright remains deferred and no end-to-end suite has run).
 - A record created through a console flow survived a full page reload; the database identity was preserved.
 - Invalid data and cross-season references are rejected before writes.
 - A forced multi-record failure rolled back every change.
@@ -195,7 +195,7 @@ Order rationale:
 
 **Exit gate — met**
 
-- AC-3.01–AC-3.18 pass through automated tests and recorded browser checks; Playwright remains deferred to Milestone 4.
+- AC-3.01-AC-3.18 pass through automated tests and recorded browser checks; Playwright remains deferred.
 - Recipient changes persist across refresh.
 - No recipient totals are stored; all are derived.
 - A user with no season can create one explicitly; the app never invents one.
@@ -214,7 +214,9 @@ Order rationale:
 
 ---
 
-## 7. Milestone 4 — Gifts
+## 7. Milestone 4 - Gifts
+
+**Status:** Complete and verified on 2026-10-28. See `docs/MILESTONE_4_REPORT.md`.
 
 **Depends on:** M2, M3; D-006, D-020; O-10.
 
@@ -251,7 +253,9 @@ Order rationale:
 
 ---
 
-## 8. Milestone 5 — Budget engine and dashboard
+## 8. Milestone 5 - Budget engine and dashboard
+
+**Status:** Not started. Begins only after owner review and authorization.
 
 **Depends on:** M4; D-021, D-024; O-11.
 
@@ -563,7 +567,7 @@ npm run test
 npm run test:coverage
 npm run build
 npm run preview
-npm run test:e2e        # from Milestone 4
+# Playwright is not installed; no end-to-end script exists yet.
 ```
 
 Manual checks supplement automation:
@@ -637,9 +641,9 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews the running recipient workflow and `docs/MILESTONE_3_REPORT.md`.
+1. Owner reviews the running recipient and gift workflows and `docs/MILESTONE_4_REPORT.md`.
 2. Owner confirms the remaining browser-storage persistence timing and buyer-facing explanation before release packaging.
-3. Owner authorizes Milestone 4.
-4. Only then begin gift records, costs, statuses, and safe gift deletion.
+3. Owner authorizes Milestone 5.
+4. Only then begin the shared budget engine and dashboard work.
 
-Milestone 4 is **not started**. Until authorization: **stop.**
+Milestone 5 is **not started**. Until authorization: **stop.**
