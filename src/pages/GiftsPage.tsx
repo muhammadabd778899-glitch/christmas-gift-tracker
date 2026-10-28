@@ -39,6 +39,21 @@ export function GiftsPage() {
   const focusMainAfterNoticeRef = useRef(false);
 
   useEffect(() => {
+    if (!data.data || !location.hash.startsWith('#gift-')) {
+      return;
+    }
+
+    const target = document.getElementById(location.hash.slice(1));
+
+    if (target) {
+      if (typeof target.scrollIntoView === 'function') {
+        target.scrollIntoView({ block: 'center' });
+      }
+      target.focus({ preventScroll: true });
+    }
+  }, [data.data, location.hash]);
+
+  useEffect(() => {
     if (!notice) return;
 
     if (focusMainAfterNoticeRef.current) {
@@ -88,6 +103,9 @@ export function GiftsPage() {
 
   const { settings, season, recipients, gifts } = data.data;
   const archived = season?.status === 'archived';
+  const highlightedGiftId = location.hash.startsWith('#gift-')
+    ? location.hash.slice('#gift-'.length)
+    : null;
   const canEdit = season !== null && !archived;
   const canAddGift = canEdit && recipients.length > 0;
   const seasonDate = season ? formatDateOnly(season.holidayDate, settings.locale) : null;
@@ -204,6 +222,7 @@ export function GiftsPage() {
               settings={settings}
               readOnly
               busyGiftId={null}
+              highlightedGiftId={highlightedGiftId}
               onEdit={() => undefined}
               onDelete={() => undefined}
               onQuickStatus={() => undefined}
@@ -281,6 +300,7 @@ export function GiftsPage() {
             settings={settings}
             readOnly={false}
             busyGiftId={statusBusyId}
+            highlightedGiftId={highlightedGiftId}
             onEdit={setFormGift}
             onDelete={setDeleteTarget}
             onQuickStatus={(gift, field, next) => {
@@ -339,6 +359,7 @@ interface GiftTableProps {
   settings: AppSettings;
   readOnly: boolean;
   busyGiftId: string | null;
+  highlightedGiftId: string | null;
   onEdit: (gift: GiftEntity) => void;
   onDelete: (gift: GiftEntity) => void;
   onQuickStatus: (gift: GiftEntity, field: GiftStatusField, next: boolean) => void;
@@ -350,6 +371,7 @@ function GiftTable({
   settings,
   readOnly,
   busyGiftId,
+  highlightedGiftId,
   onEdit,
   onDelete,
   onQuickStatus,
@@ -377,6 +399,7 @@ function GiftTable({
             settings={settings}
             readOnly={readOnly}
             busy={busyGiftId === gift.id}
+            highlighted={highlightedGiftId === gift.id}
             onEdit={onEdit}
             onDelete={onDelete}
             onQuickStatus={onQuickStatus}

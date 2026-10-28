@@ -268,6 +268,16 @@ Meta is device-local and is **not** included in backups.
 - The only persisted status values are the booleans/dates and the two season/idea status fields described above.
 - Derived cache, if ever added for performance, must be invalidated from a single source and is not part of the launch design.
 
+### 3.8 Derived Shopping List
+
+- Built at read time from gifts where `bought = false`; there is no shopping-list store or snapshot.
+- Store grouping is case-insensitive. The first spelling encountered is used as the display label. Gifts without a store are grouped under “No store specified” and placed last.
+- Named groups sort alphabetically; rows sort by gift name with a stable tie-breaker.
+- Each group has a subtotal of planned budgets, treating `null` as zero. The visible total is the sum of all group subtotals.
+- Rows show the gift, recipient, planned budget, and an external link when present.
+- “Mark bought” writes through the gift repository and follows the same status rules as the Gifts page. It is excluded from print.
+- Print output includes the list title, season, print date, groups, rows, and totals. Navigation and controls are hidden. Printing does not mutate data.
+
 ---
 
 ## 4. Storage schema

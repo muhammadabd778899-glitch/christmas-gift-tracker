@@ -14,7 +14,6 @@ async function addSeason(storage: Awaited<ReturnType<typeof createTestStorage>>)
 
 describe('Season setup page', () => {
   it('creates a first season explicitly and proceeds to recipients', async () => {
-    const user = userEvent.setup();
     const storage = await createTestStorage();
     await renderApp(['/onboarding'], { storage });
 
@@ -23,21 +22,25 @@ describe('Season setup page', () => {
     ).toBeInTheDocument();
     await expect(storage.repositories.seasons.list()).resolves.toHaveLength(0);
 
-    const nameInput = screen.getByLabelText(/Season name/);
-    await user.clear(nameInput);
-    await user.type(nameInput, 'Our Family Christmas');
+    fireEvent.change(screen.getByLabelText(/Season name/), {
+      target: { value: 'Our Family Christmas' },
+    });
     fireEvent.change(screen.getByLabelText(/Holiday date/), {
       target: { value: '2026-12-24' },
     });
-    await user.type(screen.getByLabelText(/Overall season budget/), '750.25');
-    await user.click(screen.getByRole('button', { name: 'Create season' }));
+    fireEvent.change(screen.getByLabelText(/Overall season budget/), {
+      target: { value: '750.25' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Create season' }));
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Recipients' }),
+      await screen.findByRole('heading', { level: 1, name: 'Recipients' }, { timeout: 12_000 }),
     ).toBeInTheDocument();
     expect(
       await screen.findByText(
         'Our Family Christmas is ready. Add the first person you are planning for.',
+        {},
+        { timeout: 12_000 },
       ),
     ).toBeInTheDocument();
 

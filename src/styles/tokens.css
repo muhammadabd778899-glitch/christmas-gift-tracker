@@ -50,6 +50,13 @@
   --color-success: #2e6b4f;
   --color-success-soft: #e2f0e8;
 
+  /* Semantic aliases used by feature styles. */
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: var(--color-text-soft);
+  --color-brand-evergreen: var(--color-evergreen-700);
+  --color-brand-burgundy: var(--color-burgundy-700);
+  --color-surface-overlay: var(--color-surface-muted);
+
   --shadow-xs: 0 1px 2px rgb(30 42 36 / 5%);
   --shadow-sm: 0 2px 8px rgb(30 42 36 / 5%), 0 1px 2px rgb(30 42 36 / 4%);
   --shadow-md: 0 14px 36px rgb(30 42 36 / 8%), 0 2px 8px rgb(30 42 36 / 4%);

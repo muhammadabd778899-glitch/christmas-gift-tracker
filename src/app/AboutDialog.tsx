@@ -18,6 +18,10 @@ const included = [
   'A live dashboard with budget, planned, spent, remaining, and unallocated figures',
   'A budget-vs-actual chart with an accessible table of the same numbers',
   'Holiday countdown, gift progress, and data-quality alerts',
+  'An Idea Bank with search, editing, conversion, and safe reopening',
+  'A shopping list derived from unbought gifts, grouped by store with subtotals',
+  'Mark bought from the shopping list with the same status rules',
+  'A print view that hides navigation and controls',
   'Confirmation before un-buying or deleting a gift',
   'Safe deletion that returns converted ideas to the Idea Bank',
   'Accessible dialogs, forms, tables, and responsive navigation',
@@ -26,10 +30,10 @@ const included = [
 ];
 
 const upcoming = [
-  'Ideas and grouped shopping lists (Milestone 6)',
   'Search, filters, and recipient details (Milestone 7)',
   'Season archives, backup, and CSV (Milestone 8)',
-  'Offline delivery and packaging (Milestones 9–10)',
+  'Professional UI, themes, and accessibility polish (Milestone 9)',
+  'Offline delivery and packaging (Milestone 10)',
 ];
 
 export function AboutDialog({ open, onClose }: AboutDialogProps) {
@@ -38,7 +42,7 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
       open={open}
       onClose={onClose}
       title="About this preview"
-      description={`Milestone ${APP_MILESTONE} of 12: budget engine and dashboard.`}
+      description={`Milestone ${APP_MILESTONE} of 12: Idea Bank and Shopping List.`}
       footer={
         <Button variant="secondary" onClick={onClose}>
           Close
@@ -52,9 +56,10 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
             Milestone {APP_MILESTONE}
           </Badge>
           <p>
-            The planner can now create a season, keep a recipient list, track gifts, and see
-            planned, actual, remaining, and unallocated budget figures calculated from your saved
-            records. Backup and offline packaging are not implemented yet.
+            The planner can now create a season, keep a recipient list, track gifts, capture ideas,
+            convert them into gifts, and build a grouped shopping list from unbought gifts. Budget
+            figures still come from saved gift records. Backup and offline packaging are not
+            implemented yet.
           </p>
         </div>
 
@@ -84,9 +89,9 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
         </div>
 
         <div className={styles.notice}>
-          <strong>Local and account-free.</strong> Seasons, recipients, gifts, and budget records
-          are stored only in this browser. There is no backup, cloud sync, or proven recovery from
-          cleared browser data, and no data is sent anywhere.
+          <strong>Local and account-free.</strong> Seasons, recipients, gifts, ideas, and budget
+          records are stored only in this browser. There is no backup, cloud sync, or proven
+          recovery from cleared browser data, and no data is sent anywhere.
         </div>
       </div>
     </Dialog>

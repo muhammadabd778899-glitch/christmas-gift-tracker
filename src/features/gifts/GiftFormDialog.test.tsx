@@ -98,6 +98,22 @@ describe('Gifts page', () => {
     expect(screen.getByRole('button', { name: 'Add your first gift' })).toBeInTheDocument();
   });
 
+  it('highlights and focuses the gift targeted by a converted-idea link', async () => {
+    const storage = await createTestStorage();
+    const season = await addSeason(storage);
+    const alex = await addRecipient(storage, season.id, 'Alex');
+    const gift = await addGift(storage, season.id, alex.id, { name: 'Warm scarf' });
+    await renderApp([`/gifts#gift-${gift.id}`], { storage });
+
+    const row = (await screen.findByText('Warm scarf')).closest('tr');
+    if (!row) throw new Error('Gift row was not rendered.');
+
+    await waitFor(() => {
+      expect(row).toHaveAttribute('data-highlighted', 'true');
+      expect(row).toHaveFocus();
+    });
+  });
+
   it('asks for a recipient before a gift can be added', async () => {
     const storage = await createTestStorage();
     await addSeason(storage);

@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Decision Log
 
-> Status: Approved through Milestone 5; later decisions remain proposed · Version 0.5 · 2026-10-28
+> Status: Approved through Milestone 6; later decisions remain proposed · Version 0.6 · 2026-10-28
 > Format: lightweight ADRs. Statuses: **Proposed**, **Accepted**, **Superseded**, **Rejected**.
 > Decisions marked Proposed become binding when the owner approves the milestone that depends on them.
 
@@ -326,6 +326,18 @@
 
 ---
 
+### D-026 — Shopping List is derived and print-only
+
+**Status:** Accepted 2026-10-28 for Milestone 6 · **Milestone:** 6
+
+**Context:** A saved shopping list would duplicate gift state and could drift after purchases, edits, or deletions. Printing also needs a predictable page without app navigation or action controls.
+
+**Decision:** Build the Shopping List at read time from unbought gifts. Do not add a shopping-list table, snapshot, or cache. Group stores case-insensitively, put “No store specified” last, show group subtotals and a visible total, and sort deterministically. “Mark bought” uses the existing gift repository and is omitted from print. Print output includes the title, season, print date, groups, rows, and totals, and hides app chrome and controls. Printing is performed through the browser print dialog; no PDF export or saved print file is added.
+
+**Consequences:** One source of truth and immediate consistency after gift changes. The list cannot be edited independently of gifts. A bought gift without an actual cost remains allowed and flagged under O-10. Print output depends on the browser's print rendering and has been verified with Chrome print-media emulation and a generated PDF, not with a dedicated PDF library.
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Confidence | Impact if wrong |
@@ -359,7 +371,7 @@ Each row states the recommendation. Approving this specification approves the re
 | O-6 | Backup restore mode? | Replace-all only with pre-restore backup (D-010) | M8 | Open |
 | O-7 | Sample data behavior when real data exists? | Add as an archived sample season; never mix (D-016) | M2/M8/M12 | Decided 2026-10-26 |
 | O-8 | Allow zero active seasons? | Yes, with a dedicated empty state (D-018) | M2/M3 | Decided 2026-10-26 |
-| O-9 | Include “mark bought” on the Shopping List? | Yes, excluded from print; same status rules | M6 | Open |
+| O-9 | Include “mark bought” on the Shopping List? | Yes, excluded from print; same status rules | M6 | Decided 2026-10-28 |
 | O-10 | Require actual cost when marking a gift bought? | No; allow and flag missing cost | M4 | Decided 2026-10-28 |
 | O-11 | Add a "does not need wrapping" exemption? | No for launch; document the limitation (D-024) | M5 | Decided 2026-10-28 |
 | O-12 | Support a standalone desktop wrapper for Etsy? | Only if M10 proves PWA delivery insufficient | M10/M12 | Open |
@@ -374,7 +386,7 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 5:** Resolved 2026-10-28. The owner authorized Milestone 5; D-021 and D-024 are accepted and O-11 is decided (no wrapping exemption at launch; document the limitation).
 
-**Approval needed before Milestone 6:** O-9. D-008 is accepted for the storage conversion service.
+**Approval needed before Milestone 6:** Resolved 2026-10-28. The owner authorized Milestone 6; O-9 is decided (include “mark bought” on the Shopping List, exclude it from print, and use the same status rules). D-008 is accepted for the storage conversion service.
 
 **Approval needed before Milestone 8:** D-010, D-023, O-6. D-009 and D-016 are accepted for the storage layer.
 
@@ -412,3 +424,4 @@ Each row states the recommendation. Approving this specification approves the re
 | 2026-10-26 | Milestone 1 implementation notes recorded in `MILESTONE_1_REPORT.md`; no new architecture decision required | AI |
 | 2026-10-26 | D-002 through D-009, D-016, D-018, D-019, O-3, O-4, O-7, and O-8 accepted/decided for Milestone 2; storage implementation recorded in `MILESTONE_2_REPORT.md` | AI |
 | 2026-10-26 | D-025 accepted for Milestone 3; the reactive-hook portion of D-003 is superseded; recipient implementation recorded in `MILESTONE_3_REPORT.md` | AI |
+| 2026-10-28 | O-9 decided for Milestone 6; D-026 accepted for the derived Shopping List and print behavior; implementation recorded in `MILESTONE_6_REPORT.md` | AI |

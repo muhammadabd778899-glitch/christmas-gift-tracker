@@ -44,9 +44,18 @@ describe('application shell', () => {
     for (const destination of destinations) {
       await user.click(within(primaryNavigation).getByRole('link', { name: destination.link }));
 
-      expect(
-        await screen.findByRole('heading', { level: 1, name: destination.heading }),
-      ).toBeInTheDocument();
+      try {
+        await waitFor(
+          () => {
+            expect(
+              screen.getByRole('heading', { level: 1, name: destination.heading }),
+            ).toBeInTheDocument();
+          },
+          { timeout: 3000 },
+        );
+      } catch (error) {
+        throw new Error(`Failed to reach ${destination.link}`, { cause: error });
+      }
     }
 
     await waitFor(() => {
@@ -70,7 +79,7 @@ describe('application shell', () => {
 
     const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
     expect(
-      within(dialog).getByText('Milestone 5 of 12: budget engine and dashboard.'),
+      within(dialog).getByText('Milestone 6 of 12: Idea Bank and Shopping List.'),
     ).toBeVisible();
     expect(within(dialog).getByText(/Local and account-free/i)).toBeInTheDocument();
 

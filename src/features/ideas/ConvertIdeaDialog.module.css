@@ -1,0 +1,52 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.error {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-burgundy) 10%, transparent);
+  color: var(--color-brand-burgundy);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.ideaSummary {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.ideaName {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.detail {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.note {
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+.emptyRecipients {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-gold-500) 10%, transparent);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}

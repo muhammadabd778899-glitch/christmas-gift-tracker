@@ -35,7 +35,7 @@
 }
 
 .seasonStripIcon {
-  color: var(--color-brand-gold);
+  color: var(--color-gold-500);
   display: flex;
   align-items: center;
 }

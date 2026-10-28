@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestones 0–5 complete and verified; Milestone 6 not started · Version 0.5 · 2026-10-28
+> Status: Milestones 0–6 complete and verified; Milestone 7 not started · Version 0.6 · 2026-10-28
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -10,13 +10,13 @@
 | Item | State |
 | --- | --- |
 | Repository | Runnable React/TypeScript/Vite application, approved specification, and tested local storage |
-| Current milestone | **Milestone 5 - Budget engine and dashboard** (complete; awaiting owner review before M6) |
+| Current milestone | **Milestone 6 - Idea Bank and Shopping List** (complete; awaiting owner review before M7) |
 | Application runnable | Yes - development server, tests, coverage, and production build pass |
-| Tests | 190 Vitest tests passing; no Playwright suite yet |
-| Next milestone | Milestone 6 - Idea Bank and Shopping List (not started) |
-| Next action | Owner reviews `docs/MILESTONE_5_REPORT.md` and authorizes Milestone 6 |
+| Tests | 214 Vitest tests across 23 files passing; no Playwright suite yet |
+| Next milestone | Milestone 7 - Search, filters, and recipient details (not started) |
+| Next action | Owner reviews `docs/MILESTONE_6_REPORT.md` and authorizes Milestone 7 |
 
-**Do not start Milestone 6 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
+**Do not start Milestone 7 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
 
 ---
 
@@ -30,7 +30,7 @@
 | 3 | Recipients | Recipient management with caps and summaries | Complete — verified |
 | 4 | Gifts | Gift records, costs, statuses, deletion | Complete - verified |
 | 5 | Budget engine + dashboard | Central calculations and live dashboard | Complete - verified |
-| 6 | Idea Bank + Shopping List | Ideas convert to gifts; derived shopping list | Not started |
+| 6 | Idea Bank + Shopping List | Ideas convert to gifts; derived shopping list | Complete — verified |
 | 7 | Search, filters, details | Find and review data at scale | Not started |
 | 8 | Seasons, archives, backup | Reuse yearly; protect and export data | Not started |
 | 9 | Professional UI | Themes, responsive polish, accessibility, print | Not started |
@@ -301,6 +301,8 @@ Order rationale:
 
 ## 9. Milestone 6 — Idea Bank and Shopping List
 
+**Status:** Complete and verified on 2026-10-28. See `docs/MILESTONE_6_REPORT.md`.
+
 **Depends on:** M5; D-008; O-9.
 
 **Objective:** Convert early ideas into gifts and turn unbought gifts into a practical shopping workflow.
@@ -321,13 +323,24 @@ Order rationale:
 
 - Full cross-entity search/filters (M7), seasons/backup (M8).
 
-**Exit gate**
+**Exit gate — met**
 
-- AC-6.01–AC-6.20 pass.
-- Double-clicking Convert creates one gift.
+- AC-6.01–AC-6.20 pass through automated tests, code review, and recorded browser checks.
+- Double-clicking Convert creates one gift; the repository also returns the existing gift on repeated conversion.
 - Marking bought removes the item from shopping and updates budgets.
 - Print output excludes UI chrome.
 - No separately stored shopping list.
+
+**Implementation notes**
+
+- `src/domain/calculations/ideas.ts` owns case-insensitive Idea Bank filtering across idea name, recipient, category, and store.
+- `src/domain/calculations/shopping.ts` derives the list from unbought gifts, groups stores case-insensitively, places missing stores last, sorts deterministically, and calculates group subtotals and the total.
+- `useIdeaPageData` and `useShoppingPageData` use the existing `useLiveQueryState` hook over typed repositories.
+- Conversion reuses the existing idea repository transaction and the unique `&sourceIdeaId` index; repeated conversion returns the linked gift instead of creating another.
+- Converted ideas stay in the bank with a link to the gift and remain excluded from budgets and shopping.
+- “Mark bought” calls the existing gift repository and refreshes the list and dashboard through `liveQuery`.
+- Print uses `data-print-root` and `data-print-hide` plus global `@media print` rules. Chrome print-media emulation and a generated PDF verified the output; no PDF export or saved print file is built in.
+- New UI tests cover create, edit, delete, search, conversion with recipient selection, double-click conversion, shopping grouping/exclusion, mark-bought, print structure, empty states, and archived read-only behavior.
 
 **Git checkpoint:** `feat: add idea bank and shopping list`
 
@@ -650,9 +663,9 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews the running budget dashboard and `docs/MILESTONE_5_REPORT.md`.
+1. Owner reviews the running Idea Bank, Shopping List, print view, and `docs/MILESTONE_6_REPORT.md`.
 2. Owner confirms the remaining browser-storage persistence timing and buyer-facing explanation before release packaging.
-3. Owner authorizes Milestone 6 — Idea Bank and Shopping List.
-4. Only then begin idea and shopping-list work.
+3. Owner authorizes Milestone 7 — Search, filters, and recipient details.
+4. Only then begin search, filter, and recipient-detail work.
 
-Milestone 6 is **not started**. Until authorization: **stop.**
+Milestone 7 is **not started**. Until authorization: **stop.**

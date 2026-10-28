@@ -63,7 +63,7 @@ const milestones: Milestone[] = [
     number: '6',
     title: 'Idea Bank and Shopping List',
     focus: 'Idea conversion and a derived, grouped shopping list',
-    status: 'Planned',
+    status: 'Complete',
   },
   {
     number: '7',
@@ -104,23 +104,24 @@ const milestones: Milestone[] = [
 ];
 
 const buildFacts = [
-  ['Version', `v${APP_VERSION} · Milestone 5`],
+  ['Version', `v${APP_VERSION} · Milestone 6`],
   ['Framework', 'React 19 + TypeScript + Vite'],
   ['Styling', 'CSS Modules + design tokens'],
   ['Charts', 'Recharts with an accessible data table'],
-  ['Storage', 'IndexedDB via Dexie — seasons, recipients, and gifts'],
+  ['Storage', 'IndexedDB via Dexie — seasons, recipients, gifts, and ideas'],
   ['Theme', 'Light theme only — dark mode in Milestone 9'],
   ['Offline', 'Not yet packaged — Milestone 10'],
-  ['Data', 'One active season with recipient and gift records'],
+  ['Data', 'One active season with recipient, gift, and idea records'],
 ];
 
 const limitations = [
-  'Ideas, shopping lists, search, and archive management are not available yet.',
+  'Search, filters, season switching, and archive management are not available yet.',
   'Season editing, switching, and restore controls arrive in Milestone 8.',
   'No sample records are loaded, and startup never invents a season.',
   'The theme is light only until Milestone 9.',
   'No backup, restore, or CSV export exists yet.',
   'No installable or offline package has been produced or verified.',
+  'Printing uses the browser print dialog; there is no built-in PDF export or saved print file.',
   'Wrapped progress uses every gift as its denominator, so 100% may not be reachable for digital or retailer-direct gifts.',
 ];
 
@@ -135,7 +136,7 @@ export function SettingsPage() {
         eyebrow="Preferences and information"
         title="Settings"
         description="What this build includes, what it deliberately leaves for later, and how the product will protect your data."
-        badge={<Badge tone="gold">Milestone 5 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 6 preview</Badge>}
       />
 
       <Card>

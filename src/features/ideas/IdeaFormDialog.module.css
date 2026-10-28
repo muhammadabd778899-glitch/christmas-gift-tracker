@@ -1,0 +1,26 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formError {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-burgundy) 10%, transparent);
+  color: var(--color-brand-burgundy);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+}

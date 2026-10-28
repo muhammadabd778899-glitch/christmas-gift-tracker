@@ -15,6 +15,7 @@ interface GiftRowProps {
   settings: AppSettings;
   readOnly: boolean;
   busy?: boolean;
+  highlighted?: boolean;
   onEdit: (gift: Gift) => void;
   onDelete: (gift: Gift) => void;
   onQuickStatus: (gift: Gift, field: GiftStatusField, next: boolean) => void;
@@ -30,6 +31,7 @@ export function GiftRow({
   settings,
   readOnly,
   busy = false,
+  highlighted = false,
   onEdit,
   onDelete,
   onQuickStatus,
@@ -52,7 +54,13 @@ export function GiftRow({
   ].filter((label): label is string => label !== null);
 
   return (
-    <tr className={styles.row} aria-busy={busy || undefined}>
+    <tr
+      id={`gift-${gift.id}`}
+      className={styles.row}
+      aria-busy={busy || undefined}
+      data-highlighted={highlighted || undefined}
+      tabIndex={-1}
+    >
       {/* Gift name + optional link */}
       <td className={styles.nameCell}>
         <span className={styles.giftName}>{gift.name}</span>

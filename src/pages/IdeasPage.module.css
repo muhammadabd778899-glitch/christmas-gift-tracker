@@ -1,0 +1,189 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.notice {
+  padding: 12px 15px;
+  border: 1px solid var(--color-evergreen-200);
+  border-radius: var(--radius-md);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.errorNotice {
+  padding: 12px 15px;
+  border: 1px solid color-mix(in srgb, var(--color-brand-burgundy) 24%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-burgundy) 9%, transparent);
+  color: var(--color-brand-burgundy);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.seasonStrip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.seasonStripIcon {
+  display: inline-flex;
+  color: var(--color-brand-evergreen);
+}
+
+.seasonStrip strong {
+  color: var(--color-text-primary);
+}
+
+.seasonStripDivider {
+  display: inline-block;
+  width: 1px;
+  height: 0.8em;
+  margin: 0 0.55rem;
+  background: var(--color-border-strong);
+  vertical-align: middle;
+}
+
+.seasonStripCount {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.searchBar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.searchField {
+  flex: 1;
+  min-width: 0;
+}
+
+.clearButton {
+  flex-shrink: 0;
+  margin-bottom: 1.35rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4);
+}
+
+.footnote {
+  padding-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.archivedBanner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 30%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-gold-500) 8%, var(--color-surface));
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.archivedIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-gold-500);
+}
+
+.archivedBanner strong {
+  color: var(--color-text-primary);
+}
+
+.archivedBanner p {
+  margin-top: 0.2rem;
+}
+
+.loadingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4);
+}
+
+.skeletonCard {
+  display: grid;
+  gap: 0.8rem;
+  min-height: 180px;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.skeletonLine,
+.skeletonLineShort,
+.skeletonBlock {
+  display: block;
+  border-radius: 6px;
+  background: var(--color-surface-muted);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeletonLineShort {
+  width: 32%;
+  height: 0.8rem;
+}
+
+.skeletonLine {
+  width: 62%;
+  height: 1.1rem;
+}
+
+.skeletonBlock {
+  width: 100%;
+  height: 4.5rem;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 640px) {
+  .searchBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .clearButton {
+    margin-bottom: 0;
+  }
+
+  .seasonStripCount {
+    width: 100%;
+    margin-left: 0;
+  }
+}

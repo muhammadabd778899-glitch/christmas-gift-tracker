@@ -267,16 +267,18 @@ Bulk operations (restore, season delete, recipient cascade, conversion) are sing
 
 ### 7.5 Storage persistence and health
 
-- **Deferred:** request `navigator.storage.persist()` during onboarding or after the first save, explain the result, and never block the workflow. Milestones 4 and 5 do **not** call it. Persistence timing and the buyer-facing explanation remain open.
+- **Deferred:** request `navigator.storage.persist()` during onboarding or after the first save, explain the result, and never block the workflow. Milestones 4–6 do **not** call it. Persistence timing and the buyer-facing explanation remain open.
 - Settings → Diagnostics is planned: `healthCheck()` exists in the storage layer and can produce a PII-free report, but the Settings diagnostics UI does not exist yet.
 - Quota errors are caught and surfaced with backup guidance.
 - The app never clears storage on its own.
 
-Milestone 3 implements seasons and recipients on top of the health engine. Milestone 4 adds gifts and the status rules above. Milestone 5 adds derived dashboard calculations. None of these milestones adds a persistence request, diagnostics UI, backup, or eviction protection. Browser cleanup can still remove local records, and the interface does not claim otherwise.
+Milestone 3 implements seasons and recipients on top of the health engine. Milestone 4 adds gifts and the status rules above. Milestone 5 adds derived dashboard calculations. Milestone 6 adds the Idea Bank and a derived Shopping List. None of these milestones adds a persistence request, diagnostics UI, backup, or eviction protection. Browser cleanup can still remove local records, and the interface does not claim otherwise.
 
 Milestone 4 keeps gift status changes behind repository validation. The row quick controls use `setPurchaseState`, which rejects wrapped or sent without bought and defaults a newly set date. Un-buying through the row requires an explicit confirmation dialog; the edit form uses an inline confirmation and clears all dependent states and dates only after acceptance. Gift deletion runs in one transaction and reopens a converted idea when a source link exists.
 
 Milestone 5 adds a pure dashboard selector layer in `src/domain/calculations/dashboard.ts`. It derives season totals, progress ratios, recipient chart series, data-quality findings, and countdown state from the active season's records. The dashboard never stores these values. The chart module is lazy-loaded, and the countdown checks the local calendar date every minute plus on focus and visibility change. Budget edits go through the existing season repository and appear through `liveQuery` without a reload.
+
+Milestone 6 adds the Idea Bank and Shopping List. `src/domain/calculations/ideas.ts` owns case-insensitive Idea Bank filtering. `src/domain/calculations/shopping.ts` builds the list from unbought gifts, groups stores case-insensitively, places missing stores last, sorts deterministically, and calculates group subtotals and the total. Neither calculation is persisted. Conversion reuses the existing idea repository transaction and the unique `&sourceIdeaId` index, so repeated conversion returns the same gift instead of creating a duplicate. The Shopping List page reads gifts through `liveQuery`; “Mark bought” calls the existing gift repository and refreshes the list and dashboard without a reload. Print output uses `data-print-root` and `data-print-hide` plus global `@media print` rules to show only the print header, groups, rows, and totals; the action controls and app chrome are hidden. The page exposes a browser print action only; it does not create or store a PDF file.
 
 Milestone 2 implements the health engine (`src/storage/health.ts`) but not the Settings diagnostics UI. It returns typed counts, storage estimate/persistence fields, and stable issue codes without names, addresses, or notes. It performs reads only.
 
@@ -665,3 +667,30 @@ Milestone 4 does **not** implement dashboard charts, Idea Bank UI, Shopping List
 - No Playwright suite exists. Criteria that specify E2E verification were verified manually in the production preview; that substitution is disclosed in `MILESTONE_4_REPORT.md`.
 - A production chunk-size warning remains because the main JavaScript chunk exceeds 500 kB.
 - The gift table does not yet support sorting, filtering, or search. Those arrive in Milestone 7.
+
+---
+
+## 23. Milestone 6 implementation boundaries
+
+Milestone 6 implements the Idea Bank and a derived Shopping List:
+
+- Idea Bank create, edit, delete, list, and case-insensitive search on idea name, recipient, category, and store.
+- Converted ideas remain visible with a link to their gift and are excluded from budgets and shopping.
+- Conversion copies the idea fields, requires a recipient in the same season when needed, and runs the gift write and idea update in one transaction.
+- A unique `&sourceIdeaId` index enforces at most one gift per source idea. Repeated conversion returns the existing gift.
+- Deleting a converted gift reopens its idea; deleting an idea clears the gift's source reference.
+- The Shopping List is derived from unbought gifts, grouped case-insensitively by store with missing stores last, and includes subtotals and a total.
+- “Mark bought” uses the existing gift repository and updates the list and dashboard live.
+- Print output uses `data-print-root` and `data-print-hide` with global `@media print` rules. It includes the title, season, date, groups, rows, subtotals, and total, and hides app chrome and controls.
+- Converted-idea links target the gift row, focus it, and highlight it.
+
+Milestone 6 does **not** implement cross-entity search or filters, recipient detail pages, archive management, backup/restore, CSV, sample data, season switching, themes, persistent-storage requests, service workers, or an offline package.
+
+### 23.1 Known M6 limitations
+
+- No Playwright suite exists. Criteria that specify E2E verification were checked manually in Chromium and with UI/integration tests.
+- Browser checks used Chromium at desktop widths. Firefox, Safari, mobile devices, and cross-tab updates remain unverified.
+- Print output was verified with Chrome 135 print-media emulation and a generated PDF/PNG. There is no built-in PDF export, saved print file, or cross-browser print guarantee.
+- The print view includes the visible “Open” link text when a purchase link exists.
+- Idea Bank search is scoped to the active season; global search remains Milestone 7.
+- A production chunk-size warning remains because the main JavaScript chunk exceeds 500 kB.

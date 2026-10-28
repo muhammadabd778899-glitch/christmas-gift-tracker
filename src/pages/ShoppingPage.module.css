@@ -1,0 +1,301 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.printHeader {
+  display: none;
+}
+
+.printEyebrow {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.printHeader h1 {
+  margin-top: 0.2rem;
+  color: var(--color-text-primary);
+  font-size: 2rem;
+}
+
+.printMeta {
+  margin-top: 0.35rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.notice {
+  padding: 12px 15px;
+  border: 1px solid var(--color-evergreen-200);
+  border-radius: var(--radius-md);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.errorNotice {
+  padding: 12px 15px;
+  border: 1px solid color-mix(in srgb, var(--color-brand-burgundy) 24%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-burgundy) 9%, transparent);
+  color: var(--color-brand-burgundy);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.loadingCard {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 96px;
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+}
+
+.loadingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold-500);
+  box-shadow: 0 0 0 5px rgb(189 145 70 / 12%);
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.summaryItem {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.summaryLabel {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.summaryItem strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.summaryNote {
+  max-width: 42ch;
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.groups {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.group {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.groupHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-gold-500) 6%, var(--color-surface));
+}
+
+.groupTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+
+.groupCount {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.giftName {
+  display: block;
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.category {
+  display: inline-block;
+  margin-top: 0.15rem;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.moneyCell {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.purchaseLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-brand-evergreen);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.actionCell {
+  text-align: right;
+}
+
+.subtotalRow td {
+  padding: 0.65rem 0.85rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.subtotalRow td:first-child {
+  text-align: left;
+}
+
+.totalRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 2px solid var(--color-gold-500);
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+.totalRow strong {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.footnote {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.archivedBanner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 30%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-gold-500) 8%, var(--color-surface));
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.archivedIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-gold-500);
+}
+
+.archivedBanner strong {
+  color: var(--color-text-primary);
+}
+
+.archivedBanner p {
+  margin-top: 0.2rem;
+}
+
+@media (max-width: 720px) {
+  .summaryNote {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .actionCell {
+    text-align: left;
+  }
+}
+
+@media print {
+  .page {
+    display: block;
+  }
+
+  .printHeader {
+    display: block;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-text-primary);
+  }
+
+  .groups {
+    display: block;
+  }
+
+  .group {
+    margin-bottom: 1.25rem;
+    overflow: visible;
+    break-inside: avoid;
+    border: 1px solid #999;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .groupHeader {
+    padding: 0.5rem 0.75rem;
+    background: #f1f1f1;
+  }
+
+  .group table th:last-child,
+  .group table td:last-child {
+    display: none;
+  }
+
+  .subtotalRow td {
+    background: #f7f7f7;
+  }
+
+  .totalRow {
+    padding: 0.75rem 0;
+  }
+}

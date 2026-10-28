@@ -6,6 +6,15 @@
   background: var(--color-surface-raised);
 }
 
+.row:target,
+.row:focus,
+.row[data-highlighted='true'] {
+  outline: 2px solid var(--color-gold-500);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--color-gold-500) 12%, var(--color-surface));
+  scroll-margin-top: 6rem;
+}
+
 /* Name cell */
 .nameCell {
   min-width: 10rem;
@@ -80,7 +89,7 @@
   justify-content: flex-end;
   gap: 0.25rem;
   margin-top: 0.2rem;
-  color: var(--color-brand-gold);
+  color: var(--color-gold-700);
   font-size: 0.68rem;
   font-weight: 650;
   white-space: nowrap;
