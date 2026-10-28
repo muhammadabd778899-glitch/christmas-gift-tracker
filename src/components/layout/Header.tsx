@@ -2,6 +2,7 @@ import { CalendarDays, Info, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useActiveSeason } from '../../app/providers/useActiveSeason';
 import { formatDateOnly } from '../../domain/dates';
+import { APP_MILESTONE } from '../../lib/appInfo';
 import { Brand } from './Brand';
 import { IconButton } from '../ui/IconButton';
 import styles from './Header.module.css';
@@ -86,7 +87,7 @@ export function Header({ onOpenNav, onOpenAbout }: HeaderProps) {
       <div className={styles.right}>
         <span className={styles.preview}>
           <span className={styles.previewDot} aria-hidden="true" />
-          Milestone 3 preview
+          Milestone {APP_MILESTONE} preview
         </span>
         <IconButton label="About this build" icon={<Info />} onClick={onOpenAbout} />
       </div>

@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Decision Log
 
-> Status: Approved through Milestone 4; later decisions remain proposed · Version 0.4 · 2026-10-28
+> Status: Approved through Milestone 5; later decisions remain proposed · Version 0.5 · 2026-10-28
 > Format: lightweight ADRs. Statuses: **Proposed**, **Accepted**, **Superseded**, **Rejected**.
 > Decisions marked Proposed become binding when the owner approves the milestone that depends on them.
 
@@ -268,11 +268,11 @@
 
 ### D-021 — Countdown uses calendar-day arithmetic
 
-**Status:** Proposed · **Milestone:** 5
+**Status:** Accepted 2026-10-28 for Milestone 5 · **Milestone:** 5
 
 **Context:** Elapsed-millisecond math breaks around daylight-saving changes and can show the wrong number of days.
 
-**Decision:** Compare local calendar dates via UTC date components at midnight; recompute on date change, visibility change, and season edit.
+**Decision:** Compare local calendar dates via UTC date components at midnight; recompute on date change, visibility change, and season edit. The dashboard checks the local date every minute while mounted, so it notices midnight within a minute even after device sleep, and it also refreshes on focus and visibility change.
 
 **Consequences:** Correct day counts. No timezone library. The holiday date is treated as a calendar date, not an instant.
 
@@ -304,7 +304,7 @@
 
 ### D-024 — Wrapped progress uses all gifts as the denominator
 
-**Status:** Proposed · **Milestone:** 5
+**Status:** Accepted 2026-10-28 for Milestone 5 · **Milestone:** 5
 
 **Context:** Digital and retailer-direct gifts never need wrapping, so 100% wrapped progress may be unattainable. Exemptions add a new field and complexity.
 
@@ -361,7 +361,7 @@ Each row states the recommendation. Approving this specification approves the re
 | O-8 | Allow zero active seasons? | Yes, with a dedicated empty state (D-018) | M2/M3 | Decided 2026-10-26 |
 | O-9 | Include “mark bought” on the Shopping List? | Yes, excluded from print; same status rules | M6 | Open |
 | O-10 | Require actual cost when marking a gift bought? | No; allow and flag missing cost | M4 | Decided 2026-10-28 |
-| O-11 | Add a “does not need wrapping” exemption? | No for launch; document the limitation (D-024) | M5 | Open |
+| O-11 | Add a "does not need wrapping" exemption? | No for launch; document the limitation (D-024) | M5 | Decided 2026-10-28 |
 | O-12 | Support a standalone desktop wrapper for Etsy? | Only if M10 proves PWA delivery insufficient | M10/M12 | Open |
 
 **Approval needed before Milestone 1:** Resolved 2026-10-26. The owner authorized Milestone 1; D-001, D-013, D-014, and D-022 are accepted. All other decisions can be confirmed before their blocking milestone.
@@ -372,7 +372,7 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 4:** Resolved 2026-10-28. The owner authorized Milestone 4; D-020 is accepted and O-10 is decided (allow a bought gift without a cost and flag it).
 
-**Approval needed before Milestone 5:** D-021, D-024, O-11.
+**Approval needed before Milestone 5:** Resolved 2026-10-28. The owner authorized Milestone 5; D-021 and D-024 are accepted and O-11 is decided (no wrapping exemption at launch; document the limitation).
 
 **Approval needed before Milestone 6:** O-9. D-008 is accepted for the storage conversion service.
 

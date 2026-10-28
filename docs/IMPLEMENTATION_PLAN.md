@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestones 0–4 complete and verified; Milestone 5 not started · Version 0.4 · 2026-10-28
+> Status: Milestones 0–5 complete and verified; Milestone 6 not started · Version 0.5 · 2026-10-28
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -10,13 +10,13 @@
 | Item | State |
 | --- | --- |
 | Repository | Runnable React/TypeScript/Vite application, approved specification, and tested local storage |
-| Current milestone | **Milestone 4 - Gifts and safe deletion** (complete; awaiting owner review before M5) |
+| Current milestone | **Milestone 5 - Budget engine and dashboard** (complete; awaiting owner review before M6) |
 | Application runnable | Yes - development server, tests, coverage, and production build pass |
-| Tests | 163 Vitest tests passing; no Playwright suite yet |
-| Next milestone | Milestone 5 - Budget engine and dashboard (not started) |
-| Next action | Owner reviews `docs/MILESTONE_4_REPORT.md` and authorizes Milestone 5 |
+| Tests | 190 Vitest tests passing; no Playwright suite yet |
+| Next milestone | Milestone 6 - Idea Bank and Shopping List (not started) |
+| Next action | Owner reviews `docs/MILESTONE_5_REPORT.md` and authorizes Milestone 6 |
 
-**Do not start Milestone 5 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
+**Do not start Milestone 6 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
 
 ---
 
@@ -29,7 +29,7 @@
 | 2 | Persistent storage | IndexedDB schema, repositories, migrations, validation | Complete — verified |
 | 3 | Recipients | Recipient management with caps and summaries | Complete — verified |
 | 4 | Gifts | Gift records, costs, statuses, deletion | Complete - verified |
-| 5 | Budget engine + dashboard | Central calculations and live dashboard | Not started |
+| 5 | Budget engine + dashboard | Central calculations and live dashboard | Complete - verified |
 | 6 | Idea Bank + Shopping List | Ideas convert to gifts; derived shopping list | Not started |
 | 7 | Search, filters, details | Find and review data at scale | Not started |
 | 8 | Seasons, archives, backup | Reuse yearly; protect and export data | Not started |
@@ -255,7 +255,7 @@ Order rationale:
 
 ## 8. Milestone 5 - Budget engine and dashboard
 
-**Status:** Not started. Begins only after owner review and authorization.
+**Status:** Complete and verified on 2026-10-28. See `docs/MILESTONE_5_REPORT.md`.
 
 **Depends on:** M4; D-021, D-024; O-11.
 
@@ -278,13 +278,22 @@ Order rationale:
 
 - Idea Bank, Shopping List, search/filter, seasons/backup UI.
 
-**Exit gate**
+**Exit gate — met**
 
-- AC-5.01–AC-5.20 pass.
+- AC-5.01–AC-5.20 pass through automated tests and recorded browser checks; Playwright remains deferred.
 - Changing a cost/status/budget updates the dashboard without reload.
-- Empty data yields no NaN and a useful empty state.
+- Empty data yields no NaN and a useful first-step state.
 - Archived data cannot affect current totals.
-- One calculation implementation, no component-level totals.
+- One calculation implementation; dashboard components do not recompute totals.
+
+**Implementation notes**
+
+- `src/domain/calculations/dashboard.ts` owns season totals, progress ratios, recipient chart series, data-quality findings, countdown state, and percentage formatting. Recipient metrics remain in the existing `recipients.ts` calculation.
+- `useDashboardData` loads the active season, recipients, and gifts through Dexie `liveQuery`; budget and gift writes refresh the dashboard without a reload.
+- `useLocalToday` checks the local calendar date every minute and on focus/visibility change, so the countdown recovers after device sleep.
+- Recharts is loaded as a separate chunk. The chart is hidden from assistive technology and paired with an open, accessible data table using the same numbers.
+- Season budget editing is limited to an optional amount. It uses the existing repository validation and does not add season-management UI.
+- Archived seasons show read-only figures, hide edit and alert actions, and keep budget editing unavailable.
 
 **Git checkpoint:** `feat: implement budget engine and dashboard`
 
@@ -641,9 +650,9 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews the running recipient and gift workflows and `docs/MILESTONE_4_REPORT.md`.
+1. Owner reviews the running budget dashboard and `docs/MILESTONE_5_REPORT.md`.
 2. Owner confirms the remaining browser-storage persistence timing and buyer-facing explanation before release packaging.
-3. Owner authorizes Milestone 5.
-4. Only then begin the shared budget engine and dashboard work.
+3. Owner authorizes Milestone 6 — Idea Bank and Shopping List.
+4. Only then begin idea and shopping-list work.
 
-Milestone 5 is **not started**. Until authorization: **stop.**
+Milestone 6 is **not started**. Until authorization: **stop.**

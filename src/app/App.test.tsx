@@ -69,7 +69,9 @@ describe('application shell', () => {
     await user.click(screen.getByRole('button', { name: 'About this build' }));
 
     const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
-    expect(within(dialog).getByText('Milestone 4 of 12: gifts and safe deletion.')).toBeVisible();
+    expect(
+      within(dialog).getByText('Milestone 5 of 12: budget engine and dashboard.'),
+    ).toBeVisible();
     expect(within(dialog).getByText(/Local and account-free/i)).toBeInTheDocument();
 
     await user.click(within(dialog).getByRole('button', { name: 'Close dialog' }));

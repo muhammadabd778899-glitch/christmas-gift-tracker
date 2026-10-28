@@ -1,7 +1,7 @@
 {
   "name": "christmas-gift-tracker",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "type": "module",
   "description": "A local-first Christmas gift planning application.",
   "engines": {
@@ -25,6 +25,7 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.4",
+    "recharts": "^3.10.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {

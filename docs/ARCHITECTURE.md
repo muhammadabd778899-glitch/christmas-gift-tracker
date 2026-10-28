@@ -252,6 +252,7 @@ Bulk operations (restore, season delete, recipient cascade, conversion) are sing
 - Recipient cards re-render after create, edit, reassign, and cascade deletion without a manual reload.
 - Gift rows and recipient summaries re-render after gift create, edit, status changes, and deletion through repository writes.
 - A gift's status dates follow its boolean states: the quick status controls default a newly set state to the local date, and the edit form can change or clear each optional date.
+- The dashboard reads the active season, recipients, and gifts through `useDashboardData` and recalculates from live query results after gift or budget writes.
 - A settings/active-season hook exposes the selected season and formatting preferences.
 - No duplicate in-memory copy of records; query results are the source for rendering.
 - Cross-tab updates are expected through Dexie's change events. This has not been added to the browser test matrix yet, and the current milestone makes no cross-tab guarantee.
@@ -266,14 +267,16 @@ Bulk operations (restore, season delete, recipient cascade, conversion) are sing
 
 ### 7.5 Storage persistence and health
 
-- **Deferred:** request `navigator.storage.persist()` during onboarding or after the first save, explain the result, and never block the workflow. Milestone 4 does **not** call it. Persistence timing and the buyer-facing explanation remain open.
+- **Deferred:** request `navigator.storage.persist()` during onboarding or after the first save, explain the result, and never block the workflow. Milestones 4 and 5 do **not** call it. Persistence timing and the buyer-facing explanation remain open.
 - Settings → Diagnostics is planned: `healthCheck()` exists in the storage layer and can produce a PII-free report, but the Settings diagnostics UI does not exist yet.
 - Quota errors are caught and surfaced with backup guidance.
 - The app never clears storage on its own.
 
-Milestone 3 implements seasons and recipients on top of the health engine. Milestone 4 adds gifts and the status rules above. Neither milestone adds a persistence request, diagnostics UI, backup, or eviction protection. Browser cleanup can still remove local records, and the interface does not claim otherwise.
+Milestone 3 implements seasons and recipients on top of the health engine. Milestone 4 adds gifts and the status rules above. Milestone 5 adds derived dashboard calculations. None of these milestones adds a persistence request, diagnostics UI, backup, or eviction protection. Browser cleanup can still remove local records, and the interface does not claim otherwise.
 
 Milestone 4 keeps gift status changes behind repository validation. The row quick controls use `setPurchaseState`, which rejects wrapped or sent without bought and defaults a newly set date. Un-buying through the row requires an explicit confirmation dialog; the edit form uses an inline confirmation and clears all dependent states and dates only after acceptance. Gift deletion runs in one transaction and reopens a converted idea when a source link exists.
+
+Milestone 5 adds a pure dashboard selector layer in `src/domain/calculations/dashboard.ts`. It derives season totals, progress ratios, recipient chart series, data-quality findings, and countdown state from the active season's records. The dashboard never stores these values. The chart module is lazy-loaded, and the countdown checks the local calendar date every minute plus on focus and visibility change. Budget edits go through the existing season repository and appear through `liveQuery` without a reload.
 
 Milestone 2 implements the health engine (`src/storage/health.ts`) but not the Settings diagnostics UI. It returns typed counts, storage estimate/persistence fields, and stable issue codes without names, addresses, or notes. It performs reads only.
 
@@ -325,8 +328,9 @@ Milestone 2 implements the health engine (`src/storage/health.ts`) but not the S
 ### 8.5 Charts and accessibility
 
 - Recharts with explicit text labels/tooltips and a color-independent pattern or direct labels.
-- Each chart has a visually hidden or expandable data table equivalent.
+- The chart SVG is hidden from assistive technology and Recharts' focusable accessibility layer is disabled. Each chart has an open, accessible data table equivalent with the same numbers.
 - Status uses text + icon + color; never color alone.
+- Progress indicators expose `role="progressbar"` with an accessible name and value text.
 - Focus rings are visible in both themes; motion respects `prefers-reduced-motion`.
 
 ### 8.6 Design tokens

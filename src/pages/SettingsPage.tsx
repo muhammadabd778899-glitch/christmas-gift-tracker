@@ -57,7 +57,7 @@ const milestones: Milestone[] = [
     number: '5',
     title: 'Budget engine and dashboard',
     focus: 'Pure calculations, live totals, and progress charts',
-    status: 'Planned',
+    status: 'Complete',
   },
   {
     number: '6',
@@ -104,9 +104,10 @@ const milestones: Milestone[] = [
 ];
 
 const buildFacts = [
-  ['Version', `v${APP_VERSION} · Milestone 4`],
+  ['Version', `v${APP_VERSION} · Milestone 5`],
   ['Framework', 'React 19 + TypeScript + Vite'],
   ['Styling', 'CSS Modules + design tokens'],
+  ['Charts', 'Recharts with an accessible data table'],
   ['Storage', 'IndexedDB via Dexie — seasons, recipients, and gifts'],
   ['Theme', 'Light theme only — dark mode in Milestone 9'],
   ['Offline', 'Not yet packaged — Milestone 10'],
@@ -114,13 +115,13 @@ const buildFacts = [
 ];
 
 const limitations = [
-  'Ideas, shopping lists, and archive management are not available yet.',
-  'Dashboard charts and full budget reporting arrive in Milestone 5.',
+  'Ideas, shopping lists, search, and archive management are not available yet.',
   'Season editing, switching, and restore controls arrive in Milestone 8.',
   'No sample records are loaded, and startup never invents a season.',
   'The theme is light only until Milestone 9.',
   'No backup, restore, or CSV export exists yet.',
   'No installable or offline package has been produced or verified.',
+  'Wrapped progress uses every gift as its denominator, so 100% may not be reachable for digital or retailer-direct gifts.',
 ];
 
 function statusTone(status: MilestoneStatus): BadgeTone {
@@ -134,7 +135,7 @@ export function SettingsPage() {
         eyebrow="Preferences and information"
         title="Settings"
         description="What this build includes, what it deliberately leaves for later, and how the product will protect your data."
-        badge={<Badge tone="gold">Milestone 4 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 5 preview</Badge>}
       />
 
       <Card>
@@ -211,15 +212,16 @@ export function SettingsPage() {
             <CardTitle as="h2">Local-first progress</CardTitle>
             <CardDescription>
               The planner now uses a private, validated local database for real season, recipient,
-              and gift records. Backup and offline delivery are still ahead.
+              gift, and budget records. Backup and offline delivery are still ahead.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className={styles.privacyText}>
               IndexedDB opens on this device and startup creates only safe settings and diagnostics.
               It does not create a season, seed sample gifts, or delete records. A season exists
-              only after you explicitly create one. No account and no network request are required
-              for storage.
+              only after you explicitly create one. Dashboard totals are calculated from saved
+              records and are never stored as a competing source of truth. No account and no network
+              request are required for storage.
             </p>
             <div className={styles.claims}>
               <strong>Claims we will not make until verified</strong>

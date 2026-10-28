@@ -1,0 +1,32 @@
+.wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+.chartFrame {
+  min-width: 0;
+  min-height: 260px;
+}
+
+.details {
+  min-width: 0;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+
+.details summary {
+  width: fit-content;
+  color: var(--color-evergreen-700);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.details summary:hover {
+  color: var(--color-evergreen-900);
+}
+
+.details[open] summary {
+  margin-bottom: var(--space-3);
+}
