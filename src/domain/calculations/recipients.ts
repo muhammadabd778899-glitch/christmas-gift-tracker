@@ -50,6 +50,23 @@ export function calculateRecipientMetrics(
   };
 }
 
+export interface RecipientDetail {
+  recipient: Recipient;
+  gifts: Gift[];
+  metrics: RecipientMetrics;
+}
+
+export function buildRecipientDetail(
+  recipient: Recipient,
+  seasonGifts: readonly Gift[],
+): RecipientDetail {
+  return {
+    recipient,
+    gifts: seasonGifts.filter((gift) => gift.recipientId === recipient.id),
+    metrics: calculateRecipientMetrics(recipient, seasonGifts),
+  };
+}
+
 export function calculateRecipientMetricsById(
   recipients: readonly Recipient[],
   seasonGifts: readonly Gift[],

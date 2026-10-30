@@ -338,6 +338,30 @@
 
 ---
 
+### D-027 — Gift search, filters, and sorting are derived local UI state
+
+**Status:** Accepted 2026-10-30 for Milestone 7 · **Milestone:** 7
+
+**Context:** Gift search and filters help a buyer navigate a growing list, but persisting them would add another source of truth and could make the app reopen in a confusing filtered state.
+
+**Decision:** Derive visible gift rows from the active season’s saved gifts with pure functions in `src/domain/calculations/giftList.ts`. Keep search, filter, and sort choices in local React state only. Never write them to IndexedDB. Use independent tri-state bought/wrapped/sent filters, AND-compose all filters, and make the default sort recipient A–Z followed by gift name A–Z. Place gifts with missing planned or actual amounts last in both sort directions. Clear all restores the default sort and clears search and every filter.
+
+**Consequences:** No stale filter state and no additional migration or schema surface. Reloading or navigating away resets the controls. Search is scoped to the Gifts page rather than a global search. Sorting stays deterministic through explicit tie-breakers, including id.
+
+---
+
+### D-028 — Recipient detail reuses the domain calculations
+
+**Status:** Accepted 2026-10-30 for Milestone 7 · **Milestone:** 7
+
+**Context:** A recipient page could easily drift from the dashboard if it recalculated caps, spending, or progress separately.
+
+**Decision:** Build the page from `buildRecipientDetail`, `calculateRecipientMetrics`, and `calculateProgress`, and render the selected recipient’s gifts through the shared `GiftTable`. Gift edits and status changes use the same repositories and rules as the Gifts page. Unknown recipient ids render a not-found state; archived seasons render read-only; no active season renders the create-season state.
+
+**Consequences:** Dashboard, recipient detail, and the shared table cannot disagree on business rules. The page does not add stored totals or a second gift list. It is read-only whenever the season is archived.
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Confidence | Impact if wrong |
@@ -388,6 +412,8 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 6:** Resolved 2026-10-28. The owner authorized Milestone 6; O-9 is decided (include “mark bought” on the Shopping List, exclude it from print, and use the same status rules). D-008 is accepted for the storage conversion service.
 
+**Approval needed before Milestone 7:** Resolved 2026-10-30. The owner authorized Milestone 7; D-027 and D-028 record the local filter-state and recipient-detail composition choices.
+
 **Approval needed before Milestone 8:** D-010, D-023, O-6. D-009 and D-016 are accepted for the storage layer.
 
 **Approval needed before Milestone 9:** D-015, D-017, O-2.
@@ -425,3 +451,4 @@ Each row states the recommendation. Approving this specification approves the re
 | 2026-10-26 | D-002 through D-009, D-016, D-018, D-019, O-3, O-4, O-7, and O-8 accepted/decided for Milestone 2; storage implementation recorded in `MILESTONE_2_REPORT.md` | AI |
 | 2026-10-26 | D-025 accepted for Milestone 3; the reactive-hook portion of D-003 is superseded; recipient implementation recorded in `MILESTONE_3_REPORT.md` | AI |
 | 2026-10-28 | O-9 decided for Milestone 6; D-026 accepted for the derived Shopping List and print behavior; implementation recorded in `MILESTONE_6_REPORT.md` | AI |
+| 2026-10-30 | D-027 and D-028 accepted for Milestone 7; implementation recorded in `MILESTONE_7_REPORT.md` | AI |

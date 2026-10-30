@@ -2,7 +2,7 @@ import { Check, Clock3, Sparkles } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Dialog } from '../components/ui/Dialog';
-import { APP_MILESTONE } from '../lib/appInfo';
+import { APP_MILESTONE, APP_MILESTONE_LABEL } from '../lib/appInfo';
 import styles from './AboutDialog.module.css';
 
 interface AboutDialogProps {
@@ -20,6 +20,8 @@ const included = [
   'Holiday countdown, gift progress, and data-quality alerts',
   'An Idea Bank with search, editing, conversion, and safe reopening',
   'A shopping list derived from unbought gifts, grouped by store with subtotals',
+  'Gift search across name, recipient, category, and store, with combinable filters and sorting',
+  'Recipient detail pages with caps, planned and spent totals, utilisation, progress, and gift editing',
   'Mark bought from the shopping list with the same status rules',
   'A print view that hides navigation and controls',
   'Confirmation before un-buying or deleting a gift',
@@ -30,7 +32,6 @@ const included = [
 ];
 
 const upcoming = [
-  'Search, filters, and recipient details (Milestone 7)',
   'Season archives, backup, and CSV (Milestone 8)',
   'Professional UI, themes, and accessibility polish (Milestone 9)',
   'Offline delivery and packaging (Milestone 10)',
@@ -42,7 +43,7 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
       open={open}
       onClose={onClose}
       title="About this preview"
-      description={`Milestone ${APP_MILESTONE} of 12: Idea Bank and Shopping List.`}
+      description={`Milestone ${APP_MILESTONE} of 12: ${APP_MILESTONE_LABEL}.`}
       footer={
         <Button variant="secondary" onClick={onClose}>
           Close
@@ -56,10 +57,10 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
             Milestone {APP_MILESTONE}
           </Badge>
           <p>
-            The planner can now create a season, keep a recipient list, track gifts, capture ideas,
-            convert them into gifts, and build a grouped shopping list from unbought gifts. Budget
-            figures still come from saved gift records. Backup and offline packaging are not
-            implemented yet.
+            The planner can now create a season, keep a recipient list, track gifts, search and
+            filter them, open a recipient detail page, capture ideas, convert them into gifts, and
+            build a grouped shopping list from unbought gifts. Budget figures still come from saved
+            gift records. Backup and offline packaging are not implemented yet.
           </p>
         </div>
 

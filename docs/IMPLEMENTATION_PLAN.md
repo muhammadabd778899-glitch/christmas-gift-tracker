@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestones 0–6 complete and verified; Milestone 7 not started · Version 0.6 · 2026-10-28
+> Status: Milestones 0–7 complete and verified; Milestone 8 not started · Version 0.7 · 2026-10-30
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -10,13 +10,13 @@
 | Item | State |
 | --- | --- |
 | Repository | Runnable React/TypeScript/Vite application, approved specification, and tested local storage |
-| Current milestone | **Milestone 6 - Idea Bank and Shopping List** (complete; awaiting owner review before M7) |
+| Current milestone | **Milestone 7 - Search, filters, and recipient details** (complete; awaiting owner review before M8) |
 | Application runnable | Yes - development server, tests, coverage, and production build pass |
-| Tests | 214 Vitest tests across 23 files passing; no Playwright suite yet |
-| Next milestone | Milestone 7 - Search, filters, and recipient details (not started) |
-| Next action | Owner reviews `docs/MILESTONE_6_REPORT.md` and authorizes Milestone 7 |
+| Tests | 247 Vitest tests across 26 files passing; no Playwright suite yet |
+| Next milestone | Milestone 8 - Seasons, archives, backup, CSV (not started) |
+| Next action | Owner reviews `docs/MILESTONE_7_REPORT.md` and authorizes Milestone 8 |
 
-**Do not start Milestone 7 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
+**Do not start Milestone 8 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
 
 ---
 
@@ -31,7 +31,7 @@
 | 4 | Gifts | Gift records, costs, statuses, deletion | Complete - verified |
 | 5 | Budget engine + dashboard | Central calculations and live dashboard | Complete - verified |
 | 6 | Idea Bank + Shopping List | Ideas convert to gifts; derived shopping list | Complete — verified |
-| 7 | Search, filters, details | Find and review data at scale | Not started |
+| 7 | Search, filters, details | Find and review data at scale | Complete – verified |
 | 8 | Seasons, archives, backup | Reuse yearly; protect and export data | Not started |
 | 9 | Professional UI | Themes, responsive polish, accessibility, print | Not started |
 | 10 | Offline delivery | Validated offline artifact and customer setup | Not started |
@@ -350,6 +350,8 @@ Order rationale:
 
 **Depends on:** M6.
 
+**Status:** Complete and verified on 2026-10-30. See `docs/MILESTONE_7_REPORT.md`.
+
 **Objective:** Make a large gift list navigable and give each recipient a complete view.
 
 **Build**
@@ -362,6 +364,16 @@ Order rationale:
 - Accessible filter controls.
 - Tests for matching, combining, sorting, details, and mutation safety.
 - Documentation updates.
+
+**Implemented**
+
+- `src/domain/calculations/giftList.ts` owns normalized search, AND-composed filters, deterministic sorting, default sort, and category options. It never writes to storage.
+- `GiftFilterBar` provides labelled search, recipient, category, bought, wrapped, sent, and sort controls plus a live result count and Clear all.
+- The Gifts page keeps filter and sort state locally, derives the visible rows with `buildGiftList`, and distinguishes no-data from no-results.
+- `/recipients/:recipientId` uses `buildRecipientDetail` and the existing recipient metrics and progress calculations, shows only that recipient’s gifts, and supports gift editing/status changes.
+- Unknown recipient IDs render a not-found state; archived seasons remain read-only; no active season retains the create-season state.
+- Recipient cards link to their detail page.
+- Tests cover matching, diacritics, tri-state filters, AND semantics, sorting, clear-all, no-results, live updates, detail totals, edit access, not-found, no-season, and archived read-only behavior.
 
 **Not in scope**
 
@@ -663,9 +675,9 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews the running Idea Bank, Shopping List, print view, and `docs/MILESTONE_6_REPORT.md`.
+1. Owner reviews the Gifts search/filter controls, recipient detail pages, and `docs/MILESTONE_7_REPORT.md`.
 2. Owner confirms the remaining browser-storage persistence timing and buyer-facing explanation before release packaging.
-3. Owner authorizes Milestone 7 — Search, filters, and recipient details.
-4. Only then begin search, filter, and recipient-detail work.
+3. Owner authorizes Milestone 8 — Seasons, archives, backup, CSV.
+4. Only then begin season management, archive, backup, and CSV work.
 
-Milestone 7 is **not started**. Until authorization: **stop.**
+Milestone 8 is **not started**. Until authorization: **stop.**

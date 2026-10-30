@@ -169,12 +169,24 @@
 
 .footer {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
   align-items: center;
   justify-content: space-between;
   margin-top: auto;
   padding-top: var(--space-3);
   border-top: 1px solid var(--color-border);
+}
+
+.detailsLink {
+  color: var(--color-evergreen-700);
+  font-size: 0.75rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.detailsLink:hover {
+  text-decoration: underline;
 }
 
 .giftCount {

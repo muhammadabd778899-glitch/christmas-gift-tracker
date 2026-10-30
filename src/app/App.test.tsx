@@ -79,7 +79,7 @@ describe('application shell', () => {
 
     const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
     expect(
-      within(dialog).getByText('Milestone 6 of 12: Idea Bank and Shopping List.'),
+      within(dialog).getByText('Milestone 7 of 12: Search, filters, and recipient details.'),
     ).toBeVisible();
     expect(within(dialog).getByText(/Local and account-free/i)).toBeInTheDocument();
 

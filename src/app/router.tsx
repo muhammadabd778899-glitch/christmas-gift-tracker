@@ -5,6 +5,7 @@ import { DashboardPage } from '../pages/DashboardPage';
 import { GiftsPage } from '../pages/GiftsPage';
 import { IdeasPage } from '../pages/IdeasPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
+import { RecipientDetailPage } from '../pages/RecipientDetailPage';
 import { RecipientsPage } from '../pages/RecipientsPage';
 import { SeasonSetupPage } from '../pages/SeasonSetupPage';
 import { SeasonsPage } from '../pages/SeasonsPage';
@@ -20,6 +21,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <DashboardPage /> },
       { path: 'gifts', element: <GiftsPage /> },
       { path: 'recipients', element: <RecipientsPage /> },
+      { path: 'recipients/:recipientId', element: <RecipientDetailPage /> },
       { path: 'ideas', element: <IdeasPage /> },
       { path: 'shopping', element: <ShoppingPage /> },
       { path: 'seasons', element: <SeasonsPage /> },

@@ -1,23 +1,33 @@
-import { useEffect, useRef, useState } from 'react';
-import { CalendarDays, Gift, Plus, Users } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { CalendarDays, Gift, Plus, SearchX, Users } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
 import { PageHeader } from '../components/ui/PageHeader';
-import { Table, TableBody, TableHead, TableHeaderCell, TableRow } from '../components/ui/Table';
 import { buttonStyles } from '../components/ui/buttonStyles';
 import { formatDateOnly } from '../domain/dates';
+import {
+  buildGiftCategories,
+  buildGiftList,
+  DEFAULT_GIFT_FILTERS,
+  hasActiveGiftFilters,
+  isDefaultGiftSort,
+  type GiftFilters,
+} from '../domain/calculations/giftList';
 import { toAppError } from '../storage/errors';
 import { errorMessageFrom } from '../lib/formErrors';
 import { DeleteGiftDialog } from '../features/gifts/DeleteGiftDialog';
+import { GiftFilterBar } from '../features/gifts/GiftFilterBar';
 import { GiftFormDialog } from '../features/gifts/GiftFormDialog';
-import { GiftRow, type GiftStatusField } from '../features/gifts/GiftRow';
+import { GiftTable } from '../features/gifts/GiftTable';
+import { type GiftStatusField } from '../features/gifts/GiftRow';
+import { DEFAULT_GIFT_SORT_VALUE, giftSortForValue } from '../features/gifts/giftListOptions';
 import { UnbuyGiftDialog } from '../features/gifts/UnbuyGiftDialog';
 import { useGiftPageData } from '../features/gifts/useGiftPageData';
 import { useRepositories } from '../app/providers/storageContext';
-import type { AppSettings, Gift as GiftEntity, Recipient } from '../domain/entities';
+import type { Gift as GiftEntity } from '../domain/entities';
 import styles from './GiftsPage.module.css';
 
 interface GiftsLocationState {
@@ -33,10 +43,19 @@ export function GiftsPage() {
   const [unbuyTarget, setUnbuyTarget] = useState<GiftEntity | null>(null);
   const [statusBusyId, setStatusBusyId] = useState<string | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<GiftFilters>(() => ({ ...DEFAULT_GIFT_FILTERS }));
+  const [sortValue, setSortValue] = useState(DEFAULT_GIFT_SORT_VALUE);
   const [notice, setNotice] = useState<string | null>(
     (location.state as GiftsLocationState | null)?.notice ?? null,
   );
   const focusMainAfterNoticeRef = useRef(false);
+  const sort = giftSortForValue(sortValue);
+  const categories = useMemo(() => buildGiftCategories(data.data?.gifts ?? []), [data.data?.gifts]);
+  const filteredGifts = useMemo(
+    () => buildGiftList(data.data?.gifts ?? [], data.data?.recipients ?? [], filters, sort),
+    [data.data?.gifts, data.data?.recipients, filters, sort],
+  );
+  const activeControls = hasActiveGiftFilters(filters) || !isDefaultGiftSort(sort);
 
   useEffect(() => {
     if (!data.data || !location.hash.startsWith('#gift-')) {
@@ -109,6 +128,15 @@ export function GiftsPage() {
   const canEdit = season !== null && !archived;
   const canAddGift = canEdit && recipients.length > 0;
   const seasonDate = season ? formatDateOnly(season.holidayDate, settings.locale) : null;
+
+  const clearFilters = () => setFilters({ ...DEFAULT_GIFT_FILTERS });
+  const clearAll = () => {
+    clearFilters();
+    setSortValue(DEFAULT_GIFT_SORT_VALUE);
+  };
+  const updateFilters = (patch: Partial<GiftFilters>) => {
+    setFilters((current) => ({ ...current, ...patch }));
+  };
 
   // Build a fast lookup map for recipient names
   const recipientMap = new Map(recipients.map((r) => [r.id, r]));
@@ -271,10 +299,17 @@ export function GiftsPage() {
             title="No gifts yet"
             description={`Add the first gift for ${season.name}. You only need a name and a recipient to start.`}
             action={
-              <Button onClick={() => setFormGift(null)}>
-                <Plus size={17} aria-hidden="true" />
-                Add your first gift
-              </Button>
+              <div className={styles.emptyActions}>
+                <Button onClick={() => setFormGift(null)}>
+                  <Plus size={17} aria-hidden="true" />
+                  Add your first gift
+                </Button>
+                {activeControls ? (
+                  <Button variant="secondary" onClick={clearAll}>
+                    Clear filters
+                  </Button>
+                ) : null}
+              </div>
             }
           />
         </>
@@ -294,19 +329,45 @@ export function GiftsPage() {
             </span>
           </div>
 
-          <GiftTable
-            gifts={gifts}
-            recipientMap={recipientMap}
-            settings={settings}
-            readOnly={false}
-            busyGiftId={statusBusyId}
-            highlightedGiftId={highlightedGiftId}
-            onEdit={setFormGift}
-            onDelete={setDeleteTarget}
-            onQuickStatus={(gift, field, next) => {
-              void handleQuickStatus(gift, field, next);
-            }}
+          <GiftFilterBar
+            filters={filters}
+            sortValue={sortValue}
+            categories={categories}
+            recipients={recipients}
+            resultCount={filteredGifts.length}
+            totalCount={gifts.length}
+            active={activeControls}
+            onChange={updateFilters}
+            onSortChange={setSortValue}
+            onClearAll={clearAll}
           />
+
+          {filteredGifts.length === 0 ? (
+            <EmptyState
+              icon={<SearchX />}
+              title="No gifts match these filters"
+              description="Try a different search or clear the filters to see every gift in this season."
+              action={
+                <Button variant="secondary" onClick={clearFilters}>
+                  Clear filters
+                </Button>
+              }
+            />
+          ) : (
+            <GiftTable
+              gifts={filteredGifts}
+              recipientMap={recipientMap}
+              settings={settings}
+              readOnly={false}
+              busyGiftId={statusBusyId}
+              highlightedGiftId={highlightedGiftId}
+              onEdit={setFormGift}
+              onDelete={setDeleteTarget}
+              onQuickStatus={(gift, field, next) => {
+                void handleQuickStatus(gift, field, next);
+              }}
+            />
+          )}
         </>
       )}
 
@@ -348,64 +409,5 @@ export function GiftsPage() {
         />
       ) : null}
     </div>
-  );
-}
-
-// ── Internal table sub-component ──────────────────────────────────────────────
-
-interface GiftTableProps {
-  gifts: GiftEntity[];
-  recipientMap: Map<string, Recipient>;
-  settings: AppSettings;
-  readOnly: boolean;
-  busyGiftId: string | null;
-  highlightedGiftId: string | null;
-  onEdit: (gift: GiftEntity) => void;
-  onDelete: (gift: GiftEntity) => void;
-  onQuickStatus: (gift: GiftEntity, field: GiftStatusField, next: boolean) => void;
-}
-
-function GiftTable({
-  gifts,
-  recipientMap,
-  settings,
-  readOnly,
-  busyGiftId,
-  highlightedGiftId,
-  onEdit,
-  onDelete,
-  onQuickStatus,
-}: GiftTableProps) {
-  return (
-    <Table label="Gift list">
-      <TableHead>
-        <TableRow>
-          <TableHeaderCell>Gift</TableHeaderCell>
-          <TableHeaderCell>Recipient</TableHeaderCell>
-          <TableHeaderCell>Store</TableHeaderCell>
-          <TableHeaderCell>Planned</TableHeaderCell>
-          <TableHeaderCell>Actual</TableHeaderCell>
-          <TableHeaderCell>Status</TableHeaderCell>
-          {readOnly ? null : <TableHeaderCell>Toggle</TableHeaderCell>}
-          {readOnly ? null : <TableHeaderCell>Actions</TableHeaderCell>}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {gifts.map((gift) => (
-          <GiftRow
-            key={gift.id}
-            gift={gift}
-            recipient={recipientMap.get(gift.recipientId)}
-            settings={settings}
-            readOnly={readOnly}
-            busy={busyGiftId === gift.id}
-            highlighted={highlightedGiftId === gift.id}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onQuickStatus={onQuickStatus}
-          />
-        ))}
-      </TableBody>
-    </Table>
   );
 }

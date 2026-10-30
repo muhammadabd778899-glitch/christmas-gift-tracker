@@ -68,8 +68,8 @@ const milestones: Milestone[] = [
   {
     number: '7',
     title: 'Search, filters, details',
-    focus: 'Find and review records as the planner grows',
-    status: 'Planned',
+    focus: 'Gift search and filters, sorting, and recipient detail pages',
+    status: 'Complete',
   },
   {
     number: '8',
@@ -104,7 +104,7 @@ const milestones: Milestone[] = [
 ];
 
 const buildFacts = [
-  ['Version', `v${APP_VERSION} · Milestone 6`],
+  ['Version', `v${APP_VERSION} · Milestone 7`],
   ['Framework', 'React 19 + TypeScript + Vite'],
   ['Styling', 'CSS Modules + design tokens'],
   ['Charts', 'Recharts with an accessible data table'],
@@ -115,7 +115,7 @@ const buildFacts = [
 ];
 
 const limitations = [
-  'Search, filters, season switching, and archive management are not available yet.',
+  'Season switching and archive management are not available yet.',
   'Season editing, switching, and restore controls arrive in Milestone 8.',
   'No sample records are loaded, and startup never invents a season.',
   'The theme is light only until Milestone 9.',
@@ -136,7 +136,7 @@ export function SettingsPage() {
         eyebrow="Preferences and information"
         title="Settings"
         description="What this build includes, what it deliberately leaves for later, and how the product will protect your data."
-        badge={<Badge tone="gold">Milestone 6 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 7 preview</Badge>}
       />
 
       <Card>

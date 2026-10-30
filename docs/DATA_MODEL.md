@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Data Model
 
-> Status: Normative; version-1 storage implemented in Milestone 2 · Version 0.4 · 2026-10-28
+> Status: Normative; version-1 storage implemented in Milestone 2 · Version 0.7 · 2026-10-30
 > Implements the requirements in `docs/PRODUCT_SPEC.md`. `src/domain` and `src/storage` follow this document; later sections (backup, CSV, sample loader, online sync) remain planned.
 
 ---
@@ -622,6 +622,52 @@ Every calculation must be tested against at least:
 - Multiple recipients with mixed data.
 - Archived season isolation.
 - Year boundary and DST transition for the countdown.
+
+### 7.9 Gift search, filters, and sorting
+
+Gift search and filtering are derived views over the active season’s gift array. Nothing is stored.
+
+```
+searchText(gift, recipient) = normalize(
+  gift.name + recipient.name + gift.category + gift.store
+)
+normalize(value) = trim, lowercase, remove common Latin diacritics
+match = normalize(query) is empty or is a substring of searchText
+```
+
+Filters are AND-composed:
+
+- Recipient: exact `recipientId` after trimming; empty means any.
+- Category: exact normalized category after trimming; empty means any.
+- Bought, wrapped, sent: independent tri-state values `any`, `yes`, or `no`.
+
+Sort keys:
+
+| Key | Primary comparison | Missing values |
+| --- | --- | --- |
+| Recipient | Recipient name A–Z, then gift name A–Z | — |
+| Gift name | Name A–Z or Z–A | — |
+| Planned budget | `plannedBudgetMinor` | Last in both directions |
+| Actual cost | `actualCostMinor` | Last in both directions |
+| Status | Derived status order: not started, bought, wrapped, sent | — |
+| Last updated | `updatedAt` newest or oldest | — |
+
+Every sort ends with a deterministic tie-breaker chain including recipient name, gift name, and id. The default is recipient A–Z, then gift name A–Z. Filter and sort state is local UI state; it is never written to IndexedDB.
+
+### 7.10 Recipient detail
+
+The recipient detail page is a derived composition of existing data:
+
+```
+recipientGifts = gifts where gift.recipientId === recipient.id
+metrics        = calculateRecipientMetrics(recipient, seasonGifts)
+progress       = calculateProgress(recipientGifts)
+```
+
+- Metrics and progress therefore match the dashboard and domain layer; the page does not recalculate totals independently.
+- Only the selected recipient’s gifts are shown. Gift editing, deletion, and status changes go through the same repositories and rules as the Gifts page.
+- An archived season renders the same data read-only.
+- An unknown `recipientId` renders a not-found state and never creates or mutates a recipient.
 
 ---
 

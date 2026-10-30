@@ -146,7 +146,9 @@ describe('Gifts page', () => {
     });
     expect(await screen.findByText('Warm scarf was added.')).toBeInTheDocument();
     expect(screen.getByText('Warm scarf')).toBeInTheDocument();
-    expect(screen.getByText('Alex')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('region', { name: 'Gift list' })).getByText('Alex'),
+    ).toBeInTheDocument();
 
     const stored = await storage.repositories.gifts.listBySeason(season.id);
     expect(stored).toHaveLength(1);
@@ -415,7 +417,8 @@ describe('Gifts page', () => {
     await user.click(checkbox);
 
     await waitFor(() => {
-      expect(screen.getAllByText('Bought').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Bought')).toHaveLength(2);
+      expect(checkbox).not.toBeDisabled();
     });
     const stored = await storage.repositories.gifts.listBySeason(season.id);
     expect(stored[0]?.bought).toBe(true);

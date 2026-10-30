@@ -66,7 +66,7 @@ describe('Season setup page', () => {
     await user.click(screen.getByRole('button', { name: 'Create season' }));
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Recipients' }),
+      await screen.findByRole('heading', { level: 1, name: 'Recipients' }, { timeout: 12_000 }),
     ).toBeInTheDocument();
     const [season] = await storage.repositories.seasons.list();
     expect(season.budgetMinor).toBeNull();

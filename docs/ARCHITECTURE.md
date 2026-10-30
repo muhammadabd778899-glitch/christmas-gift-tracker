@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Architecture
 
-> Status: Version 0.4 · 2026-10-28 · Milestone 4 gifts and safe deletion recorded
-> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, recipient workflow, and gift workflow now exist; later sections remain target architecture.
+> Status: Version 0.7 · 2026-10-30 · Milestone 7 search, filters, and recipient details recorded
+> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, recipient, gift, idea, shopping, search/filter, and recipient-detail workflows now exist; later sections remain target architecture.
 
 ---
 
@@ -692,5 +692,34 @@ Milestone 6 does **not** implement cross-entity search or filters, recipient det
 - Browser checks used Chromium at desktop widths. Firefox, Safari, mobile devices, and cross-tab updates remain unverified.
 - Print output was verified with Chrome 135 print-media emulation and a generated PDF/PNG. There is no built-in PDF export, saved print file, or cross-browser print guarantee.
 - The print view includes the visible “Open” link text when a purchase link exists.
-- Idea Bank search is scoped to the active season; global search remains Milestone 7.
+- Idea Bank search is scoped to the active season; M7 added equivalent scoped Gifts-page gift search and filters. Global cross-entity search remains out of scope.
+- A production chunk-size warning remains because the main JavaScript chunk exceeds 500 kB.
+
+---
+
+## 24. Milestone 7 implementation boundaries
+
+Milestone 7 adds gift search, filters, sorting, and recipient detail pages:
+
+- `src/domain/calculations/giftList.ts` owns normalized search text, AND-composed filters, deterministic sorting, default sort, and category options. It reads plain arrays and never writes to storage.
+- Search matches gift name, recipient name, category, and store. Matching ignores case, surrounding whitespace, and common Latin diacritics, and uses substring matching.
+- Bought, wrapped, and sent filters are independent tri-state controls (`any`, `yes`, `no`). Recipient and category filters are exact after normalization.
+- Sorting supports recipient, gift name, planned budget, actual cost, derived status, and last-updated date. Missing money values sort last. The default is recipient A–Z, then gift name A–Z, with id as the final deterministic tie-breaker.
+- The Gifts page keeps filter and sort state in local React state. The visible rows are derived with `buildGiftList` on every live data update. No filter state or result snapshot is persisted.
+- The no-results state is distinct from the no-gifts-yet state and offers Clear filters; Clear all also restores the default sort.
+- `src/features/gifts/GiftTable.tsx` is shared by the Gifts page and recipient detail page so table structure and status controls do not diverge.
+- `/recipients/:recipientId` loads the active season through the existing page-data hook, resolves the recipient by id, and renders `buildRecipientDetail`, `calculateRecipientMetrics`, and `calculateProgress`. Totals therefore match the dashboard and domain layer.
+- Recipient detail shows only that recipient’s gifts. Active seasons allow recipient editing and the same gift edit, delete, and status actions as the Gifts page. Archived seasons are read-only.
+- Unknown recipient ids render a not-found state; a missing active season renders the create-season state.
+- Recipient cards link to their detail page.
+
+Milestone 7 does **not** implement global cross-entity search, saved filter presets, URL-persisted filters, archive management, backup/restore, CSV, sample data, season switching, themes, persistent-storage requests, service workers, or an offline package.
+
+### 24.1 Known M7 limitations
+
+- No Playwright suite exists. Criteria that specify E2E verification were checked manually in Chromium and with UI/integration tests.
+- Search and filters are scoped to the Gifts page in the active season. They are not a global search and do not include Idea Bank or Shopping List rows.
+- Filter and sort state lives only in the page session. Reloading or navigating away resets the controls; nothing is stored.
+- Money sorting places gifts without a planned budget or actual cost last in both directions, rather than treating a missing amount as zero.
+- Browser checks used Chromium at desktop widths. Firefox, Safari, mobile devices, and cross-tab updates remain unverified.
 - A production chunk-size warning remains because the main JavaScript chunk exceeds 500 kB.

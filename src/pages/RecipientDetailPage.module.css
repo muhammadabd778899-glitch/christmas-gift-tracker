@@ -1,0 +1,232 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.loadingCard {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 96px;
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+}
+
+.loadingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold-500);
+  box-shadow: 0 0 0 5px rgb(189 145 70 / 12%);
+}
+
+.notice {
+  padding: 12px 15px;
+  border: 1px solid var(--color-evergreen-200);
+  border-radius: var(--radius-md);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.errorNotice {
+  padding: 12px 15px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-burgundy) 10%, transparent);
+  color: var(--color-brand-burgundy);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.archivedBanner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  border: 1px solid var(--color-gold-200);
+  border-radius: var(--radius-lg);
+  background: var(--color-gold-50);
+  color: var(--color-gold-700);
+}
+
+.archivedIcon {
+  display: flex;
+  flex: none;
+  padding-top: 2px;
+}
+
+.archivedBanner strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.archivedBanner p {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-soft);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.metricCard {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.metricLabel {
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.metricValue {
+  color: var(--color-evergreen-950);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  line-height: 1.1;
+}
+
+.metricValueOver {
+  color: var(--color-critical);
+}
+
+.metricNote {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.insightsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.capContent {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.capTop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.capPercent {
+  color: var(--color-evergreen-950);
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  line-height: 1.1;
+}
+
+.capTrack {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-surface-muted);
+}
+
+.capFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-evergreen-600);
+  transition: width var(--transition-base);
+}
+
+.capFillOver {
+  background: var(--color-critical);
+}
+
+.capSummary {
+  margin: 0;
+  color: var(--color-text-soft);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.noProgress {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.progressList {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.progressRow {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.progressHeading {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.progressIcon {
+  display: flex;
+  color: var(--color-gold-700);
+}
+
+.progressLabel {
+  color: var(--color-text);
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.progressCount {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.progressTrack {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-surface-muted);
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-gold-500);
+  transition: width var(--transition-base);
+}
+
+.notes {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 1100px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .metricsGrid,
+  .insightsGrid {
+    grid-template-columns: 1fr;
+  }
+}

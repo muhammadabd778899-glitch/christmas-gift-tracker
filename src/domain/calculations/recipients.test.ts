@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateRecipientMetrics } from './recipients';
+import { buildRecipientDetail, calculateRecipientMetrics } from './recipients';
 import type { Gift } from '../entities';
 import { FIXED_IDS, makeGift, makeRecipient } from '../../test/fixtures';
 
@@ -87,5 +87,21 @@ describe('recipient metrics', () => {
 
     expect(metrics.plannedMinor).toBe(0);
     expect(metrics.giftCount).toBe(0);
+  });
+
+  it('builds recipient detail from the same gift set and metrics used elsewhere', () => {
+    const recipient = makeRecipient({ budgetCapMinor: 10000 });
+    const ownGift = makeGift({ plannedBudgetMinor: 2500, actualCostMinor: 2400, bought: true });
+    const otherGift = makeGift({
+      id: FIXED_IDS.giftFromIdea as Gift['id'],
+      recipientId: FIXED_IDS.otherRecipient as Gift['recipientId'],
+      plannedBudgetMinor: 9000,
+    });
+
+    const detail = buildRecipientDetail(recipient, [ownGift, otherGift]);
+
+    expect(detail.recipient).toBe(recipient);
+    expect(detail.gifts).toEqual([ownGift]);
+    expect(detail.metrics).toEqual(calculateRecipientMetrics(recipient, [ownGift, otherGift]));
   });
 });

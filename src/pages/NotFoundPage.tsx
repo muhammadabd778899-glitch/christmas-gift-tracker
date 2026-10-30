@@ -12,8 +12,8 @@ export function NotFoundPage() {
       <p className={styles.code}>404</p>
       <h1 className={styles.title}>This page slipped out of the stocking.</h1>
       <p className={styles.description}>
-        The address does not match a page in this preview. No data was changed or lost — this build
-        does not store planning data yet.
+        The address does not match a page in this app. No data was changed or lost. Use the links
+        below to return to your plan.
       </p>
       <div className={styles.actions}>
         <Link className={buttonStyles()} to="/">

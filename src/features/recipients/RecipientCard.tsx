@@ -1,4 +1,5 @@
 import { Gift, Pencil, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
@@ -135,6 +136,13 @@ export function RecipientCard({
             <Gift size={14} aria-hidden="true" />
             {giftLabel}
           </span>
+          <Link
+            className={styles.detailsLink}
+            to={`/recipients/${recipient.id}`}
+            aria-label={`View details for ${recipient.name}`}
+          >
+            View details
+          </Link>
           {readOnly ? (
             <span className={styles.readOnlyLabel}>Archived · read only</span>
           ) : (
