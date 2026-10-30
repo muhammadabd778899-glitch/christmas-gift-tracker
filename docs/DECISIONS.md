@@ -196,7 +196,7 @@
 
 ### D-015 — Currency formatting changes do not convert stored amounts
 
-**Status:** Proposed · **Milestone:** 9
+**Status:** Accepted 2026-10-30 · **Milestone:** 9
 
 **Context:** A customer may switch from `$` to `€` or change decimal places. Implicit conversion would invent exchange rates and corrupt records.
 
@@ -220,7 +220,7 @@
 
 ### D-017 — Theme is mirrored to localStorage for pre-paint only
 
-**Status:** Proposed · **Milestone:** 9
+**Status:** Accepted 2026-10-30 · **Milestone:** 9
 
 **Context:** Applying the theme from IndexedDB is asynchronous and causes a flash of the wrong theme.
 
@@ -400,7 +400,7 @@ Each row states the recommendation. Approving this specification approves the re
 | ID | Question | Recommendation | Blocks | Status |
 | --- | --- | --- | --- | --- |
 | O-1 | What is the offline delivery method: PWA, standalone HTML, or desktop wrapper? | PWA-first; test standalone in M10; add a wrapper only if commercially necessary and approved | M10, Etsy copy | Open |
-| O-2 | Final product name and visual brand? | Keep “Christmas Gift Tracker” as a working name; finalize before M9 | M9, packaging | Open |
+| O-2 | Final product name and visual brand? | Keep “Christmas Gift Tracker” as a working name; finalize before M9 | M9, packaging | Decided 2026-10-30 — keep the name and refine the warm/evergreen/burgundy/gold identity |
 | O-3 | Currency defaults and presets? | USD `$` 2 decimals default; presets for EUR, GBP, CAD, AUD, JPY (0 decimals); custom symbol/code; no conversion | M2/M9 | Decided 2026-10-26 |
 | O-4 | Recipient deletion behavior? | Block; offer reassign or explicit cascade (D-007) | M3 | Decided 2026-10-26 |
 | O-5 | Include the online edition in the first Etsy release? | No; ship and validate offline first (D-011) | M11, listing | Open |
@@ -428,7 +428,7 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 8:** Resolved 2026-10-30. The owner authorized Milestone 8; D-010 and D-023 are accepted and O-6 is decided (replace-all restore with a required fresh backup and `RESTORE`). D-009 and D-016 are applied in the UI. D-029 records the backup/typed-word safety gates.
 
-**Approval needed before Milestone 9:** D-015, D-017, O-2.
+**Approval needed before Milestone 9:** Resolved 2026-10-30. The owner authorized Milestone 9 and approved D-015 and D-017; O-2 is decided (keep “Christmas Gift Tracker” and refine the existing warm/evergreen/burgundy/gold identity rather than renaming the product).
 
 **Approval needed before Milestone 10:** D-011, O-1, O-12.
 

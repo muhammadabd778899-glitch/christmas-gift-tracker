@@ -13,7 +13,7 @@ async function addSeason(storage: Awaited<ReturnType<typeof createTestStorage>>)
 }
 
 describe('Season setup page', () => {
-  it('creates a first season explicitly and proceeds to recipients', async () => {
+  it('creates a first season explicitly and opens the dashboard', async () => {
     const storage = await createTestStorage();
     await renderApp(['/onboarding'], { storage });
 
@@ -34,14 +34,10 @@ describe('Season setup page', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Create season' }));
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Recipients' }, { timeout: 12_000 }),
+      await screen.findByRole('heading', { level: 1, name: 'Dashboard' }, { timeout: 12_000 }),
     ).toBeInTheDocument();
     expect(
-      await screen.findByText(
-        'Our Family Christmas is ready. Add the first person you are planning for.',
-        {},
-        { timeout: 12_000 },
-      ),
+      await screen.findByText('Our Family Christmas is ready.', {}, { timeout: 12_000 }),
     ).toBeInTheDocument();
 
     const seasons = await storage.repositories.seasons.list();
@@ -55,6 +51,7 @@ describe('Season setup page', () => {
     });
     const settings = await storage.repositories.settings.get();
     expect(settings.activeSeasonId).toBe(seasons[0].id);
+    expect(settings.hasCompletedOnboarding).toBe(true);
   });
 
   it('allows the season budget to be left blank', async () => {
@@ -66,10 +63,47 @@ describe('Season setup page', () => {
     await user.click(screen.getByRole('button', { name: 'Create season' }));
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Recipients' }, { timeout: 12_000 }),
+      await screen.findByRole('heading', { level: 1, name: 'Dashboard' }, { timeout: 12_000 }),
     ).toBeInTheDocument();
     const [season] = await storage.repositories.seasons.list();
     expect(season.budgetMinor).toBeNull();
+  });
+
+  it('saves theme and currency choices and can load the optional sample season', async () => {
+    const user = userEvent.setup();
+    const storage = await createTestStorage();
+    await renderApp(['/onboarding'], { storage });
+
+    await screen.findByRole('heading', { level: 1, name: 'Set the scene for this Christmas' });
+    await user.selectOptions(screen.getByLabelText('Theme'), 'dark');
+    await user.selectOptions(screen.getByLabelText('Currency'), 'JPY');
+    await user.click(screen.getByLabelText('Load the optional sample season'));
+    await user.click(screen.getByRole('button', { name: 'Create season' }));
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Dashboard' }, { timeout: 12_000 }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/A flagged sample season was added as archived/),
+    ).toBeInTheDocument();
+
+    const settings = await storage.repositories.settings.get();
+    expect(settings).toMatchObject({
+      theme: 'dark',
+      currencyCode: 'JPY',
+      currencySymbol: '¥',
+      fractionDigits: 0,
+      hasCompletedOnboarding: true,
+    });
+
+    const seasons = await storage.repositories.seasons.list();
+    expect(seasons).toHaveLength(2);
+    expect(seasons.find((season) => season.isSample)).toMatchObject({
+      status: 'archived',
+    });
+    expect(seasons.find((season) => !season.isSample)).toMatchObject({
+      status: 'active',
+    });
   });
 
   it('rejects an invalid budget without creating a season', async () => {

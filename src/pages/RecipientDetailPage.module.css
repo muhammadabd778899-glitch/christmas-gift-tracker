@@ -17,7 +17,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--color-gold-500);
-  box-shadow: 0 0 0 5px rgb(189 145 70 / 12%);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold-500) 12%, transparent);
 }
 
 .notice {
@@ -77,6 +77,13 @@
 .metricCard {
   display: grid;
   gap: var(--space-1);
+}
+
+.metricLabelRow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .metricLabel {

@@ -17,7 +17,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--color-gold-500);
-  box-shadow: 0 0 0 5px rgb(189 145 70 / 12%);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold-500) 12%, transparent);
 }
 
 .emptyActions,
@@ -58,7 +58,7 @@
   background:
     radial-gradient(circle at 84% 16%, rgb(189 145 70 / 24%), transparent 18rem),
     radial-gradient(circle at 98% 96%, rgb(122 46 58 / 26%), transparent 20rem),
-    linear-gradient(135deg, var(--color-evergreen-950), var(--color-evergreen-800));
+    linear-gradient(135deg, var(--color-panel-deep), var(--color-panel-mid));
   box-shadow: var(--shadow-lg);
   color: var(--color-text-inverse);
 }
@@ -233,6 +233,18 @@
   gap: var(--space-4);
 }
 
+@media (min-width: 981px) {
+  .summaryGrid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 761px) and (max-width: 980px) {
+  .summaryGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .metricCard {
   min-width: 0;
 }
@@ -245,10 +257,18 @@
   height: 100%;
 }
 
+.metricLabelRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
 .metricLabel {
   display: flex;
   gap: 8px;
   align-items: center;
+  min-width: 0;
   color: var(--color-text-muted);
   font-size: 0.66rem;
   font-weight: 750;
@@ -377,7 +397,7 @@
   flex: none;
   place-items: center;
   border-radius: 50%;
-  background: rgb(255 255 255 / 62%);
+  background: color-mix(in srgb, var(--color-surface) 62%, transparent);
   color: var(--color-burgundy-700);
 }
 

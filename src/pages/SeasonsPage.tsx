@@ -365,7 +365,12 @@ export function SeasonsPage() {
         )}
       </section>
 
-      <section className={styles.section} aria-labelledby="data-tools-title">
+      <section
+        id="data-tools"
+        className={styles.section}
+        aria-labelledby="data-tools-title"
+        tabIndex={-1}
+      >
         <div className={styles.sectionIntro}>
           <div>
             <p className={styles.eyebrow}>Portability</p>

@@ -154,7 +154,36 @@ describe('dashboard', () => {
     expect(within(rows[2]!).getByText('$45.00')).toBeInTheDocument();
     expect(within(rows[2]!).getByText('$24.00')).toBeInTheDocument();
 
+    expect(
+      await screen.findByRole('img', {
+        name: /Planned versus actual spending by recipient/,
+      }),
+    ).toBeInTheDocument();
+
     expect(document.body.textContent).not.toMatch(/NaN|Infinity/);
+  });
+
+  it('explains unallocated budget with a keyboard-accessible tooltip', async () => {
+    const user = userEvent.setup();
+    const storage = await createTestStorage();
+    await seedDashboard(storage);
+    await renderApp(['/'], { storage });
+
+    const tipButton = await screen.findByRole('button', { name: 'About unallocated budget' });
+    expect(tipButton).toHaveAttribute('aria-expanded', 'false');
+
+    tipButton.focus();
+    await user.keyboard('{Enter}');
+
+    expect(tipButton).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('note')).toHaveTextContent(
+      'Season budget minus planned spending. It shows whether the plan fits',
+    );
+
+    await user.keyboard('{Escape}');
+
+    expect(tipButton).toHaveAttribute('aria-expanded', 'false');
+    expect(tipButton).toHaveFocus();
   });
 
   it('shows not-set budget values and can set a budget from the first-step panel', async () => {

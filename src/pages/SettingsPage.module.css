@@ -8,6 +8,23 @@
   min-width: 0;
 }
 
+.loadingCard {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 96px;
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+}
+
+.loadingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold-500);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold-500) 12%, transparent);
+}
+
 .tableContent {
   min-width: 0;
   padding-top: 0;
@@ -67,7 +84,11 @@
 
 .privacyCard {
   background:
-    radial-gradient(circle at 100% 0%, rgb(189 145 70 / 15%), transparent 16rem),
+    radial-gradient(
+      circle at 100% 0%,
+      color-mix(in srgb, var(--color-gold-600) 14%, transparent),
+      transparent 16rem
+    ),
     var(--color-gold-50);
 }
 
@@ -79,7 +100,7 @@
   place-items: center;
   border: 1px solid var(--color-gold-200);
   border-radius: 15px;
-  background: rgb(255 253 249 / 66%);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
   color: var(--color-gold-700);
 }
 
@@ -101,7 +122,7 @@
   padding: var(--space-4);
   border: 1px solid var(--color-gold-200);
   border-radius: var(--radius-md);
-  background: rgb(255 253 249 / 58%);
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
 }
 
 .claims strong {
@@ -153,8 +174,101 @@
   content: '';
 }
 
+.toolLinks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toolLink {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 44px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+
+.toolLink:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-raised);
+}
+
+.toolIcon {
+  display: grid;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--color-accent-surface);
+  color: var(--color-gold-700);
+}
+
+.toolIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.toolCopy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.toolCopy strong {
+  font-size: 0.86rem;
+}
+
+.toolCopy span {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.toolArrow {
+  flex: none;
+  margin-left: auto;
+  color: var(--color-text-muted);
+  transition:
+    transform 150ms ease,
+    color 150ms ease;
+}
+
+.toolLink:hover .toolArrow {
+  color: var(--color-evergreen-800);
+  transform: translateX(2px);
+}
+
+.footnote {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toolLink,
+  .toolArrow {
+    transition: none;
+  }
+}
+
 @media (max-width: 880px) {
   .twoColumn {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .toolLinks {
     grid-template-columns: minmax(0, 1fr);
   }
 }

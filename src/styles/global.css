@@ -87,11 +87,11 @@ svg {
 
 ::selection {
   background: var(--color-gold-200);
-  color: var(--color-evergreen-950);
+  color: var(--color-on-accent);
 }
 
 :focus-visible {
-  outline: 3px solid var(--color-gold-500);
+  outline: 3px solid var(--color-focus);
   outline-offset: 3px;
 }
 
@@ -114,8 +114,8 @@ svg {
   z-index: 1000;
   padding: 10px 16px;
   border-radius: var(--radius-sm);
-  background: var(--color-evergreen-900);
-  color: var(--color-text-inverse);
+  background: var(--color-panel-deep);
+  color: var(--color-on-panel);
   font-weight: 650;
   box-shadow: var(--shadow-md);
   transform: translateY(-150%);

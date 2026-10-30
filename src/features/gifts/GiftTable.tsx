@@ -1,6 +1,7 @@
 import { Table, TableBody, TableHead, TableHeaderCell, TableRow } from '../../components/ui/Table';
 import type { AppSettings, Gift, Recipient } from '../../domain/entities';
 import { GiftRow, type GiftStatusField } from './GiftRow';
+import styles from './GiftTable.module.css';
 
 interface GiftTableProps {
   gifts: readonly Gift[];
@@ -26,7 +27,7 @@ export function GiftTable({
   onQuickStatus,
 }: GiftTableProps) {
   return (
-    <Table label="Gift list">
+    <Table label="Gift list" className={styles.giftTable}>
       <TableHead>
         <TableRow>
           <TableHeaderCell>Gift</TableHeaderCell>

@@ -14,10 +14,10 @@
 
 .name {
   font-family: var(--font-display);
-  font-size: 1.12rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.025em;
-  line-height: 1.15;
+  line-height: 1.2;
   white-space: nowrap;
 }
 

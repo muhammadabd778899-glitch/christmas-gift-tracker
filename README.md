@@ -2,8 +2,8 @@
 
 A local-first Christmas gift planning application: recipients, gifts, budgets, ideas, shopping lists, seasons, backups, and offline use.
 
-> **Status: Milestone 8 — Seasons, archives, and data portability complete and verified.**
-> The shell is runnable, responsive, and tested. A private local IndexedDB database stores real seasons, recipients, gifts, ideas, and season budgets, and no customer plan or sample records are created automatically. Backups and CSV exports are explicit local downloads. Nothing is transmitted.
+> **Status: Milestone 9 — Professional interface, themes, and accessibility complete and verified.**
+> The shell is runnable, responsive, themed, and tested. A private local IndexedDB database stores real seasons, recipients, gifts, ideas, and season budgets, and no customer plan or sample records are created automatically. Light, dark, and system themes apply before first paint; currency formatting, diagnostics, and privacy details live in Settings. Backups and CSV exports are explicit local downloads. Nothing is transmitted.
 
 ---
 
@@ -52,14 +52,20 @@ A local-first Christmas gift planning application: recipients, gifts, budgets, i
 - CSV privacy default: addresses and notes are excluded unless explicitly included, with a visible warning.
 - Optional sample data with a fixed, clearly labeled sample season; it is archived when any season exists, never mixes into real totals, and is idempotent to load.
 - Sample removal that deletes only sample records, plus a reset flow that requires a downloaded backup and the typed word `DELETE`.
+- Light, dark, and system themes with persisted choice, live system-preference updates, and pre-paint application without a flash of the wrong theme.
+- A rebuilt Settings page with appearance, currency symbol/code/fraction digits, PII-free diagnostics, privacy explanation, app/schema versions, and the backup/reset tools.
+- Monetary format changes are display-only: stored minor units are never converted, and a change with data present requires confirmation.
+- Responsive polish at 360/768/1024/1440 px, including stacked gift and shopping cards, full-width mobile actions, and 44×44 px targets.
+- Keyboard-accessible metric explanations for planned, spent, remaining, unallocated, and utilization figures, plus visible gold focus rings in both themes.
+- Accessible chart equivalents, reduced-motion support, and screen-only mobile table rules that keep the print layout tabular.
 - A version-1 Dexie/IndexedDB schema with typed validation for seasons, recipients, gifts, ideas, settings, and diagnostics.
 - Typed repositories with cross-season checks, transactional recipient policies, idea conversion, gift integrity, season lifecycle operations, and data portability.
 - Safe startup: settings and meta are created only when absent; startup never creates a season, seeds sample data, or deletes records.
 - A boot screen, a storage recovery screen with guidance, a health-check engine, a migration harness, and explicit restore/reset APIs.
-- 291 Vitest tests across 31 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, dashboard calculations, season lifecycle, backup export/validation/restore, CSV encoding and safety, and sample-data isolation.
+- 307 Vitest tests across 33 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, dashboard calculations, season lifecycle, backup export/validation/restore, CSV encoding and safety, sample-data isolation, theme resolution and pre-paint behavior, and the Settings flows.
 - GitHub Actions CI for formatting, type checking, linting, tests, and the production build.
 
-Offline packaging and themes remain deliberate future milestones. There are no invented totals, hidden calculations, automatic cloud backups, or silent data repair.
+Offline packaging remains a deliberate future milestone. There are no invented totals, hidden calculations, automatic cloud backups, or silent data repair.
 
 ---
 
@@ -93,7 +99,7 @@ Open `http://localhost:5173`.
 
 ## Current technology
 
-Installed through Milestone 8:
+Installed through Milestone 9:
 
 - React 19 + TypeScript
 - Vite 8
@@ -114,7 +120,7 @@ Not installed yet — each arrives with the milestone that needs it:
 
 Reactive reads use a small typed `useLiveQueryState` hook over Dexie's own `liveQuery`, rather than the separate `dexie-react-hooks` package (D-025). Recipient and season forms use shared React state, the Zod schemas, and the existing validation utilities; React Hook Form is not installed.
 
-No runtime CDN assets, remote fonts, analytics, or telemetry are used. The interface uses a local system font stack until self-hosted brand fonts are introduced in Milestone 9.
+No runtime CDN assets, remote fonts, analytics, or telemetry are used. The interface uses a local system font stack; no brand font is bundled or fetched.
 
 ---
 
@@ -122,14 +128,14 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 
 | Path | Purpose |
 | --- | --- |
-| `src/app/` | Composition root, router, shell, navigation metadata, and error boundaries |
+| `src/app/` | Composition root, router, shell, navigation metadata, theme controller, and error boundaries |
 | `src/pages/` | Route-level pages and deliberate feature placeholders |
 | `src/components/ui/` | Reusable interface primitives with no domain knowledge |
 | `src/components/layout/` | Brand, sidebar, header, navigation, and mobile drawer |
 | `src/lib/` | Generic utilities |
 | `src/styles/` | Design tokens and global base styles |
 | `src/test/` | Test setup, memory-router helper, fake-indexeddb storage harness, and fixtures |
-| `src/features/` | Recipient, gift, dashboard, idea, shopping, and season cards, dialogs, page-data hooks, and feature styles |
+| `src/features/` | Recipient, gift, dashboard, idea, shopping, season, and settings cards, dialogs, page-data hooks, and feature styles |
 | `src/domain/` | Branded entities, Zod schemas, money/date/locale utilities, and typed errors |
 | `src/storage/` | Dexie schema, initialization, repositories, migration harness, health, reset, backup, CSV, and sample data |
 | `e2e/` | Reserved for an end-to-end suite; Playwright is not installed yet |
@@ -155,6 +161,7 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | `docs/MILESTONE_6_REPORT.md` | Idea Bank and Shopping List milestone report and verification evidence |
 | `docs/MILESTONE_7_REPORT.md` | Search, filters, and recipient details milestone report and verification evidence |
 | `docs/MILESTONE_8_REPORT.md` | Seasons, archives, and data portability milestone report and verification evidence |
+| `docs/MILESTONE_9_REPORT.md` | Professional interface, themes, and accessibility milestone report and verification evidence |
 | `AI_DEVELOPMENT_PROTOCOL.md` | Permanent working rules for the AI agent |
 
 **Reading order for a new session:** protocol → product spec → architecture → data model → acceptance criteria → decisions → implementation plan → latest milestone report.
@@ -174,12 +181,12 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | 6 | Idea Bank and Shopping List | Complete — verified |
 | 7 | Search, filters, recipient details | Complete — verified |
 | 8 | Seasons, archives, backup, CSV | Complete — verified |
-| 9 | Professional UI, themes, accessibility | Not started |
+| 9 | Professional UI, themes, accessibility | Complete — verified |
 | 10 | Offline delivery | Not started |
 | 11 | Online edition and sync | Not started |
 | 12 | QA, packaging, Etsy launch | Not started |
 
-Milestone 8 is complete and verified. Milestone 9 — Professional UI, themes, accessibility — begins only after owner review and authorization.
+Milestone 9 is complete and verified. Milestone 10 — Offline delivery — begins only after owner review and authorization.
 
 ---
 
@@ -190,6 +197,7 @@ Milestone 8 is complete and verified. Milestone 9 — Professional UI, themes, a
 - **Shopping List:** generated at read time from unbought gifts. Marking a gift bought writes through the gift repository, removes the row, and updates budgets. The print view is browser printing only; there is no saved PDF export.
 - **Backup and reset:** JSON backups and CSV exports are downloaded locally on demand. Restore is replace-all only and requires a fresh backup download plus the typed word `RESTORE`; reset requires a fresh backup plus `DELETE`. Both preserve `databaseId` and never run automatically. There is no cloud, scheduled, or automatic backup, and no merge restore.
 - **Sample data:** optional and explicit. It uses a flagged sample season, stays isolated from real totals, is archived whenever any season exists, and can be removed independently.
+- **Theme and currency:** the theme choice (light, dark, or system) is stored in Settings and mirrored to `localStorage` only for first-paint styling; IndexedDB remains authoritative. Currency symbol, code, and fraction digits affect display only and never convert stored minor units.
 - **Accounts and sync:** not implemented.
 - **Analytics/telemetry:** none.
 - **Browser storage risk:** the app does not call `navigator.storage.persist()` yet. Browser cleanup or site-data clearing can remove local records. The current UI does not claim protection from eviction; persistence timing and buyer-facing explanation remain open for a later milestone.
@@ -202,11 +210,11 @@ The interface copy is intentionally conservative: local downloads are offered, b
 
 ## Current next step
 
-1. Owner reviews `docs/MILESTONE_8_REPORT.md`, the Seasons & archives page, and the backup/restore and CSV downloads.
-2. Owner authorizes Milestone 9 — Professional UI, themes, accessibility.
-3. Milestone 9 must use the existing repositories and domain rules, and must not weaken the data-safety gates.
+1. Owner reviews `docs/MILESTONE_9_REPORT.md`, the light/dark/system themes, and the responsive layouts.
+2. Owner authorizes Milestone 10 — Offline delivery.
+3. Milestone 10 must use the existing repositories and domain rules, and must not weaken the data-safety gates.
 
-Until authorized: **do not start Milestone 9.**
+Until authorized: **do not start Milestone 10.**
 
 ---
 

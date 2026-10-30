@@ -142,7 +142,7 @@
 }
 
 .progressFill[data-over='true'] {
-  background: linear-gradient(90deg, var(--color-burgundy-700), #b34a4a);
+  background: linear-gradient(90deg, var(--color-burgundy-700), var(--color-critical));
 }
 
 .progressNote {

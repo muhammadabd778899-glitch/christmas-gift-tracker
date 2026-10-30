@@ -1,0 +1,70 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.button {
+  position: relative;
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: help;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.button::before {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  content: '';
+}
+
+.button:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-evergreen-800);
+}
+
+.button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  width: max-content;
+  max-width: min(280px, 74vw);
+  padding: 10px 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text-soft);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  line-height: 1.5;
+  text-transform: none;
+  white-space: normal;
+}
+
+.tip[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

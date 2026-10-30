@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   ArrowRight,
   CalendarDays,
@@ -17,7 +17,7 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import {
@@ -30,6 +30,7 @@ import {
 } from '../components/ui/Card';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
+import { InfoTip } from '../components/ui/InfoTip';
 import { PageHeader } from '../components/ui/PageHeader';
 import { buttonStyles } from '../components/ui/buttonStyles';
 import {
@@ -135,9 +136,21 @@ function ProgressRow({ label, count, total, ratio, icon, fillClassName }: Progre
 export function DashboardPage() {
   const data = useDashboardData();
   const today = useLocalToday();
+  const location = useLocation();
   const [budgetOpen, setBudgetOpen] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(
+    () => (location.state as { notice?: string } | null)?.notice ?? null,
+  );
   const payload = data.data;
+
+  useEffect(() => {
+    if (!notice) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setNotice(null), 7000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
   const model = useMemo(
     () =>
       payload?.season
@@ -490,12 +503,18 @@ export function DashboardPage() {
 
           <Card className={styles.metricCard}>
             <CardContent className={styles.metricContent}>
-              <h3 className={styles.metricLabel}>
-                <span className={styles.metricIcon} aria-hidden="true">
-                  <PackageCheck size={18} />
-                </span>
-                Unallocated budget
-              </h3>
+              <div className={styles.metricLabelRow}>
+                <h3 className={styles.metricLabel}>
+                  <span className={styles.metricIcon} aria-hidden="true">
+                    <PackageCheck size={18} />
+                  </span>
+                  Unallocated budget
+                </h3>
+                <InfoTip label="unallocated budget">
+                  Season budget minus planned spending. It shows whether the plan fits; it is not
+                  cash left after purchases. Remaining budget subtracts actual spending instead.
+                </InfoTip>
+              </div>
               <p className={styles.metricValue}>
                 {totals.unallocatedMinor === null ? 'Not set' : money(totals.unallocatedMinor)}
               </p>

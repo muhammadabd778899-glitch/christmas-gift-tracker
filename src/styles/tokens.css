@@ -57,6 +57,26 @@
   --color-brand-burgundy: var(--color-burgundy-700);
   --color-surface-overlay: var(--color-surface-muted);
 
+  /* Deep evergreen panels stay dark in both themes. */
+  --color-panel: #102f26;
+  --color-panel-mid: #163b30;
+  --color-panel-deep: #0b241d;
+  --color-on-panel: #f8f3e8;
+
+  /* Action surfaces adapt so text and controls keep AA contrast. */
+  --color-action: var(--color-evergreen-800);
+  --color-action-hover: var(--color-evergreen-950);
+  --color-on-action: var(--color-text-inverse);
+  --color-danger-action: var(--color-burgundy-700);
+  --color-danger-action-hover: var(--color-burgundy-800);
+  --color-on-danger: var(--color-text-inverse);
+  --color-accent-surface: var(--color-gold-100);
+  --color-accent-hover: #fff8e7;
+  --color-on-accent: #0b241d;
+
+  --color-scrim: rgb(11 36 29 / 58%);
+  --color-focus: var(--color-gold-600);
+
   --shadow-xs: 0 1px 2px rgb(30 42 36 / 5%);
   --shadow-sm: 0 2px 8px rgb(30 42 36 / 5%), 0 1px 2px rgb(30 42 36 / 4%);
   --shadow-md: 0 14px 36px rgb(30 42 36 / 8%), 0 2px 8px rgb(30 42 36 / 4%);
@@ -87,4 +107,77 @@
 
   --transition-fast: 140ms ease;
   --transition-base: 220ms ease;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-canvas: #0e1613;
+  --color-canvas-deep: #0a110e;
+  --color-surface: #141f1b;
+  --color-surface-raised: #18251f;
+  --color-surface-muted: #1b2822;
+  --color-surface-sunken: #0f1815;
+
+  --color-border: #2b3a33;
+  --color-border-strong: #3d5147;
+
+  --color-text: #eef2ec;
+  --color-text-soft: #c3ccc6;
+  --color-text-muted: #a4b0a9;
+  --color-text-inverse: #f8f3e8;
+
+  --color-evergreen-950: #eef4ef;
+  --color-evergreen-900: #dce9e1;
+  --color-evergreen-800: #c9dccf;
+  --color-evergreen-700: #a9cdb9;
+  --color-evergreen-600: #63a68a;
+  --color-evergreen-200: #335247;
+  --color-evergreen-100: #1f3a30;
+  --color-evergreen-50: #17291f;
+
+  --color-burgundy-800: #f3c5cb;
+  --color-burgundy-700: #e6a3ad;
+  --color-burgundy-200: #56313a;
+  --color-burgundy-100: #3a2328;
+  --color-burgundy-50: #2a191d;
+
+  --color-gold-700: #e7c98f;
+  --color-gold-600: #d9b76f;
+  --color-gold-500: #c9a657;
+  --color-gold-300: #e3c98f;
+  --color-gold-200: #efdcb4;
+  --color-gold-100: #3a2f18;
+  --color-gold-50: #2a2314;
+
+  --color-critical: #ff9d9d;
+  --color-critical-soft: #3a2020;
+  --color-success: #8fd0b0;
+  --color-success-soft: #143127;
+
+  --color-brand-evergreen: var(--color-evergreen-700);
+  --color-brand-burgundy: var(--color-burgundy-700);
+
+  --color-panel: #102f26;
+  --color-panel-mid: #163b30;
+  --color-panel-deep: #0b211b;
+  --color-on-panel: #f8f3e8;
+
+  --color-action: #63a68a;
+  --color-action-hover: #7cbc9f;
+  --color-on-action: #0b241d;
+  --color-danger-action: #d08a94;
+  --color-danger-action-hover: #dfa2ab;
+  --color-on-danger: #2a0c11;
+  --color-accent-surface: #efdcb4;
+  --color-accent-hover: #f7e9c8;
+  --color-on-accent: #0b241d;
+
+  --color-scrim: rgb(3 8 6 / 72%);
+  --color-focus: var(--color-gold-500);
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 32%);
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 34%), 0 1px 2px rgb(0 0 0 / 26%);
+  --shadow-md: 0 14px 36px rgb(0 0 0 / 42%), 0 2px 8px rgb(0 0 0 / 28%);
+  --shadow-lg: 0 28px 70px rgb(0 0 0 / 55%);
 }

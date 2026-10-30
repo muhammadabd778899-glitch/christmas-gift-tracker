@@ -8,8 +8,8 @@
   gap: var(--space-5);
   min-height: var(--header-height);
   padding: 12px clamp(18px, 3vw, 34px);
-  border-bottom: 1px solid rgb(207 192 170 / 55%);
-  background: rgb(246 241 231 / 82%);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border-strong) 55%, transparent);
+  background: color-mix(in srgb, var(--color-canvas) 82%, transparent);
   backdrop-filter: blur(16px);
 }
 
@@ -64,11 +64,11 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 34px;
-  padding: 5px 12px;
+  min-height: 44px;
+  padding: 5px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  background: rgb(255 253 249 / 72%);
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
   color: var(--color-text-soft);
   font-size: 0.78rem;
   font-weight: 600;
@@ -120,7 +120,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--color-gold-500);
-  box-shadow: 0 0 0 4px rgb(189 145 70 / 12%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-gold-500) 12%, transparent);
 }
 
 @media (max-width: 1024px) {
@@ -161,8 +161,8 @@
   }
 
   .seasonChip {
-    min-height: 32px;
-    padding-inline: 10px;
+    min-height: 44px;
+    padding-inline: 12px;
   }
 }
 

@@ -61,8 +61,8 @@
   padding: var(--space-6);
   background:
     radial-gradient(circle at 90% 0%, rgb(189 145 70 / 16%), transparent 14rem),
-    var(--color-evergreen-950);
-  color: var(--color-text-inverse);
+    var(--color-panel-deep);
+  color: var(--color-on-panel);
 }
 
 .statusIcon {
@@ -139,7 +139,7 @@
   padding: var(--space-4) var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: rgb(255 253 249 / 65%);
+  background: color-mix(in srgb, var(--color-surface) 65%, transparent);
 }
 
 .checkStrip span {

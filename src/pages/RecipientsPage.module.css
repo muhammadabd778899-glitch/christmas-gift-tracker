@@ -27,7 +27,7 @@
   padding: 10px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: rgb(255 253 249 / 58%);
+  background: color-mix(in srgb, var(--color-surface) 58%, transparent);
   color: var(--color-text-soft);
   font-size: 0.78rem;
 }

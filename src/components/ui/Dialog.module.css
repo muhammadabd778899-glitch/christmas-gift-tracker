@@ -22,7 +22,7 @@
 }
 
 .dialog::backdrop {
-  background: rgb(11 36 29 / 58%);
+  background: var(--color-scrim);
   backdrop-filter: blur(5px);
   animation: backdrop-in 180ms ease both;
 }

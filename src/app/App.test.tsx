@@ -4,6 +4,8 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import { AppErrorBoundary } from './boundaries/AppErrorBoundary';
 import { RouteErrorPage } from './boundaries/RouteErrorPage';
+import { THEME_STORAGE_KEY } from '../lib/theme';
+import { createTestStorage } from '../test/storage';
 import { renderApp } from '../test/render';
 
 function Explodes(): never {
@@ -79,12 +81,45 @@ describe('application shell', () => {
 
     const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
     expect(
-      within(dialog).getByText('Milestone 8 of 12: Seasons, archives, and data portability.'),
+      within(dialog).getByText(
+        'Milestone 9 of 12: Professional interface, themes, and accessibility.',
+      ),
     ).toBeVisible();
     expect(within(dialog).getByText(/Local and account-free/i)).toBeInTheDocument();
 
     await user.click(within(dialog).getByRole('button', { name: 'Close dialog' }));
     expect(screen.queryByRole('dialog', { name: 'About this preview' })).not.toBeInTheDocument();
+  });
+
+  it('applies and persists the theme from the header toggle', async () => {
+    const user = userEvent.setup();
+    const { storage } = await renderApp();
+    expect(await screen.findByText('No active season')).toBeInTheDocument();
+
+    await waitFor(() => expect(document.documentElement.dataset.theme).toBe('light'));
+    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe('system');
+
+    await user.click(screen.getByRole('button', { name: 'Switch to dark theme' }));
+
+    await waitFor(() => expect(document.documentElement.dataset.theme).toBe('dark'));
+    expect((await storage.repositories.settings.get()).theme).toBe('dark');
+    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark');
+    expect(screen.getByRole('button', { name: 'Switch to light theme' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Switch to light theme' }));
+
+    await waitFor(() => expect(document.documentElement.dataset.theme).toBe('light'));
+    expect((await storage.repositories.settings.get()).theme).toBe('light');
+  });
+
+  it('restores a saved theme preference after storage loads', async () => {
+    const storage = await createTestStorage();
+    await storage.repositories.settings.update({ theme: 'dark' });
+
+    await renderApp(['/'], { storage });
+
+    await waitFor(() => expect(document.documentElement.dataset.theme).toBe('dark'));
+    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark');
   });
 
   it('renders a friendly not-found page for unknown routes', async () => {

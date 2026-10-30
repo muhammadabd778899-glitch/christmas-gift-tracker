@@ -16,12 +16,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { ErrorState } from '../components/ui/ErrorState';
 import { Input } from '../components/ui/Input';
 import { PageHeader } from '../components/ui/PageHeader';
+import { Select } from '../components/ui/Select';
 import { buttonStyles } from '../components/ui/buttonStyles';
 import { useActiveSeason } from '../app/providers/useActiveSeason';
 import { useRepositories } from '../app/providers/storageContext';
 import { defaultSeasonName, formatDateOnly, upcomingChristmasDate } from '../domain/dates';
+import type { ThemePreference } from '../domain/entities';
 import { ValidationError } from '../domain/errors';
-import { formatMoney, parseMoneyInput } from '../domain/money';
+import { CURRENCY_PRESETS, DEFAULT_CURRENCY, formatMoney, parseMoneyInput } from '../domain/money';
 import { errorMessageFrom, fieldErrorsFrom, type FieldErrors } from '../lib/formErrors';
 import styles from './SeasonSetupPage.module.css';
 
@@ -52,6 +54,9 @@ export function SeasonSetupPage() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [draftTheme, setDraftTheme] = useState<ThemePreference | null>(null);
+  const [draftCurrencyCode, setDraftCurrencyCode] = useState<string | null>(null);
+  const [includeSample, setIncludeSample] = useState(false);
 
   useEffect(() => {
     if (Object.keys(errors).length === 0) {
@@ -154,6 +159,11 @@ export function SeasonSetupPage() {
     );
   }
 
+  const theme = draftTheme ?? settings.theme;
+  const currencyCode = draftCurrencyCode ?? settings.currencyCode;
+  const currency =
+    CURRENCY_PRESETS.find((preset) => preset.code === currencyCode) ?? DEFAULT_CURRENCY;
+
   const setField = (field: keyof SetupValues, value: string) => {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => {
@@ -175,8 +185,8 @@ export function SeasonSetupPage() {
 
     try {
       budgetMinor = parseMoneyInput(values.budget, {
-        fractionDigits: settings.fractionDigits,
-        currencySymbol: settings.currencySymbol,
+        fractionDigits: currency.fractionDigits,
+        currencySymbol: currency.symbol,
       });
     } catch (error) {
       if (error instanceof ValidationError) {
@@ -194,13 +204,6 @@ export function SeasonSetupPage() {
         name: values.name,
         holidayDate: values.holidayDate,
         budgetMinor,
-      });
-
-      navigate('/recipients', {
-        replace: true,
-        state: {
-          notice: `${values.name.trim()} is ready. Add the first person you are planning for.`,
-        },
       });
     } catch (error) {
       const nextErrors = fieldErrorsFrom(error);
@@ -222,7 +225,49 @@ export function SeasonSetupPage() {
         );
         setSaving(false);
       }
+
+      return;
     }
+
+    let preferencesSaved = true;
+
+    try {
+      await repositories.settings.update({
+        theme,
+        currencyCode: currency.code,
+        currencySymbol: currency.symbol,
+        fractionDigits: currency.fractionDigits,
+        hasCompletedOnboarding: true,
+      });
+    } catch {
+      preferencesSaved = false;
+    }
+
+    let sampleNote: string | null = null;
+
+    if (includeSample) {
+      try {
+        const result = await repositories.data.loadSampleData();
+        sampleNote = result.created
+          ? 'A flagged sample season was added as archived.'
+          : 'Sample data was already loaded.';
+      } catch {
+        sampleNote =
+          'The sample season could not be loaded; you can add it later from Seasons & archives.';
+      }
+    }
+
+    const noticeParts = [`${values.name.trim()} is ready.`];
+
+    if (!preferencesSaved) {
+      noticeParts.push('Your theme or currency choice could not be saved; set them in Settings.');
+    }
+
+    if (sampleNote) {
+      noticeParts.push(sampleNote);
+    }
+
+    navigate('/', { replace: true, state: { notice: noticeParts.join(' ') } });
   };
 
   return (
@@ -235,7 +280,7 @@ export function SeasonSetupPage() {
       <PageHeader
         eyebrow="First season"
         title="Set the scene for this Christmas"
-        description="Create one season to hold your recipients, gifts, and budget. It is stored only on this device."
+        description="Welcome. Create one season to hold your recipients, gifts, and budget. Everything you save stays in this browser — no account, no uploads."
         badge={<Badge tone="gold">One small setup step</Badge>}
       />
 
@@ -289,11 +334,58 @@ export function SeasonSetupPage() {
                 value={values.budget}
                 onChange={(event) => setField('budget', event.target.value)}
                 error={errors.budget}
-                hint={`Leave blank if you have not decided. Amounts use ${settings.currencyCode} (${settings.currencySymbol}).`}
+                hint={`Leave blank if you have not decided. Amounts use ${currency.code} (${currency.symbol}).`}
                 inputMode="decimal"
                 placeholder="For example, 500.00"
                 autoComplete="off"
               />
+
+              <fieldset className={styles.preferences}>
+                <legend>Preferences</legend>
+                <p>Defaults are fine. You can change both later in Settings.</p>
+                <div className={styles.preferenceGrid}>
+                  <Select
+                    id="setup-theme"
+                    label="Theme"
+                    value={theme}
+                    onChange={(event) => setDraftTheme(event.target.value as ThemePreference)}
+                    hint="System follows this device’s light or dark setting."
+                  >
+                    <option value="system">System</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </Select>
+                  <Select
+                    id="setup-currency"
+                    label="Currency"
+                    value={currency.code}
+                    onChange={(event) => setDraftCurrencyCode(event.target.value)}
+                    hint="Display-only. Presets set the symbol and decimal places."
+                  >
+                    {CURRENCY_PRESETS.map((preset) => (
+                      <option key={preset.code} value={preset.code}>
+                        {preset.code} — {preset.label}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              </fieldset>
+
+              <label className={styles.sampleRow}>
+                <input
+                  type="checkbox"
+                  checked={includeSample}
+                  onChange={(event) => setIncludeSample(event.target.checked)}
+                  aria-label="Load the optional sample season"
+                />
+                <span>
+                  <strong>Load the optional sample season</strong>
+                  <span>
+                    A flagged example with two people and three gifts. It is added as archived, so
+                    it never changes your totals, and you can remove it anytime.
+                  </span>
+                </span>
+              </label>
 
               <div className={styles.formActions}>
                 <Button type="submit" disabled={saving}>
@@ -302,7 +394,7 @@ export function SeasonSetupPage() {
                 </Button>
                 <span className={styles.safeNote}>
                   <ShieldCheck size={15} aria-hidden="true" />
-                  No account, sample people, or gifts will be created.
+                  No account is created. Sample records load only if you tick the box.
                 </span>
               </div>
             </form>

@@ -10,6 +10,7 @@ import {
   type ValidatedBackup,
 } from '../backup';
 import { exportCsv, type CsvExport, type CsvExportOptions } from '../csv';
+import { hasStoredMonetaryData } from '../dataPresence';
 import {
   loadSampleData,
   removeSampleData,
@@ -31,6 +32,7 @@ import { createSettingsRepository, type SettingsRepository } from './settings';
 
 export interface DataRepository {
   healthCheck(): Promise<StorageHealth>;
+  hasMonetaryData(): Promise<boolean>;
   resetAllData(confirmation: string): Promise<ResetAllDataResult>;
   exportBackup(): Promise<BackupExport>;
   validateBackup(file: BackupSource): Promise<ValidatedBackup>;
@@ -65,6 +67,7 @@ export function createRepositories(
     ideas: createIdeaRepository(context),
     data: {
       healthCheck: () => healthCheck(db),
+      hasMonetaryData: () => hasStoredMonetaryData(db),
       resetAllData: (confirmation) => resetAllData(context, { confirmation }),
       exportBackup: () => createBackup(context),
       validateBackup: (file) => validateBackup(file),

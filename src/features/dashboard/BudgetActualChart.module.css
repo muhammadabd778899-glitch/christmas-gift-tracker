@@ -30,3 +30,13 @@
 .details[open] summary {
   margin-bottom: var(--space-3);
 }
+
+.chartTable table {
+  min-width: 0;
+}
+
+.chartTable th,
+.chartTable td {
+  padding: 10px 12px;
+  font-size: 0.8rem;
+}

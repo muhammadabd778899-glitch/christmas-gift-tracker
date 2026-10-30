@@ -79,16 +79,22 @@ export function GiftRow({
       </td>
 
       {/* Recipient */}
-      <td className={styles.recipientCell}>{recipientName(recipient)}</td>
+      <td className={styles.recipientCell} data-label="For">
+        {recipientName(recipient)}
+      </td>
 
       {/* Store */}
-      <td className={styles.storeCell}>{gift.store ?? <span className={styles.empty}>—</span>}</td>
+      <td className={styles.storeCell} data-label="Store">
+        {gift.store ?? <span className={styles.empty}>—</span>}
+      </td>
 
       {/* Planned budget */}
-      <td className={styles.moneyCell}>{money(gift.plannedBudgetMinor)}</td>
+      <td className={styles.moneyCell} data-label="Planned">
+        {money(gift.plannedBudgetMinor)}
+      </td>
 
       {/* Actual cost, with an explicit flag when bought without a cost */}
-      <td className={styles.moneyCell}>
+      <td className={styles.moneyCell} data-label="Actual">
         <span className={styles.moneyValue}>{money(gift.actualCostMinor)}</span>
         {gift.bought && gift.actualCostMinor === null ? (
           <span

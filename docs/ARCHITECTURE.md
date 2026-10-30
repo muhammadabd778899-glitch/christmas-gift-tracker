@@ -269,8 +269,8 @@ Bulk operations (restore, season delete, recipient cascade, conversion) are sing
 
 ### 7.5 Storage persistence and health
 
-- **Deferred:** request `navigator.storage.persist()` during onboarding or after the first save, explain the result, and never block the workflow. Milestones 4–6 do **not** call it. Persistence timing and the buyer-facing explanation remain open.
-- Settings → Diagnostics is planned: `healthCheck()` exists in the storage layer and can produce a PII-free report, but the Settings diagnostics UI does not exist yet.
+- **Deferred:** request `navigator.storage.persist()` during onboarding or after the first save, explain the result, and never block the workflow. Milestones 4–9 do **not** call it. Persistence timing and the buyer-facing explanation remain open.
+- Settings → Diagnostics (Milestone 9) renders the existing PII-free `healthCheck()` report: counts, issue codes, storage estimates, persistence status, and app/schema versions. It performs reads only and never repairs or deletes data.
 - Quota errors are caught and surfaced with backup guidance.
 - The app never clears storage on its own.
 
@@ -326,9 +326,10 @@ Milestone 2 implements the health engine (`src/storage/health.ts`) but not the S
 ### 8.4 Tables and mobile
 
 - Semantic `<table>` on desktop with sortable headers and accessible labels.
-- At narrow widths, rows become cards or a horizontally scrollable region with a visible affordance; the page itself never scrolls horizontally.
+- At narrow widths, Gifts and Shopping rows become stacked cards with visible `data-label` headings, full-width actions, and 44 px toggle targets (Milestone 9). Other wide tables use a bounded scroll region with a visible affordance.
+- Chart data tables shrink their cell padding rather than forcing page-level scrolling; the page itself never scrolls horizontally at 360, 768, 1024, or 1440 px.
 - Sticky action columns are avoided; actions are reachable via a menu.
-- Print CSS hides navigation, filters, and controls.
+- Print CSS hides navigation, filters, and controls; mobile card rules are scoped to `@media screen`, so print keeps the tabular layout.
 
 ### 8.5 Charts and accessibility
 
@@ -346,10 +347,11 @@ CSS custom properties for:
 - Brand: deep evergreen, muted burgundy, soft gold.
 - Text: primary, secondary, inverse.
 - Borders, shadows, radii, spacing scale, type scale, status colors.
-- Dark theme overrides under `[data-theme='dark']`.
+- Dark theme overrides under `[data-theme='dark']`, including surfaces, borders, shadows, status tones, focus rings, and chart colors.
 - Print overrides under `@media print`.
+- Currency and appearance tokens are driven by Settings; format changes never mutate stored minor units (D-015).
 
-Tokens are defined in Milestone 1 and refined in Milestone 9; components never hardcode raw colors.
+Tokens were defined in Milestone 1 and refined in Milestone 9; components never hardcode raw colors.
 
 ---
 
@@ -757,3 +759,29 @@ Milestone 8 does **not** implement merge restore, automatic/scheduled backups, c
 - CSV has no import path and no per-recipient export.
 - Browser checks used Chromium at desktop widths. Firefox, Safari, and mobile layouts remain unverified.
 - A production chunk-size warning remains because the main JavaScript chunk exceeds 500 kB.
+
+---
+
+## 26. Milestone 9 implementation boundaries
+
+Milestone 9 refines the interface without changing the data model or business rules:
+
+- `src/lib/theme.ts` owns theme normalization, storage keys, and system-preference resolution. `src/app/ThemeController.tsx` applies `data-theme`, `color-scheme`, and the `theme-color` meta tag; it mirrors the choice to `localStorage` for pre-paint and treats IndexedDB settings as authoritative (D-017).
+- `index.html` contains a small synchronous script that applies the mirrored theme before first paint. A verified snapshot shows dark applied at DOMContentLoaded without an intermediate wrong-theme mutation.
+- Settings is rebuilt around appearance (light/dark/system), currency format (symbol, code, fraction digits), PII-free diagnostics, privacy explanation, app/schema versions, and the existing backup/restore/sample/reset tools. Monetary format changes never convert stored minor units and require confirmation when data exists (D-015).
+- The palette remains warm ivory, deep evergreen, muted burgundy, and soft gold. Dark theme overrides every surface, border, shadow, status tone, and chart color. Components consume tokens only.
+- Gifts and Shopping tables become stacked cards at narrow widths using screen-only CSS; print keeps the tabular layout. Chart tables reduce padding instead of forcing page scrolling. No route overflows horizontally at 360/768/1024/1440 px.
+- `InfoTip` provides keyboard-focusable explanations for planned/spent/remaining/unallocated/utilization metrics. The budget chart keeps an accessible data table; motion respects `prefers-reduced-motion`.
+- Buttons, icon buttons, season chips, dialog controls, and mobile table toggles meet 44×44 px targets. Focus rings use a visible gold outline in both themes.
+- First-run onboarding includes name, holiday date, optional budget, theme, currency, and optional sample data; startup still creates nothing.
+
+Milestone 9 does **not** add new business features, self-hosted fonts, a service worker, an offline package, cloud sync, or automatic storage persistence. Playwright remains unconfigured.
+
+### 26.1 Known M9 limitations
+
+- Browser verification used headless Edge (Chromium) at 360/768/1024/1440. Firefox, Safari, iOS, and real touch hardware remain unverified.
+- Contrast was checked against token pairs and visual inspection, not a full automated WCAG audit or screen-reader session.
+- Theme is stored per browser profile; there is no cross-device synchronization.
+- The system-font stack is retained intentionally. No remote or self-hosted brand font is shipped.
+- A production chunk-size warning remains because the main JavaScript chunk exceeds 500 kB.
+

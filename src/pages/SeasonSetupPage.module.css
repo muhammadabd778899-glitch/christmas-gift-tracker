@@ -35,6 +35,73 @@
   gap: var(--space-5);
 }
 
+.preferences {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.preferences legend {
+  padding-inline: 4px;
+  color: var(--color-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.preferences > p {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.preferenceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.sampleRow {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  min-height: 44px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  cursor: pointer;
+}
+
+.sampleRow input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 2px;
+  accent-color: var(--color-evergreen-700);
+}
+
+.sampleRow > span {
+  min-width: 0;
+}
+
+.sampleRow strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 0.84rem;
+}
+
+.sampleRow span span {
+  display: block;
+  margin-top: 2px;
+  color: var(--color-text-muted);
+  font-size: 0.77rem;
+  line-height: 1.45;
+}
+
 .formError {
   padding: 12px 14px;
   border: 1px solid var(--color-burgundy-200);
@@ -73,9 +140,8 @@
   border: 1px solid rgb(248 243 232 / 12%);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at 100% 0%, rgb(189 145 70 / 18%), transparent 18rem),
-    var(--color-evergreen-900);
-  color: var(--color-text-inverse);
+    radial-gradient(circle at 100% 0%, rgb(189 145 70 / 18%), transparent 18rem), var(--color-panel);
+  color: var(--color-on-panel);
   box-shadow: var(--shadow-md);
 }
 
@@ -230,7 +296,7 @@
   height: 9px;
   border-radius: 50%;
   background: var(--color-gold-500);
-  box-shadow: 0 0 0 5px rgb(189 145 70 / 12%);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold-500) 12%, transparent);
 }
 
 @media (max-width: 900px) {
@@ -242,6 +308,10 @@
 @media (max-width: 560px) {
   .readyCard {
     align-items: flex-start;
+  }
+
+  .preferenceGrid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .formActions > :first-child {

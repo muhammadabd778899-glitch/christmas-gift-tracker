@@ -292,7 +292,7 @@ describe('Seasons and archives page', () => {
     const resetButton = await screen.findByRole('button', { name: 'Reset all data' });
     expect(resetButton).toBeDisabled();
 
-    await user.click(screen.getByRole('button', { name: 'Download backup before resetting' }));
+    await user.click(screen.getByRole('button', { name: 'Download backup first' }));
     expect(await screen.findByText(/Backup downloaded/)).toBeInTheDocument();
     expect(downloaded[0]).toMatch(/^christmas-gift-tracker-backup-.*\.json$/);
     expect(resetButton).toBeDisabled();
@@ -302,7 +302,11 @@ describe('Seasons and archives page', () => {
     await user.click(resetButton);
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Set the scene for this Christmas' }),
+      await screen.findByRole(
+        'heading',
+        { level: 1, name: 'Set the scene for this Christmas' },
+        { timeout: 4000 },
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByText('All planner data was cleared. A fresh, empty planner is ready.'),

@@ -32,7 +32,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--color-gold-500);
-  box-shadow: 0 0 0 5px rgb(189 145 70 / 12%);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold-500) 12%, transparent);
 }
 
 .impactSummary {

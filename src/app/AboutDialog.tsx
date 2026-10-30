@@ -30,15 +30,20 @@ const included = [
   'Optional sample data that stays isolated, plus a guarded reset that requires a backup',
   'Confirmation before un-buying or deleting a gift',
   'Safe deletion that returns converted ideas to the Idea Bank',
+  'Light, dark, and system themes with pre-paint application and no flash',
+  'Currency symbol, code, and fraction-digit settings with confirmation before reinterpretation',
+  'A rebuilt Settings page with PII-free diagnostics, privacy explanation, and app/schema versions',
+  'Keyboard-accessible metric explanations, visible focus, and reduced-motion support',
+  'Responsive layouts with mobile gift and shopping cards at 360 px',
   'Accessible dialogs, forms, tables, and responsive navigation',
   'Versioned local storage with validation and transactions',
   'Automated tests, type checking, linting, and a production build',
 ];
 
 const upcoming = [
-  'Professional UI, themes, and accessibility polish (Milestone 9)',
   'Offline delivery and packaging (Milestone 10)',
-  'Release hardening for the remaining milestones',
+  'Online accounts and synchronization (Milestone 11)',
+  'Release hardening and Etsy packaging (Milestone 12)',
 ];
 
 export function AboutDialog({ open, onClose }: AboutDialogProps) {
@@ -64,7 +69,9 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
             The planner now manages several seasons with one active at a time and read-only
             archives. It can export a complete JSON backup, validate and restore one atomically,
             export CSV for spreadsheets, load isolated sample data, and reset only after a fresh
-            backup. Offline packaging, themes, and cloud sync are not implemented yet.
+            backup. This build also adds light, dark, and system themes, responsive layouts,
+            keyboard-accessible tooltips, and a rebuilt Settings page. Offline packaging and cloud
+            sync are not implemented yet.
           </p>
         </div>
 

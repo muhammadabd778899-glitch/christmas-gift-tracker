@@ -102,6 +102,26 @@ describe('Recipient detail page', () => {
     expect(screen.getByText(book.category ?? '')).toBeInTheDocument();
   });
 
+  it('explains cap left with a keyboard-accessible tooltip', async () => {
+    const user = userEvent.setup();
+    const { storage, alex } = await seedRecipient();
+    await renderApp([`/recipients/${alex.id}`], { storage });
+
+    const tipButton = await screen.findByRole('button', { name: 'About cap left' });
+    tipButton.focus();
+    await user.keyboard('{Enter}');
+
+    expect(tipButton).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('note')).toHaveTextContent(
+      'The budget cap minus the actual cost of bought gifts.',
+    );
+
+    await user.keyboard('{Escape}');
+
+    expect(tipButton).toHaveAttribute('aria-expanded', 'false');
+    expect(tipButton).toHaveFocus();
+  });
+
   it('provides recipient edit access from the detail page', async () => {
     const user = userEvent.setup();
     const { storage, alex } = await seedRecipient();

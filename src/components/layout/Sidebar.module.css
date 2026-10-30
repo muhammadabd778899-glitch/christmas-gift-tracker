@@ -2,15 +2,17 @@
   position: sticky;
   top: 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
   gap: var(--space-7);
   height: 100dvh;
   padding: var(--space-6) 18px var(--space-5);
+  overflow-x: hidden;
   overflow-y: auto;
   background:
     radial-gradient(circle at 12% 2%, rgb(189 145 70 / 14%), transparent 17rem),
     radial-gradient(circle at 90% 96%, rgb(122 46 58 / 17%), transparent 20rem),
-    var(--color-evergreen-950);
+    var(--color-panel-deep);
   border-right: 1px solid rgb(248 243 232 / 8%);
   color: var(--color-text-inverse);
 }
@@ -60,7 +62,7 @@
   margin-top: 5px;
   border-radius: 50%;
   background: var(--color-gold-500);
-  box-shadow: 0 0 0 4px rgb(189 145 70 / 14%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-gold-500) 14%, transparent);
 }
 
 .buildCopy {

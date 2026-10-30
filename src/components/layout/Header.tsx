@@ -4,6 +4,7 @@ import { useActiveSeason } from '../../app/providers/useActiveSeason';
 import { formatDateOnly } from '../../domain/dates';
 import { APP_MILESTONE } from '../../lib/appInfo';
 import { Brand } from './Brand';
+import { ThemeToggle } from './ThemeToggle';
 import { IconButton } from '../ui/IconButton';
 import styles from './Header.module.css';
 
@@ -92,6 +93,7 @@ export function Header({ onOpenNav, onOpenAbout }: HeaderProps) {
           <span className={styles.previewDot} aria-hidden="true" />
           Milestone {APP_MILESTONE} preview
         </span>
+        <ThemeToggle />
         <IconButton label="About this build" icon={<Info />} onClick={onOpenAbout} />
       </div>
     </header>

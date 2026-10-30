@@ -1,3 +1,4 @@
+import { APP_MILESTONE, APP_MILESTONE_LABEL } from '../../lib/appInfo';
 import { Dialog } from '../ui/Dialog';
 import { NavLinks } from './NavLinks';
 import styles from './MobileNav.module.css';
@@ -21,7 +22,9 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
       </div>
       <div className={styles.footer}>
         <span className={styles.dot} aria-hidden="true" />
-        <span>Milestone 3 · Recipients and first-season setup</span>
+        <span>
+          Milestone {APP_MILESTONE} · {APP_MILESTONE_LABEL}
+        </span>
       </div>
     </Dialog>
   );

@@ -43,7 +43,7 @@
 .control:focus {
   border-color: var(--color-evergreen-700);
   outline: none;
-  box-shadow: 0 0 0 4px rgb(37 103 84 / 14%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-evergreen-600) 22%, transparent);
 }
 
 .control:disabled {
@@ -57,15 +57,20 @@
 }
 
 .controlInvalid:focus {
-  box-shadow: 0 0 0 4px rgb(159 53 53 / 12%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-critical) 18%, transparent);
 }
 
 .select {
   appearance: none;
   padding-right: 38px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23556259' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
   background-repeat: no-repeat;
-  background-position: right 14px center;
+  background-position:
+    right 18px center,
+    right 13px center;
+  background-size: 5px 5px;
 }
 
 .textarea {

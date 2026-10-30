@@ -6,6 +6,7 @@ import { MobileNav } from '../components/layout/MobileNav';
 import { Sidebar } from '../components/layout/Sidebar';
 import { APP_VERSION } from '../lib/appInfo';
 import { getPageTitle } from './navigation';
+import { ThemeController } from './ThemeController';
 import styles from './AppShell.module.css';
 
 export function AppShell() {
@@ -33,8 +34,56 @@ export function AppShell() {
     document.getElementById('main-content')?.focus({ preventScroll: true });
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!location.hash) {
+      return;
+    }
+
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id) {
+      return;
+    }
+
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    let cancelled = false;
+    let frame = 0;
+    let attempts = 0;
+
+    const reveal = () => {
+      if (cancelled) {
+        return;
+      }
+
+      const target = document.getElementById(id);
+
+      if (!target) {
+        if (attempts >= 60) {
+          return;
+        }
+
+        attempts += 1;
+        frame = window.requestAnimationFrame(reveal);
+        return;
+      }
+
+      if (typeof target.scrollIntoView === 'function') {
+        target.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+      }
+
+      target.focus({ preventScroll: true });
+    };
+
+    frame = window.requestAnimationFrame(reveal);
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frame);
+    };
+  }, [location.pathname, location.hash]);
+
   return (
     <div className={styles.shell}>
+      <ThemeController />
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>

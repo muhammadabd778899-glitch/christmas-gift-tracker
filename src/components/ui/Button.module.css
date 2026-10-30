@@ -35,19 +35,19 @@
 }
 
 .sm {
-  min-height: 38px;
-  padding: 0 15px;
+  min-height: 44px;
+  padding: 0 16px;
   font-size: 0.82rem;
 }
 
 .primary {
-  background: var(--color-evergreen-800);
-  color: var(--color-text-inverse);
+  background: var(--color-action);
+  color: var(--color-on-action);
   box-shadow: 0 10px 22px rgb(16 47 38 / 16%);
 }
 
 .primary:not(:disabled):hover {
-  background: var(--color-evergreen-950);
+  background: var(--color-action-hover);
   box-shadow: 0 12px 26px rgb(16 47 38 / 22%);
 }
 
@@ -73,23 +73,23 @@
 }
 
 .danger {
-  background: var(--color-burgundy-700);
-  color: var(--color-text-inverse);
+  background: var(--color-danger-action);
+  color: var(--color-on-danger);
   box-shadow: 0 10px 22px rgb(122 46 58 / 15%);
 }
 
 .danger:not(:disabled):hover {
-  background: var(--color-burgundy-800);
+  background: var(--color-danger-action-hover);
 }
 
 .inverse {
-  background: var(--color-gold-100);
-  color: var(--color-evergreen-950);
+  background: var(--color-accent-surface);
+  color: var(--color-on-accent);
   box-shadow: 0 10px 24px rgb(0 0 0 / 16%);
 }
 
 .inverse:not(:disabled):hover {
-  background: #fff8e7;
+  background: var(--color-accent-hover);
 }
 
 .ghost-inverse {

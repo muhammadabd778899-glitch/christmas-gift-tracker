@@ -236,7 +236,7 @@ export function ShoppingPage() {
                       </span>
                     </div>
 
-                    <Table label={`${group.label} shopping items`}>
+                    <Table label={`${group.label} shopping items`} className={styles.shoppingTable}>
                       <TableHead>
                         <TableRow>
                           <TableHeaderCell>Gift</TableHeaderCell>
@@ -257,8 +257,8 @@ export function ShoppingPage() {
                                 <span className={styles.category}>{gift.category}</span>
                               ) : null}
                             </TableCell>
-                            <TableCell>{recipient?.name ?? '—'}</TableCell>
-                            <TableCell className={styles.moneyCell}>
+                            <TableCell data-label="For">{recipient?.name ?? '—'}</TableCell>
+                            <TableCell className={styles.moneyCell} data-label="Planned">
                               {gift.plannedBudgetMinor === null ? (
                                 <span className={styles.muted}>Not set</span>
                               ) : (

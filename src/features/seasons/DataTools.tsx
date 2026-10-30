@@ -588,7 +588,7 @@ export function ResetDataCard({ onReset }: ResetDataCardProps) {
           className={styles.resetButton}
         >
           <Download size={16} aria-hidden="true" />
-          {backupDownloaded ? 'Download backup again' : 'Download backup before resetting'}
+          {backupDownloaded ? 'Download backup again' : 'Download backup first'}
         </Button>
 
         {backupDownloaded ? (

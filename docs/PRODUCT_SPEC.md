@@ -659,7 +659,7 @@ These materially affect scope or promise. Recommendations are in `docs/DECISIONS
 | ID | Decision | Recommendation | Blocks |
 | --- | --- | --- | --- |
 | O-1 | Offline delivery: PWA-only, standalone HTML, or desktop wrapper | PWA first; test standalone in Milestone 10; add wrapper only if needed | Milestone 10, Etsy copy |
-| O-2 | Product name and brand | Keep "Christmas Gift Tracker" as working name; finalize before Milestone 9 | Milestone 9, packaging |
+| O-2 | Product name and brand | Keep "Christmas Gift Tracker"; decided 2026-10-30 to refine the warm/evergreen/burgundy/gold identity rather than rename | Milestone 9, packaging |
 | O-3 | Currency defaults and supported presets | USD default; symbol + 0–3 fraction digits; no conversion | Milestone 2/9 |
 | O-4 | Recipient deletion default | Block; offer reassign or explicit cascade | Milestone 3 |
 | O-5 | Online edition in the first Etsy release? | No; ship offline first | Milestone 11, listing |

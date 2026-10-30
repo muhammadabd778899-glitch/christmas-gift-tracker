@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestones 0–8 complete and verified; Milestone 9 not started · Version 0.8 · 2026-10-30
+> Status: Milestones 0–9 complete and verified; Milestone 10 not started · Version 0.9 · 2026-10-30
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -10,13 +10,13 @@
 | Item | State |
 | --- | --- |
 | Repository | Runnable React/TypeScript/Vite application, approved specification, and tested local storage |
-| Current milestone | **Milestone 8 - Seasons, archives, backup, and export** (complete; awaiting owner review before M9) |
+| Current milestone | **Milestone 9 - Professional UI, themes, accessibility** (complete; awaiting owner review before M10) |
 | Application runnable | Yes - development server, tests, coverage, and production build pass |
-| Tests | 291 Vitest tests across 31 files passing; no Playwright suite yet |
-| Next milestone | Milestone 9 - Professional UI, themes, accessibility (not started) |
-| Next action | Owner reviews `docs/MILESTONE_8_REPORT.md` and authorizes Milestone 9 |
+| Tests | 307 Vitest tests across 33 files passing; no Playwright suite yet |
+| Next milestone | Milestone 10 - Offline delivery (not started) |
+| Next action | Owner reviews `docs/MILESTONE_9_REPORT.md` and authorizes Milestone 10 |
 
-**Do not start Milestone 9 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
+**Do not start Milestone 10 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
 
 ---
 
@@ -33,7 +33,7 @@
 | 6 | Idea Bank + Shopping List | Ideas convert to gifts; derived shopping list | Complete — verified |
 | 7 | Search, filters, details | Find and review data at scale | Complete – verified |
 | 8 | Seasons, archives, backup | Reuse yearly; protect and export data | Complete — verified |
-| 9 | Professional UI | Themes, responsive polish, accessibility, print | Not started |
+| 9 | Professional UI | Themes, responsive polish, accessibility, print | Complete — verified |
 | 10 | Offline delivery | Validated offline artifact and customer setup | Not started |
 | 11 | Online edition | Accounts, cloud, sync, conflicts | Not started |
 | 12 | QA + packaging + launch | Tested, documented Etsy release | Not started |
@@ -120,7 +120,7 @@ Order rationale:
 - The toast/announcer primitive was deferred until the first feature that needs transient feedback (Milestone 3/4). Inline errors and the shared error states exist now.
 - Playwright remains deferred; `e2e/` is reserved but no end-to-end suite has run.
 - ESLint is pinned to 9.39.5 because `eslint-plugin-jsx-a11y` 6.10.2 does not support ESLint 10 yet. Revisit after the release milestone.
-- System font stacks are used until self-hosted brand fonts are introduced in Milestone 9. No remote font or CDN request is made.
+- System font stacks remain in use; no brand font is bundled or fetched.
 - GitHub Actions verifies formatting, type checking, linting, tests, and the production build on pushes and pull requests.
 - No storage, domain calculations, onboarding, sample records, charts, or PWA registration were added.
 
@@ -433,6 +433,8 @@ Order rationale:
 
 ## 12. Milestone 9 — Professional UI, themes, accessibility
 
+**Status:** Complete and verified 2026-10-30. Evidence is in `docs/MILESTONE_9_REPORT.md`.
+
 **Depends on:** M8; D-015, D-017; O-2.
 
 **Objective:** Turn the working app into a premium, comfortable, accessible product.
@@ -677,9 +679,9 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews the `/seasons` surface, backup/restore and CSV downloads, and `docs/MILESTONE_8_REPORT.md`.
+1. Owner reviews `docs/MILESTONE_9_REPORT.md`, the themed pages, and the responsive settings and mobile-table layouts.
 2. Owner confirms the remaining browser-storage persistence timing and buyer-facing explanation before release packaging.
-3. Owner authorizes Milestone 9 — Professional UI, themes, accessibility.
-4. Only then begin theme, accessibility, and visual-polish work.
+3. Owner authorizes Milestone 10 — Offline delivery.
+4. Only then begin service-worker, manifest, and offline-artifact work.
 
-Milestone 9 is **not started**. Until authorization: **stop.**
+Milestone 10 is **not started**. Until authorization: **stop.**

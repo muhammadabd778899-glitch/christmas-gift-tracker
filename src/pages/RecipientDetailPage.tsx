@@ -16,6 +16,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
+import { InfoTip } from '../components/ui/InfoTip';
 import { PageHeader } from '../components/ui/PageHeader';
 import { buttonStyles } from '../components/ui/buttonStyles';
 import { calculateProgress, formatRatioPercent } from '../domain/calculations/dashboard';
@@ -358,7 +359,13 @@ export function RecipientDetailPage() {
 
         <Card>
           <CardContent className={styles.metricCard}>
-            <span className={styles.metricLabel}>Cap left</span>
+            <div className={styles.metricLabelRow}>
+              <span className={styles.metricLabel}>Cap left</span>
+              <InfoTip label="cap left">
+                The budget cap minus the actual cost of bought gifts. Planned gifts do not reduce it
+                until they are bought.
+              </InfoTip>
+            </div>
             <strong
               className={`${styles.metricValue} ${metrics.overCap ? styles.metricValueOver : ''}`}
             >
