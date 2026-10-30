@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestones 0–10 complete and verified; Milestone 11 not started · Version 0.10 · 2026-10-30
+> Status: Milestones 0–11 complete and verified locally; Milestone 12 not started · Version 0.11 · 2026-10-30
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -9,14 +9,14 @@
 
 | Item | State |
 | --- | --- |
-| Repository | Runnable React/TypeScript/Vite application, approved specification, and tested local storage |
-| Current milestone | **Milestone 10 - Offline delivery** (complete; awaiting owner review before M11) |
-| Application runnable | Yes - development server, tests, coverage, and production PWA build pass |
-| Tests | 327 Vitest tests across 37 files passing; no Playwright suite yet |
-| Next milestone | Milestone 11 - Online edition and cloud synchronization (not started) |
-| Next action | Owner reviews `docs/MILESTONE_10_REPORT.md` and authorizes Milestone 11 |
+| Repository | Runnable React/TypeScript/Vite application with two build editions, tested local storage, and an optional Supabase-backed online edition |
+| Current milestone | **Milestone 11 - Online accounts and synchronization** (complete locally; remote Supabase security run pending owner credentials) |
+| Application runnable | Yes - development server, tests, coverage, offline PWA build, and online build pass |
+| Tests | 377 Vitest tests across 43 files passing; no Playwright suite yet |
+| Next milestone | Milestone 12 - QA, packaging, and Etsy release (not started) |
+| Next action | Owner reviews `docs/MILESTONE_11_REPORT.md` and runs `npm run verify:supabase` against the dedicated test project before authorizing Milestone 12 |
 
-**Do not start Milestone 11 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
+**Milestone 11 is locally complete. Do not start Milestone 12 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
 
 ---
 
@@ -35,7 +35,7 @@
 | 8 | Seasons, archives, backup | Reuse yearly; protect and export data | Complete — verified |
 | 9 | Professional UI | Themes, responsive polish, accessibility, print | Complete — verified |
 | 10 | Offline delivery | Validated offline artifact and customer setup | Complete — verified |
-| 11 | Online edition | Accounts, cloud, sync, conflicts | Not started |
+| 11 | Online edition | Accounts, cloud, sync, conflicts | Complete — verified locally; remote RLS run pending credentials |
 | 12 | QA + packaging + launch | Tested, documented Etsy release | Not started |
 
 Order rationale:
@@ -512,6 +512,8 @@ Order rationale:
 
 ## 14. Milestone 11 — Online edition and cloud synchronization
 
+**Status:** Implemented and verified locally on 2026-10-30; the remote Supabase isolation run requires the owner's dedicated test project. See `docs/MILESTONE_11_REPORT.md` and `docs/ONLINE_SETUP.md`.
+
 **Depends on:** M10; D-012; O-5; owner approval to build it at all.
 
 **Objective:** Add optional accounts and cross-device access without weakening the offline product.
@@ -681,10 +683,10 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews `docs/MILESTONE_10_REPORT.md`, the installable PWA, and `docs/OFFLINE_SETUP.md`.
-2. Owner confirms the hosted URL, hosting provider, and listing copy for the tested offline setup.
-3. Owner decides whether the unverified Firefox/Safari/iOS matrix needs additional hardware before release.
-4. Owner authorizes Milestone 11 — Online edition and cloud synchronization.
-5. Only then begin backend, authentication, and sync work.
+1. Owner reviews `docs/MILESTONE_11_REPORT.md`, both build editions, and `docs/ONLINE_SETUP.md`.
+2. Owner creates the dedicated Supabase test project, applies `supabase/migrations/20261030000100_online_sync.sql`, and supplies the URL and anon key through the git-ignored `.env.online.local` only.
+3. Run `npm run verify:supabase` to complete the remote RLS/cross-account verification and record the result in the milestone report.
+4. Owner confirms the M12 scope: final QA, packaging, listing copy, and Etsy release for the account-free offline edition.
+5. Only then begin Milestone 12.
 
-Milestone 11 is **not started**. Until authorization: **stop.**
+Milestone 12 is **not started**. Until authorization: **stop.**

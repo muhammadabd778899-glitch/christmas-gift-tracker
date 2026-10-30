@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { SCHEMA_VERSION } from './db';
 import { healthCheck } from './health';
 import { createTestStorage, type TestStorage } from '../test/storage';
 import {
@@ -57,7 +58,7 @@ describe('storage health check', () => {
     const report = await healthCheck(storage.db);
 
     expect(report.ok).toBe(true);
-    expect(report.databaseVersion).toBe(1);
+    expect(report.databaseVersion).toBe(SCHEMA_VERSION);
     expect(report.counts).toEqual({
       seasons: 1,
       activeSeasons: 1,

@@ -1,8 +1,15 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+function editionModule(mode: string): string {
+  return fileURLToPath(
+    new URL(mode === 'online' ? './src/app/onlineEdition.tsx' : './src/app/offlineEdition.ts', import.meta.url),
+  );
+}
+
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
@@ -63,10 +70,15 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      '@edition': editionModule(mode),
+    },
+  },
   server: {
     port: 5173,
   },
   preview: {
     port: 4173,
   },
-});
+}));

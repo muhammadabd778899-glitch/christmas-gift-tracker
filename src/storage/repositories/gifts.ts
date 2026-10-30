@@ -12,6 +12,7 @@ import {
   type GiftUpdateInput,
 } from '../../domain/schemas';
 import { createId } from '../../lib/ids';
+import { recordLocalChange } from '../changeTracking';
 import { withStorageErrors } from '../errors';
 import {
   applyDefined,
@@ -73,44 +74,62 @@ export function createGiftRepository(context: RepositoryContext): GiftRepository
       return withStorageErrors(async () => {
         const parsed = parseWithSchema(giftCreateInputSchema, input, 'The new gift is invalid.');
 
-        return db.transaction('rw', db.gifts, db.seasons, db.recipients, async () => {
-          await assertWritableSeason(context, parsed.seasonId);
-          await assertRecipientInSeason(context, parsed.recipientId, parsed.seasonId);
-          const timestamp = context.nowIso();
-          const today = localToday(context.now());
-          const gift = parseWithSchema(
-            giftEntitySchema,
-            {
-              id: createId(),
-              seasonId: parsed.seasonId,
-              recipientId: parsed.recipientId,
-              name: parsed.name,
-              category: parsed.category ?? null,
-              store: parsed.store ?? null,
-              purchaseUrl: parsed.purchaseUrl ?? null,
-              plannedBudgetMinor: parsed.plannedBudgetMinor ?? null,
-              actualCostMinor: parsed.actualCostMinor ?? null,
-              bought: parsed.bought,
-              // A newly bought gift defaults to today unless a date was supplied explicitly.
-              boughtOn:
-                parsed.boughtOn === undefined ? (parsed.bought ? today : null) : parsed.boughtOn,
-              wrapped: parsed.wrapped,
-              wrappedOn:
-                parsed.wrappedOn === undefined ? (parsed.wrapped ? today : null) : parsed.wrappedOn,
-              sent: parsed.sent,
-              sentOn: parsed.sentOn === undefined ? (parsed.sent ? today : null) : parsed.sentOn,
-              deliveryMethod: parsed.deliveryMethod ?? null,
-              address: parsed.address ?? null,
-              notes: parsed.notes ?? null,
-              createdAt: timestamp,
-              updatedAt: timestamp,
-            },
-            'The new gift is invalid.',
-          );
+        return db.transaction(
+          'rw',
+          db.gifts,
+          db.seasons,
+          db.recipients,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            await assertWritableSeason(context, parsed.seasonId);
+            await assertRecipientInSeason(context, parsed.recipientId, parsed.seasonId);
+            const timestamp = context.nowIso();
+            const today = localToday(context.now());
+            const gift = parseWithSchema(
+              giftEntitySchema,
+              {
+                id: createId(),
+                seasonId: parsed.seasonId,
+                recipientId: parsed.recipientId,
+                name: parsed.name,
+                category: parsed.category ?? null,
+                store: parsed.store ?? null,
+                purchaseUrl: parsed.purchaseUrl ?? null,
+                plannedBudgetMinor: parsed.plannedBudgetMinor ?? null,
+                actualCostMinor: parsed.actualCostMinor ?? null,
+                bought: parsed.bought,
+                // A newly bought gift defaults to today unless a date was supplied explicitly.
+                boughtOn:
+                  parsed.boughtOn === undefined ? (parsed.bought ? today : null) : parsed.boughtOn,
+                wrapped: parsed.wrapped,
+                wrappedOn:
+                  parsed.wrappedOn === undefined
+                    ? parsed.wrapped
+                      ? today
+                      : null
+                    : parsed.wrappedOn,
+                sent: parsed.sent,
+                sentOn: parsed.sentOn === undefined ? (parsed.sent ? today : null) : parsed.sentOn,
+                deliveryMethod: parsed.deliveryMethod ?? null,
+                address: parsed.address ?? null,
+                notes: parsed.notes ?? null,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+              },
+              'The new gift is invalid.',
+            );
 
-          await db.gifts.add(gift);
-          return gift;
-        });
+            await db.gifts.add(gift);
+            await recordLocalChange(db, {
+              entityType: 'gift',
+              entityId: gift.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
+            return gift;
+          },
+        );
       });
     },
 
@@ -118,46 +137,65 @@ export function createGiftRepository(context: RepositoryContext): GiftRepository
       return withStorageErrors(async () => {
         const parsed = parseWithSchema(giftUpdateInputSchema, input, 'The gift change is invalid.');
 
-        return db.transaction('rw', db.gifts, db.seasons, db.recipients, async () => {
-          const current = await readGift(context, id);
-          await assertWritableSeason(context, current.seasonId);
+        return db.transaction(
+          'rw',
+          db.gifts,
+          db.seasons,
+          db.recipients,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            const current = await readGift(context, id);
+            await assertWritableSeason(context, current.seasonId);
 
-          if (parsed.recipientId !== undefined && parsed.recipientId !== current.recipientId) {
-            await assertRecipientInSeason(context, parsed.recipientId, current.seasonId);
-          }
+            if (parsed.recipientId !== undefined && parsed.recipientId !== current.recipientId) {
+              await assertRecipientInSeason(context, parsed.recipientId, current.seasonId);
+            }
 
-          const next: Gift = { ...applyDefined(current, parsed), updatedAt: context.nowIso() };
-          const today = localToday(context.now());
+            const timestamp = context.nowIso();
+            const next: Gift = { ...applyDefined(current, parsed), updatedAt: timestamp };
+            const today = localToday(context.now());
 
-          // Dates follow their boolean. When a flag is explicitly cleared and its
-          // date is omitted, clear the date too. Dependent statuses are not
-          // cascaded here: the user must confirm an un-buy in the UI first.
-          if (parsed.bought === false && parsed.boughtOn === undefined) {
-            next.boughtOn = null;
-          }
-          if (parsed.wrapped === false && parsed.wrappedOn === undefined) {
-            next.wrappedOn = null;
-          }
-          if (parsed.sent === false && parsed.sentOn === undefined) {
-            next.sentOn = null;
-          }
+            // Dates follow their boolean. When a flag is explicitly cleared and its
+            // date is omitted, clear the date too. Dependent statuses are not
+            // cascaded here: the user must confirm an un-buy in the UI first.
+            if (parsed.bought === false && parsed.boughtOn === undefined) {
+              next.boughtOn = null;
+            }
+            if (parsed.wrapped === false && parsed.wrappedOn === undefined) {
+              next.wrappedOn = null;
+            }
+            if (parsed.sent === false && parsed.sentOn === undefined) {
+              next.sentOn = null;
+            }
 
-          // A false-to-true transition defaults to today when no date was sent.
-          if (!current.bought && parsed.bought === true && parsed.boughtOn === undefined) {
-            next.boughtOn = today;
-          }
-          if (!current.wrapped && parsed.wrapped === true && parsed.wrappedOn === undefined) {
-            next.wrappedOn = today;
-          }
-          if (!current.sent && parsed.sent === true && parsed.sentOn === undefined) {
-            next.sentOn = today;
-          }
+            // A false-to-true transition defaults to today when no date was sent.
+            if (!current.bought && parsed.bought === true && parsed.boughtOn === undefined) {
+              next.boughtOn = today;
+            }
+            if (!current.wrapped && parsed.wrapped === true && parsed.wrappedOn === undefined) {
+              next.wrappedOn = today;
+            }
+            if (!current.sent && parsed.sent === true && parsed.sentOn === undefined) {
+              next.sentOn = today;
+            }
 
-          const validated = parseWithSchema(giftEntitySchema, next, 'The gift change is invalid.');
+            const validated = parseWithSchema(
+              giftEntitySchema,
+              next,
+              'The gift change is invalid.',
+            );
 
-          await db.gifts.put(validated);
-          return validated;
-        });
+            await db.gifts.put(validated);
+            await recordLocalChange(db, {
+              entityType: 'gift',
+              entityId: validated.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
+            return validated;
+          },
+        );
       });
     },
 
@@ -169,105 +207,139 @@ export function createGiftRepository(context: RepositoryContext): GiftRepository
           'The gift status change is invalid.',
         );
 
-        return db.transaction('rw', db.gifts, db.seasons, async () => {
-          const current = await readGift(context, id);
-          await assertWritableSeason(context, current.seasonId);
-          const today = localToday(context.now());
-          const next: Gift = { ...current, updatedAt: context.nowIso() };
+        return db.transaction(
+          'rw',
+          db.gifts,
+          db.seasons,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            const current = await readGift(context, id);
+            await assertWritableSeason(context, current.seasonId);
+            const today = localToday(context.now());
+            const timestamp = context.nowIso();
+            const next: Gift = { ...current, updatedAt: timestamp };
 
-          if (parsed.bought !== undefined) {
-            next.bought = parsed.bought;
+            if (parsed.bought !== undefined) {
+              next.bought = parsed.bought;
 
-            if (!parsed.bought) {
-              next.boughtOn = null;
-              next.wrapped = false;
-              next.wrappedOn = null;
-              next.sent = false;
-              next.sentOn = null;
+              if (!parsed.bought) {
+                next.boughtOn = null;
+                next.wrapped = false;
+                next.wrappedOn = null;
+                next.sent = false;
+                next.sentOn = null;
+              }
             }
-          }
 
-          if (parsed.boughtOn !== undefined) {
-            next.boughtOn = parsed.boughtOn;
-          }
-
-          if (parsed.wrapped !== undefined) {
-            next.wrapped = parsed.wrapped;
-
-            if (!parsed.wrapped) {
-              next.wrappedOn = null;
+            if (parsed.boughtOn !== undefined) {
+              next.boughtOn = parsed.boughtOn;
             }
-          }
 
-          if (parsed.wrappedOn !== undefined) {
-            next.wrappedOn = parsed.wrappedOn;
-          }
+            if (parsed.wrapped !== undefined) {
+              next.wrapped = parsed.wrapped;
 
-          if (parsed.sent !== undefined) {
-            next.sent = parsed.sent;
-
-            if (!parsed.sent) {
-              next.sentOn = null;
+              if (!parsed.wrapped) {
+                next.wrappedOn = null;
+              }
             }
-          }
 
-          if (parsed.sentOn !== undefined) {
-            next.sentOn = parsed.sentOn;
-          }
+            if (parsed.wrappedOn !== undefined) {
+              next.wrappedOn = parsed.wrappedOn;
+            }
 
-          if (next.bought && next.boughtOn === null) {
-            next.boughtOn = today;
-          }
+            if (parsed.sent !== undefined) {
+              next.sent = parsed.sent;
 
-          if (next.wrapped && next.wrappedOn === null) {
-            next.wrappedOn = today;
-          }
+              if (!parsed.sent) {
+                next.sentOn = null;
+              }
+            }
 
-          if (next.sent && next.sentOn === null) {
-            next.sentOn = today;
-          }
+            if (parsed.sentOn !== undefined) {
+              next.sentOn = parsed.sentOn;
+            }
 
-          const validated = parseWithSchema(
-            giftEntitySchema,
-            next,
-            'The gift status change is invalid.',
-          );
+            if (next.bought && next.boughtOn === null) {
+              next.boughtOn = today;
+            }
 
-          await db.gifts.put(validated);
-          return validated;
-        });
+            if (next.wrapped && next.wrappedOn === null) {
+              next.wrappedOn = today;
+            }
+
+            if (next.sent && next.sentOn === null) {
+              next.sentOn = today;
+            }
+
+            const validated = parseWithSchema(
+              giftEntitySchema,
+              next,
+              'The gift status change is invalid.',
+            );
+
+            await db.gifts.put(validated);
+            await recordLocalChange(db, {
+              entityType: 'gift',
+              entityId: validated.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
+            return validated;
+          },
+        );
       });
     },
 
     delete(id) {
       return withStorageErrors(async () => {
-        return db.transaction('rw', db.gifts, db.ideas, db.seasons, async () => {
-          const gift = await readGift(context, id);
-          await assertWritableSeason(context, gift.seasonId);
-          const timestamp = context.nowIso();
+        return db.transaction(
+          'rw',
+          db.gifts,
+          db.ideas,
+          db.seasons,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            const gift = await readGift(context, id);
+            await assertWritableSeason(context, gift.seasonId);
+            const timestamp = context.nowIso();
 
-          if (gift.sourceIdeaId) {
-            const idea = await db.ideas.get(gift.sourceIdeaId);
+            if (gift.sourceIdeaId) {
+              const idea = await db.ideas.get(gift.sourceIdeaId);
 
-            if (idea) {
-              const reopened = parseWithSchema(
-                ideaEntitySchema,
-                {
-                  ...idea,
-                  status: 'active',
-                  convertedGiftId: null,
-                  convertedAt: null,
-                  updatedAt: timestamp,
-                },
-                'The linked idea could not be reopened safely.',
-              );
+              if (idea) {
+                const reopened = parseWithSchema(
+                  ideaEntitySchema,
+                  {
+                    ...idea,
+                    status: 'active',
+                    convertedGiftId: null,
+                    convertedAt: null,
+                    updatedAt: timestamp,
+                  },
+                  'The linked idea could not be reopened safely.',
+                );
 
-              await db.ideas.put(reopened);
+                await db.ideas.put(reopened);
+                await recordLocalChange(db, {
+                  entityType: 'idea',
+                  entityId: reopened.id,
+                  operation: 'upsert',
+                  at: timestamp,
+                });
+              }
             }
-          }
 
-          await db.gifts.delete(gift.id);
-        });
+            await db.gifts.delete(gift.id);
+            await recordLocalChange(db, {
+              entityType: 'gift',
+              entityId: gift.id,
+              operation: 'delete',
+              at: timestamp,
+            });
+          },
+        );
       });
     },
   };

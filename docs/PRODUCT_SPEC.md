@@ -19,13 +19,13 @@ It helps a customer:
 6. Reuse the product across Christmas seasons without losing prior years.
 7. Protect their data with a complete backup and a spreadsheet-friendly export.
 
-The first commercial release is a **single-user, account-free, offline-first web application** sold as an Etsy digital download. An optional online edition with accounts and cross-device synchronization is planned after the offline edition is validated and selling.
+The first commercial release is a **single-user, account-free, offline-first web application** sold as an Etsy digital download. An optional online edition with accounts and cross-device synchronization is implemented from the same codebase but is not part of that first release (O-5).
 
 ---
 
 ## 2. Edition model
 
-| Capability | Offline edition (launch) | Online edition (planned, V2) |
+| Capability | Offline edition (launch) | Online edition (optional, implemented) |
 | --- | --- | --- |
 | Opens in a modern browser | Yes | Yes |
 | Works without a network connection | Yes, after the documented one-time setup | Core planning works offline; sync requires network |
@@ -93,7 +93,7 @@ Typical scale:
 ### Non-goals for the launch release
 
 - Real payment processing, subscriptions, or license enforcement.
-- Cloud accounts, multi-device sync, or collaboration (reserved for V2).
+- Cloud accounts, multi-device sync, or collaboration in the launch edition; accounts and sync exist only in the separately built optional online edition.
 - AI-generated gift suggestions or chat features.
 - Multi-currency portfolios, exchange rates, or tax handling.
 - Refund/return accounting (a cost can be edited or the gift deleted instead).
@@ -133,7 +133,7 @@ Priority describes business value, not build order. Build order is defined in `d
 
 ### P2 — valuable after launch
 
-- Online edition with accounts and synchronization.
+- Online edition with accounts and synchronization (implemented in Milestone 11; not part of the first Etsy release).
 - Password-encrypted backups.
 - Additional charts (spending by category, season-over-season history).
 - Budget templates and rollover.
@@ -548,16 +548,16 @@ A single-file build was produced and tested from `file://` in Microsoft Edge: th
 
 ---
 
-## 12. Online edition boundaries (planned, not launch)
+## 12. Online edition boundaries (optional; implemented, not in the first release)
 
 The online edition adds, without changing domain rules:
 
-- Account registration, sign-in, sign-out, password recovery, account deletion.
-- Cloud persistence scoped to the authenticated user.
-- Cross-device synchronization with a documented conflict strategy.
-- Visible sync status and actionable errors.
-- Offline editing with queued changes.
-- Export of cloud data and account-level data deletion.
+- Account registration, sign-in, sign-out, password recovery, password change, and typed-confirmation account deletion.
+- Cloud persistence scoped to the authenticated user, protected by server-side row-level security.
+- Explicit device linking with upload, download, or merge planning and a required backup before a merge.
+- Cross-device synchronization with per-record revisions, an outbox/tombstone queue, retry, duplicate protection, and resumable pulls.
+- Visible sync status and actionable errors, plus conflict choices that show both versions.
+- Export of account data; account deletion removes cloud rows and leaves the local planner intact.
 
 Constraints:
 
@@ -565,9 +565,11 @@ Constraints:
 - One user's records must never be readable or writable by another user; server-side authorization is mandatory, not client-side filtering.
 - Conflicts are surfaced, not silently overwritten.
 - The offline edition remains installable and account-free.
+- While a device is linked, restore, reset, and sample-data tools are blocked.
 - No payment processing or subscription enforcement in the initial online release.
+- Only the public anon key is embedded in the online client; the service-role key and database credentials never enter the client or the repository.
 
-The recommended backend is Supabase (PostgreSQL, Auth, Row Level Security) unless Milestone 11 documents a compelling alternative. Exact synchronization design is deferred to that milestone and must be specified before implementation.
+Supabase (PostgreSQL, Auth, Row Level Security) is the backend (D-012). The cloud schema, sync RPCs, and setup steps are documented in `docs/ONLINE_SETUP.md`; the implementation is recorded in `docs/MILESTONE_11_REPORT.md`.
 
 ---
 

@@ -10,6 +10,7 @@ import {
   type IdeaUpdateInput,
 } from '../../domain/schemas';
 import { createId } from '../../lib/ids';
+import { recordLocalChange } from '../changeTracking';
 import { withStorageErrors } from '../errors';
 import {
   applyDefined,
@@ -60,38 +61,52 @@ export function createIdeaRepository(context: RepositoryContext): IdeaRepository
       return withStorageErrors(async () => {
         const parsed = parseWithSchema(ideaCreateInputSchema, input, 'The new idea is invalid.');
 
-        return db.transaction('rw', db.ideas, db.seasons, db.recipients, async () => {
-          await assertWritableSeason(context, parsed.seasonId);
+        return db.transaction(
+          'rw',
+          db.ideas,
+          db.seasons,
+          db.recipients,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            await assertWritableSeason(context, parsed.seasonId);
 
-          if (parsed.recipientId) {
-            await assertRecipientInSeason(context, parsed.recipientId, parsed.seasonId);
-          }
+            if (parsed.recipientId) {
+              await assertRecipientInSeason(context, parsed.recipientId, parsed.seasonId);
+            }
 
-          const timestamp = context.nowIso();
-          const idea = parseWithSchema(
-            ideaEntitySchema,
-            {
-              id: createId(),
-              seasonId: parsed.seasonId,
-              recipientId: parsed.recipientId ?? null,
-              name: parsed.name,
-              category: parsed.category ?? null,
-              store: parsed.store ?? null,
-              purchaseUrl: parsed.purchaseUrl ?? null,
-              estimatedPriceMinor: parsed.estimatedPriceMinor ?? null,
-              notes: parsed.notes ?? null,
-              status: 'active',
-              convertedGiftId: null,
-              convertedAt: null,
-              createdAt: timestamp,
-              updatedAt: timestamp,
-            },
-            'The new idea is invalid.',
-          );
+            const timestamp = context.nowIso();
+            const idea = parseWithSchema(
+              ideaEntitySchema,
+              {
+                id: createId(),
+                seasonId: parsed.seasonId,
+                recipientId: parsed.recipientId ?? null,
+                name: parsed.name,
+                category: parsed.category ?? null,
+                store: parsed.store ?? null,
+                purchaseUrl: parsed.purchaseUrl ?? null,
+                estimatedPriceMinor: parsed.estimatedPriceMinor ?? null,
+                notes: parsed.notes ?? null,
+                status: 'active',
+                convertedGiftId: null,
+                convertedAt: null,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+              },
+              'The new idea is invalid.',
+            );
 
-          await db.ideas.add(idea);
-          return idea;
-        });
+            await db.ideas.add(idea);
+            await recordLocalChange(db, {
+              entityType: 'idea',
+              entityId: idea.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
+            return idea;
+          },
+        );
       });
     },
 
@@ -99,166 +114,232 @@ export function createIdeaRepository(context: RepositoryContext): IdeaRepository
       return withStorageErrors(async () => {
         const parsed = parseWithSchema(ideaUpdateInputSchema, input, 'The idea change is invalid.');
 
-        return db.transaction('rw', db.ideas, db.seasons, db.recipients, async () => {
-          const current = await readIdea(context, id);
-          await assertWritableSeason(context, current.seasonId);
+        return db.transaction(
+          'rw',
+          db.ideas,
+          db.seasons,
+          db.recipients,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            const current = await readIdea(context, id);
+            await assertWritableSeason(context, current.seasonId);
 
-          if (parsed.recipientId !== undefined && parsed.recipientId !== null) {
-            await assertRecipientInSeason(context, parsed.recipientId, current.seasonId);
-          }
+            if (parsed.recipientId !== undefined && parsed.recipientId !== null) {
+              await assertRecipientInSeason(context, parsed.recipientId, current.seasonId);
+            }
 
-          const next = parseWithSchema(
-            ideaEntitySchema,
-            { ...applyDefined(current, parsed), updatedAt: context.nowIso() },
-            'The idea change is invalid.',
-          );
+            const timestamp = context.nowIso();
+            const next = parseWithSchema(
+              ideaEntitySchema,
+              { ...applyDefined(current, parsed), updatedAt: timestamp },
+              'The idea change is invalid.',
+            );
 
-          await db.ideas.put(next);
-          return next;
-        });
+            await db.ideas.put(next);
+            await recordLocalChange(db, {
+              entityType: 'idea',
+              entityId: next.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
+            return next;
+          },
+        );
       });
     },
 
     convert(id, recipientId) {
       return withStorageErrors(async () => {
-        return db.transaction('rw', db.ideas, db.gifts, db.seasons, db.recipients, async () => {
-          const idea = await readIdea(context, id);
-          await assertWritableSeason(context, idea.seasonId);
+        return db.transaction(
+          'rw',
+          [db.ideas, db.gifts, db.seasons, db.recipients, db.syncOutbox, db.syncTombstones],
+          async () => {
+            const idea = await readIdea(context, id);
+            await assertWritableSeason(context, idea.seasonId);
 
-          if (idea.status === 'converted') {
-            if (idea.convertedGiftId) {
-              const existing = await db.gifts.get(idea.convertedGiftId);
+            if (idea.status === 'converted') {
+              if (idea.convertedGiftId) {
+                const existing = await db.gifts.get(idea.convertedGiftId);
 
-              if (existing && existing.seasonId === idea.seasonId) {
-                return parseWithSchema(giftEntitySchema, existing, 'The linked gift is invalid.');
+                if (existing && existing.seasonId === idea.seasonId) {
+                  return parseWithSchema(giftEntitySchema, existing, 'The linked gift is invalid.');
+                }
               }
+
+              throw new ConflictError(
+                'This idea is marked converted, but its gift is missing.',
+                'Reopen the idea before converting it again.',
+              );
             }
 
-            throw new ConflictError(
-              'This idea is marked converted, but its gift is missing.',
-              'Reopen the idea before converting it again.',
+            await assertRecipientInSeason(context, recipientId, idea.seasonId);
+            const existingLink = await db.gifts.where('sourceIdeaId').equals(idea.id).first();
+
+            if (existingLink) {
+              throw new ConflictError(
+                'This idea already has a linked gift.',
+                'Refresh the Idea Bank and open the existing gift.',
+              );
+            }
+
+            const timestamp = context.nowIso();
+            const gift = parseWithSchema(
+              giftEntitySchema,
+              {
+                id: createId(),
+                seasonId: idea.seasonId,
+                recipientId,
+                name: idea.name,
+                category: idea.category,
+                store: idea.store,
+                purchaseUrl: idea.purchaseUrl,
+                plannedBudgetMinor: idea.estimatedPriceMinor,
+                actualCostMinor: null,
+                bought: false,
+                boughtOn: null,
+                wrapped: false,
+                wrappedOn: null,
+                sent: false,
+                sentOn: null,
+                deliveryMethod: null,
+                address: null,
+                notes: idea.notes,
+                sourceIdeaId: idea.id,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+              },
+              'The converted gift is invalid.',
             );
-          }
 
-          await assertRecipientInSeason(context, recipientId, idea.seasonId);
-          const existingLink = await db.gifts.where('sourceIdeaId').equals(idea.id).first();
+            await db.gifts.add(gift);
+            await recordLocalChange(db, {
+              entityType: 'gift',
+              entityId: gift.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
 
-          if (existingLink) {
-            throw new ConflictError(
-              'This idea already has a linked gift.',
-              'Refresh the Idea Bank and open the existing gift.',
+            const converted = parseWithSchema(
+              ideaEntitySchema,
+              {
+                ...idea,
+                status: 'converted',
+                convertedGiftId: gift.id,
+                convertedAt: timestamp,
+                updatedAt: timestamp,
+              },
+              'The idea could not be marked converted.',
             );
-          }
 
-          const timestamp = context.nowIso();
-          const gift = parseWithSchema(
-            giftEntitySchema,
-            {
-              id: createId(),
-              seasonId: idea.seasonId,
-              recipientId,
-              name: idea.name,
-              category: idea.category,
-              store: idea.store,
-              purchaseUrl: idea.purchaseUrl,
-              plannedBudgetMinor: idea.estimatedPriceMinor,
-              actualCostMinor: null,
-              bought: false,
-              boughtOn: null,
-              wrapped: false,
-              wrappedOn: null,
-              sent: false,
-              sentOn: null,
-              deliveryMethod: null,
-              address: null,
-              notes: idea.notes,
-              sourceIdeaId: idea.id,
-              createdAt: timestamp,
-              updatedAt: timestamp,
-            },
-            'The converted gift is invalid.',
-          );
-
-          await db.gifts.add(gift);
-
-          const converted = parseWithSchema(
-            ideaEntitySchema,
-            {
-              ...idea,
-              status: 'converted',
-              convertedGiftId: gift.id,
-              convertedAt: timestamp,
-              updatedAt: timestamp,
-            },
-            'The idea could not be marked converted.',
-          );
-
-          await db.ideas.put(converted);
-          return gift;
-        });
+            await db.ideas.put(converted);
+            await recordLocalChange(db, {
+              entityType: 'idea',
+              entityId: converted.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
+            return gift;
+          },
+        );
       });
     },
 
     reopen(id) {
       return withStorageErrors(async () => {
-        return db.transaction('rw', db.ideas, db.gifts, db.seasons, async () => {
-          const idea = await readIdea(context, id);
-          await assertWritableSeason(context, idea.seasonId);
+        return db.transaction(
+          'rw',
+          db.ideas,
+          db.gifts,
+          db.seasons,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            const idea = await readIdea(context, id);
+            await assertWritableSeason(context, idea.seasonId);
 
-          if (idea.status === 'active') {
-            return idea;
-          }
-
-          if (idea.convertedGiftId) {
-            const linkedGift = await db.gifts.get(idea.convertedGiftId);
-
-            if (linkedGift) {
-              throw new ConflictError(
-                'Delete the linked gift to return this idea to the Idea Bank.',
-                'Open the gift and delete it first.',
-              );
+            if (idea.status === 'active') {
+              return idea;
             }
-          }
 
-          const reopened = parseWithSchema(
-            ideaEntitySchema,
-            {
-              ...idea,
-              status: 'active',
-              convertedGiftId: null,
-              convertedAt: null,
-              updatedAt: context.nowIso(),
-            },
-            'The idea could not be reopened.',
-          );
+            if (idea.convertedGiftId) {
+              const linkedGift = await db.gifts.get(idea.convertedGiftId);
 
-          await db.ideas.put(reopened);
-          return reopened;
-        });
+              if (linkedGift) {
+                throw new ConflictError(
+                  'Delete the linked gift to return this idea to the Idea Bank.',
+                  'Open the gift and delete it first.',
+                );
+              }
+            }
+
+            const timestamp = context.nowIso();
+            const reopened = parseWithSchema(
+              ideaEntitySchema,
+              {
+                ...idea,
+                status: 'active',
+                convertedGiftId: null,
+                convertedAt: null,
+                updatedAt: timestamp,
+              },
+              'The idea could not be reopened.',
+            );
+
+            await db.ideas.put(reopened);
+            await recordLocalChange(db, {
+              entityType: 'idea',
+              entityId: reopened.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
+            return reopened;
+          },
+        );
       });
     },
 
     delete(id) {
       return withStorageErrors(async () => {
-        return db.transaction('rw', db.ideas, db.gifts, db.seasons, async () => {
-          const idea = await readIdea(context, id);
-          await assertWritableSeason(context, idea.seasonId);
-          const timestamp = context.nowIso();
-          const linkedGifts = await db.gifts.where('sourceIdeaId').equals(idea.id).toArray();
+        return db.transaction(
+          'rw',
+          db.ideas,
+          db.gifts,
+          db.seasons,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            const idea = await readIdea(context, id);
+            await assertWritableSeason(context, idea.seasonId);
+            const timestamp = context.nowIso();
+            const linkedGifts = await db.gifts.where('sourceIdeaId').equals(idea.id).toArray();
 
-          for (const gift of linkedGifts) {
-            const updated = { ...gift, updatedAt: timestamp };
-            delete updated.sourceIdeaId;
-            const validated = parseWithSchema(
-              giftEntitySchema,
-              updated,
-              'A linked gift could not be unlinked safely.',
-            );
-            await db.gifts.put(validated);
-          }
+            for (const gift of linkedGifts) {
+              const updated = { ...gift, updatedAt: timestamp };
+              delete updated.sourceIdeaId;
+              const validated = parseWithSchema(
+                giftEntitySchema,
+                updated,
+                'A linked gift could not be unlinked safely.',
+              );
+              await db.gifts.put(validated);
+              await recordLocalChange(db, {
+                entityType: 'gift',
+                entityId: validated.id,
+                operation: 'upsert',
+                at: timestamp,
+              });
+            }
 
-          await db.ideas.delete(idea.id);
-        });
+            await db.ideas.delete(idea.id);
+            await recordLocalChange(db, {
+              entityType: 'idea',
+              entityId: idea.id,
+              operation: 'delete',
+              at: timestamp,
+            });
+          },
+        );
       });
     },
   };

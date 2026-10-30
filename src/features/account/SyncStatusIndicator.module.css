@@ -1,0 +1,46 @@
+.status {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 24px;
+  color: var(--color-text-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.status:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.status:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-text-muted);
+}
+
+.synced .dot {
+  background: var(--color-evergreen-600);
+}
+
+.pending .dot,
+.syncing .dot {
+  background: var(--color-gold-600);
+}
+
+.conflict .dot,
+.error .dot {
+  background: var(--color-critical);
+}
+
+.offline .dot {
+  background: var(--color-text-muted);
+}

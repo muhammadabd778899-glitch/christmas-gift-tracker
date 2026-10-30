@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react(), viteSingleFile()],
   resolve: {
     alias: {
+      '@edition': fileURLToPath(new URL('./src/app/offlineEdition.ts', import.meta.url)),
       'virtual:pwa-register/react': fileURLToPath(
         new URL('./src/pwa/registerStub.ts', import.meta.url),
       ),

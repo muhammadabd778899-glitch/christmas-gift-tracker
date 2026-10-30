@@ -4,6 +4,7 @@ import { MigrationError, isAppError } from '../domain/errors';
 import { metaRecordSchema, parseWithSchema, settingsEntitySchema } from '../domain/schemas';
 import { createId } from '../lib/ids';
 import { createDefaultSettings, createMetaRecords } from './defaults';
+import { setChangeTrackingEnabled } from './changeTracking';
 import { createDatabase, type GiftTrackerDatabase } from './db';
 import { mapStorageError } from './errors';
 
@@ -102,6 +103,7 @@ export async function initializeStorage(
     }
 
     await db.meta.bulkPut(meta);
+    setChangeTrackingEnabled(Boolean(await db.syncMeta.get('link')));
 
     return { db, settings, openedAt };
   } catch (error) {

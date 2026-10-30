@@ -16,6 +16,7 @@ blob-report/
 .env
 .env.*
 !.env.example
+!.env.*.example
 .env.local
 .env.*.local
 

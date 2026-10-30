@@ -2,8 +2,8 @@
 
 A local-first Christmas gift planning application: recipients, gifts, budgets, ideas, shopping lists, seasons, backups, and offline use.
 
-> **Status: Milestone 10 — Validated offline delivery complete and verified.**
-> The app is an installable offline-first PWA. The shell is runnable, responsive, themed, and tested; a private local IndexedDB database stores real seasons, recipients, gifts, ideas, and season budgets, and no customer plan or sample records are created automatically. After one online visit, the production app launches and works with the network disabled. Light, dark, and system themes apply before first paint; currency formatting, diagnostics, privacy details, install guidance, and persistent-storage requests live in Settings. Backups and CSV exports are explicit local downloads. Nothing is transmitted.
+> **Status: Milestone 11 — Online accounts and synchronization complete and verified locally.**
+> The delivered Etsy edition remains the account-free, offline-first PWA. The same codebase also builds an optional online edition (`npm run build:online`) with Supabase email/password accounts, password recovery, account export and deletion, device linking, automatic sync, retry, duplicate protection, and conflict choices. The private local IndexedDB database stays authoritative for offline work in both editions; nothing is transmitted unless the user links a device in the online edition. Light, dark, and system themes apply before first paint; currency formatting, diagnostics, privacy details, install guidance, and persistent-storage requests live in Settings. Backups and CSV exports are explicit local downloads.
 
 ---
 
@@ -64,11 +64,18 @@ A local-first Christmas gift planning application: recipients, gifts, budgets, i
 - Settings install guidance for Chrome/Edge desktop, Android, iPhone/iPad Safari, and Firefox, plus a one-time-online-visit explanation.
 - A user-initiated persistent-storage request with plain-language granted/declined/unsupported results and backup guidance; storage-unavailable and quota messages explain that data was not deleted and recommend a backup before freeing space.
 - The production artifact was verified offline: cached launch and reload, all seven routes, create/edit across seasons, recipients, and gifts, persistence after browser restart, backup/CSV downloads offline, and the update flow.
-- A version-1 Dexie/IndexedDB schema with typed validation for seasons, recipients, gifts, ideas, settings, and diagnostics.
+- Two editions from one codebase: the default `npm run build` is the account-free offline edition, and `npm run build --mode online` adds the Account route; an automated bundle scan fails if account, Supabase, sync-RPC, or privileged-key strings leak into the offline artifact.
+- Online accounts with Supabase email/password sign-up, sign-in, sign-out, email confirmation, password recovery, password change, account data export, and typed-confirmation account deletion.
+- Explicit device linking with a connection plan (upload, download, or merge), a typed `CONNECT` confirmation, and a mandatory fresh local backup before a merge; connecting never silently deletes or overwrites either side.
+- Automatic sync through a transactional local outbox and tombstones: per-record revision checks, a resumable sequence cursor, idempotent retries, duplicate protection, safe interruption recovery, and no last-write-wins.
+- Surfaced conflicts with both versions and explicit choices to keep this device’s version or accept the cloud version/deletion; sync status is visible as synced, pending, syncing, offline, conflict, error, or disconnected.
+- Device linkage blocks restore/reset/sample tools while linked; disconnecting keeps the local planner and clears only sync state and credentials.
+- Supabase schema with row-level security, per-user isolation policies, validated RPC writes, soft-delete tombstones, scoped export, and a server-side account-deletion function.
+- A version-2 Dexie/IndexedDB schema with typed validation for seasons, recipients, gifts, ideas, settings, diagnostics, and sync outbox/tombstones/state/conflicts/link metadata.
 - Typed repositories with cross-season checks, transactional recipient policies, idea conversion, gift integrity, season lifecycle operations, and data portability.
 - Safe startup: settings and meta are created only when absent; startup never creates a season, seeds sample data, or deletes records.
 - A boot screen, a storage recovery screen with guidance, a health-check engine, a migration harness, and explicit restore/reset APIs.
-- 327 Vitest tests across 37 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, dashboard calculations, season lifecycle, backup export/validation/restore, CSV encoding and safety, sample-data isolation, theme resolution and pre-paint behavior, Settings flows, install-prompt behavior, offline status, update consent, and persistent-storage results.
+- 377 Vitest tests across 43 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, dashboard calculations, season lifecycle, backup export/validation/restore, CSV encoding and safety, sample-data isolation, theme resolution and pre-paint behavior, Settings flows, install-prompt behavior, offline status, update consent, persistent-storage results, schema-2 upgrade, transactional change capture, connection planning, merge safety, push/pull retry, conflict resolution, fake-cloud isolation, and Account UI flows.
 - GitHub Actions CI for formatting, type checking, linting, tests, and the production build.
 
 The hosted installable PWA is the delivered offline edition. A single-file build was produced and evaluated from `file://` but is **not shipped**, because service workers cannot run there and Firefox, Safari, and iOS were not available for the required matrix. There are no invented totals, hidden calculations, automatic cloud backups, or silent data repair.
@@ -198,26 +205,26 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | 8 | Seasons, archives, backup, CSV | Complete — verified |
 | 9 | Professional UI, themes, accessibility | Complete — verified |
 | 10 | Offline delivery | Complete — verified |
-| 11 | Online edition and sync | Not started |
+| 11 | Online edition and sync | Complete — verified locally; remote RLS run pending test credentials |
 | 12 | QA, packaging, Etsy launch | Not started |
 
-Milestone 10 is complete and verified. Milestone 11 — Online edition and cloud synchronization — begins only after owner review and authorization.
+Milestone 11 is complete locally. The remote Supabase cross-account run (`npm run verify:supabase`) still requires the owner’s dedicated test project; see `docs/ONLINE_SETUP.md`. Milestone 12 — final QA, packaging, and the Etsy release of the offline edition — begins only after owner review and authorization.
 
 ---
 
 ## Data, privacy, and offline status
 
-- **Storage:** a version-1 local IndexedDB database stores seasons (at most one active), their optional overall budgets, recipients, gifts, and ideas. Startup creates settings and diagnostics only when needed; it never creates a season, seeds sample data, or deletes records. A season exists only after an explicit setup, restore, or sample-load action.
+- **Storage:** a version-2 local IndexedDB database stores seasons (at most one active), their optional overall budgets, recipients, gifts, and ideas, plus sync bookkeeping used only after a device is linked. Startup creates settings and diagnostics only when needed; it never creates a season, seeds sample data, or deletes records. A season exists only after an explicit setup, restore, or sample-load action.
 - **Calculations:** season budget, planned, actual, remaining, and unallocated figures, recipient metrics, progress, chart series, data-quality findings, countdown, Idea Bank search results, gift search/filter/sort results, recipient detail figures, and the Shopping List are derived from saved records through pure domain functions. No totals, filter state, or shopping-list snapshots are stored. Unbought gifts do not count as spent, and a bought gift without an actual cost contributes zero.
 - **Shopping List:** generated at read time from unbought gifts. Marking a gift bought writes through the gift repository, removes the row, and updates budgets. The print view is browser printing only; there is no saved PDF export.
 - **Backup and reset:** JSON backups and CSV exports are downloaded locally on demand. Restore is replace-all only and requires a fresh backup download plus the typed word `RESTORE`; reset requires a fresh backup plus `DELETE`. Both preserve `databaseId` and never run automatically. There is no cloud, scheduled, or automatic backup, and no merge restore.
 - **Sample data:** optional and explicit. It uses a flagged sample season, stays isolated from real totals, is archived whenever any season exists, and can be removed independently.
 - **Theme and currency:** the theme choice (light, dark, or system) is stored in Settings and mirrored to `localStorage` only for first-paint styling; IndexedDB remains authoritative. Currency symbol, code, and fraction digits affect display only and never convert stored minor units.
-- **Accounts and sync:** not implemented.
+- **Accounts and sync:** not present in the offline edition, which remains account-free and transmits nothing. The separately built online edition adds optional Supabase accounts. After the user signs in and confirms `CONNECT`, records sync to that user’s own rows; row-level security prevents cross-account access, and only the public anon key is embedded (no service-role key). The local database remains the working copy, and conflicts are always surfaced for a decision rather than overwritten. Disconnecting or deleting the account does not delete the local planner; cloud data is removed by the user’s explicit deletion request.
 - **Analytics/telemetry:** none.
 - **Browser storage risk:** browser cleanup or site-data clearing can remove local records. Settings explains this and offers a user-initiated `navigator.storage.persist()` request, reporting granted, declined, unsupported, or unavailable results. The app never claims protection from every eviction; backups remain the recovery path.
 - **Offline delivery:** the hosted app is an installable offline-first PWA. One online visit caches the app shell (21 precached assets), after which launch, reload, and all core workflows work without a network. The service worker updates only when the user chooses to reload, and it refuses while a dialog with unsaved work is open. A raw `file://` build was evaluated but is not shipped and is not advertised as reliably storing data. See `docs/OFFLINE_SETUP.md`.
-- **Offline status:** the footer states whether data is saved on this device and whether the app is offline; it makes no sync claim. The offline edition has no accounts, cloud backup, or cross-device access.
+- **Offline status:** the footer states whether data is saved on this device and whether the app is offline; the offline edition makes no sync claim and has no accounts, cloud backup, or cross-device access. The online edition shows a separate sync indicator with pending, offline, conflict, and error states.
 - **Customer data:** entered season, budget, recipient, gift, and idea data stays in the browser profile. No names, addresses, notes, or diagnostics are transmitted. Diagnostic health reports contain counts, codes, and storage estimates only.
 
 The interface copy is intentionally conservative: local downloads are offered, but no automatic, cloud, or guaranteed recovery is claimed.
@@ -226,13 +233,13 @@ The interface copy is intentionally conservative: local downloads are offered, b
 
 ## Current next step
 
-1. Owner reviews `docs/MILESTONE_10_REPORT.md`, the installable PWA, and `docs/OFFLINE_SETUP.md`.
-2. Owner confirms the hosted URL, hosting provider, and listing copy for the tested offline setup.
-3. Owner decides whether Firefox/Safari/iOS verification needs additional hardware before release.
-4. Owner authorizes Milestone 11 — Online edition and cloud synchronization.
-5. Milestone 11 must preserve the offline edition and use the existing repositories and domain rules.
+1. Owner reviews `docs/MILESTONE_11_REPORT.md`, the offline build, the online build, and `docs/ONLINE_SETUP.md`.
+2. Owner creates the dedicated Supabase test project, applies the migration, and supplies the URL and anon key through the git-ignored `.env.online.local` only.
+3. Owner runs `npm run verify:supabase`; the result completes the remote RLS/cross-account evidence.
+4. Owner authorizes Milestone 12 — final QA, packaging, and the Etsy release of the account-free offline edition.
+5. Milestone 12 must preserve both editions and keep the offline edition account-free.
 
-Until authorized: **do not start Milestone 11.**
+Until authorized: **do not start Milestone 12.**
 
 ---
 

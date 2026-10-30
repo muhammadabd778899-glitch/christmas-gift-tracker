@@ -3,6 +3,7 @@ import { ValidationError } from '../domain/errors';
 import { initializeStorage } from './initialize';
 import { createTestStorage, type TestStorage } from '../test/storage';
 import { FIXED_TIMESTAMP } from '../test/fixtures';
+import { SCHEMA_VERSION } from './db';
 
 let storage: TestStorage;
 
@@ -70,7 +71,7 @@ describe('explicit reset', () => {
     expect(await storage.db.gifts.count()).toBe(0);
     expect(await storage.db.ideas.count()).toBe(0);
     expect((await storage.db.meta.get('databaseId'))?.value).toBe(databaseId);
-    expect((await storage.db.meta.get('schemaVersion'))?.value).toBe(1);
+    expect((await storage.db.meta.get('schemaVersion'))?.value).toBe(SCHEMA_VERSION);
     expect((await storage.db.meta.get('lastOpenedAt'))?.value).toBe(FIXED_TIMESTAMP);
   });
 

@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      '@edition': fileURLToPath(new URL('./src/app/offlineEdition.ts', import.meta.url)),
       'virtual:pwa-register/react': fileURLToPath(
         new URL('./src/pwa/registerStub.ts', import.meta.url),
       ),
@@ -17,6 +18,7 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     css: true,
     testTimeout: 40_000,
+    maxWorkers: 6,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

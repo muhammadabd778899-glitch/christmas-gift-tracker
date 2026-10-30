@@ -11,6 +11,7 @@ import {
   type SeasonUpdateInput,
 } from '../../domain/schemas';
 import { createId } from '../../lib/ids';
+import { recordLocalChange } from '../changeTracking';
 import { withStorageErrors } from '../errors';
 import {
   applyDefined,
@@ -72,6 +73,14 @@ async function copyRecipientsIntoSeason(
 
   if (copied.length > 0) {
     await context.db.recipients.bulkAdd(copied);
+    for (const recipient of copied) {
+      await recordLocalChange(context.db, {
+        entityType: 'recipient',
+        entityId: recipient.id,
+        operation: 'upsert',
+        at: timestamp,
+      });
+    }
   }
 
   return copied;
@@ -129,80 +138,106 @@ export function createSeasonRepository(context: RepositoryContext): SeasonReposi
           'The new season is invalid.',
         );
 
-        return db.transaction('rw', db.seasons, db.recipients, db.settings, async () => {
-          const timestamp = context.nowIso();
-          const status = parsed.status ?? 'active';
+        return db.transaction(
+          'rw',
+          db.seasons,
+          db.recipients,
+          db.settings,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            const timestamp = context.nowIso();
+            const status = parsed.status ?? 'active';
 
-          if (options.archiveCurrent && status !== 'active') {
-            throw new ValidationError('Only a new active season can archive the current one.', [
-              {
-                path: 'status',
-                message: 'Create the season as active to archive the current season.',
-              },
-            ]);
-          }
+            if (options.archiveCurrent && status !== 'active') {
+              throw new ValidationError('Only a new active season can archive the current one.', [
+                {
+                  path: 'status',
+                  message: 'Create the season as active to archive the current season.',
+                },
+              ]);
+            }
 
-          if (status === 'active') {
-            const activeSeasons = await db.seasons.where('status').equals('active').toArray();
+            if (status === 'active') {
+              const activeSeasons = await db.seasons.where('status').equals('active').toArray();
 
-            if (activeSeasons.length > 0) {
-              if (!options.archiveCurrent) {
-                throw new ConflictError(
-                  'Another season is already active.',
-                  'Archive the current season before creating a new active season.',
-                );
-              }
+              if (activeSeasons.length > 0) {
+                if (!options.archiveCurrent) {
+                  throw new ConflictError(
+                    'Another season is already active.',
+                    'Archive the current season before creating a new active season.',
+                  );
+                }
 
-              for (const active of activeSeasons) {
-                const archived = parseWithSchema(
-                  seasonEntitySchema,
-                  {
-                    ...active,
-                    status: 'archived',
-                    archivedAt: timestamp,
-                    updatedAt: timestamp,
-                  },
-                  'The current season could not be archived.',
-                );
-                await db.seasons.put(archived);
+                for (const active of activeSeasons) {
+                  const archived = parseWithSchema(
+                    seasonEntitySchema,
+                    {
+                      ...active,
+                      status: 'archived',
+                      archivedAt: timestamp,
+                      updatedAt: timestamp,
+                    },
+                    'The current season could not be archived.',
+                  );
+                  await db.seasons.put(archived);
+                  await recordLocalChange(db, {
+                    entityType: 'season',
+                    entityId: archived.id,
+                    operation: 'upsert',
+                    at: timestamp,
+                  });
+                }
               }
             }
-          }
 
-          const season = parseWithSchema(
-            seasonEntitySchema,
-            {
-              id: createId(),
-              name: parsed.name,
-              holidayDate: parsed.holidayDate,
-              budgetMinor: parsed.budgetMinor ?? null,
-              status,
-              isSample: parsed.isSample ?? false,
-              archivedAt: status === 'archived' ? timestamp : null,
-              createdAt: timestamp,
-              updatedAt: timestamp,
-            },
-            'The new season is invalid.',
-          );
-
-          await db.seasons.add(season);
-
-          if (season.status === 'active') {
-            const settings = await readSettings(context);
-            const nextSettings = parseWithSchema(
-              settingsEntitySchema,
-              { ...settings, activeSeasonId: season.id, updatedAt: timestamp },
-              'The active season could not be selected.',
+            const season = parseWithSchema(
+              seasonEntitySchema,
+              {
+                id: createId(),
+                name: parsed.name,
+                holidayDate: parsed.holidayDate,
+                budgetMinor: parsed.budgetMinor ?? null,
+                status,
+                isSample: parsed.isSample ?? false,
+                archivedAt: status === 'archived' ? timestamp : null,
+                createdAt: timestamp,
+                updatedAt: timestamp,
+              },
+              'The new season is invalid.',
             );
-            await db.settings.put(nextSettings);
-          }
 
-          if (options.copyRecipientsFromId) {
-            await copyRecipientsIntoSeason(context, options.copyRecipientsFromId, season.id);
-          }
+            await db.seasons.add(season);
+            await recordLocalChange(db, {
+              entityType: 'season',
+              entityId: season.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
 
-          return season;
-        });
+            if (season.status === 'active') {
+              const settings = await readSettings(context);
+              const nextSettings = parseWithSchema(
+                settingsEntitySchema,
+                { ...settings, activeSeasonId: season.id, updatedAt: timestamp },
+                'The active season could not be selected.',
+              );
+              await db.settings.put(nextSettings);
+              await recordLocalChange(db, {
+                entityType: 'settings',
+                entityId: 'app',
+                operation: 'upsert',
+                at: timestamp,
+              });
+            }
+
+            if (options.copyRecipientsFromId) {
+              await copyRecipientsIntoSeason(context, options.copyRecipientsFromId, season.id);
+            }
+
+            return season;
+          },
+        );
       });
     },
 
@@ -214,15 +249,22 @@ export function createSeasonRepository(context: RepositoryContext): SeasonReposi
           'The season change is invalid.',
         );
 
-        return db.transaction('rw', db.seasons, async () => {
+        return db.transaction('rw', db.seasons, db.syncOutbox, db.syncTombstones, async () => {
           const current = await assertWritableSeason(context, id);
+          const timestamp = context.nowIso();
           const next = parseWithSchema(
             seasonEntitySchema,
-            { ...applyDefined(current, parsed), updatedAt: context.nowIso() },
+            { ...applyDefined(current, parsed), updatedAt: timestamp },
             'The season change is invalid.',
           );
 
           await db.seasons.put(next);
+          await recordLocalChange(db, {
+            entityType: 'season',
+            entityId: next.id,
+            operation: 'upsert',
+            at: timestamp,
+          });
           return next;
         });
       });
@@ -230,95 +272,145 @@ export function createSeasonRepository(context: RepositoryContext): SeasonReposi
 
     archive(id) {
       return withStorageErrors(async () => {
-        return db.transaction('rw', db.seasons, db.settings, async () => {
-          const season = await readSeason(context, id);
+        return db.transaction(
+          'rw',
+          db.seasons,
+          db.settings,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            const season = await readSeason(context, id);
 
-          if (season.status === 'archived') {
-            throw new ConflictError('That season is already archived.');
-          }
+            if (season.status === 'archived') {
+              throw new ConflictError('That season is already archived.');
+            }
 
-          const timestamp = context.nowIso();
-          const archived = parseWithSchema(
-            seasonEntitySchema,
-            {
-              ...season,
-              status: 'archived',
-              archivedAt: timestamp,
-              updatedAt: timestamp,
-            },
-            'The season could not be archived.',
-          );
-
-          await db.seasons.put(archived);
-
-          const settings = await readSettings(context);
-          if (settings.activeSeasonId === id) {
-            await db.settings.put(
-              parseWithSchema(
-                settingsEntitySchema,
-                { ...settings, activeSeasonId: null, updatedAt: timestamp },
-                'The active season could not be cleared.',
-              ),
+            const timestamp = context.nowIso();
+            const archived = parseWithSchema(
+              seasonEntitySchema,
+              {
+                ...season,
+                status: 'archived',
+                archivedAt: timestamp,
+                updatedAt: timestamp,
+              },
+              'The season could not be archived.',
             );
-          }
 
-          return archived;
-        });
+            await db.seasons.put(archived);
+            await recordLocalChange(db, {
+              entityType: 'season',
+              entityId: archived.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
+
+            const settings = await readSettings(context);
+            if (settings.activeSeasonId === id) {
+              await db.settings.put(
+                parseWithSchema(
+                  settingsEntitySchema,
+                  { ...settings, activeSeasonId: null, updatedAt: timestamp },
+                  'The active season could not be cleared.',
+                ),
+              );
+              await recordLocalChange(db, {
+                entityType: 'settings',
+                entityId: 'app',
+                operation: 'upsert',
+                at: timestamp,
+              });
+            }
+
+            return archived;
+          },
+        );
       });
     },
 
     restore(id) {
       return withStorageErrors(async () => {
-        return db.transaction('rw', db.seasons, db.settings, async () => {
-          const target = await readSeason(context, id);
-          const timestamp = context.nowIso();
+        return db.transaction(
+          'rw',
+          db.seasons,
+          db.settings,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            const target = await readSeason(context, id);
+            const timestamp = context.nowIso();
 
-          if (target.status === 'active') {
+            if (target.status === 'active') {
+              const settings = await readSettings(context);
+              await db.settings.put(
+                parseWithSchema(
+                  settingsEntitySchema,
+                  { ...settings, activeSeasonId: target.id, updatedAt: timestamp },
+                  'The active season could not be selected.',
+                ),
+              );
+              await recordLocalChange(db, {
+                entityType: 'settings',
+                entityId: 'app',
+                operation: 'upsert',
+                at: timestamp,
+              });
+              return target;
+            }
+
+            const activeSeasons = await db.seasons.where('status').equals('active').toArray();
+
+            for (const active of activeSeasons) {
+              const archived = parseWithSchema(
+                seasonEntitySchema,
+                {
+                  ...active,
+                  status: 'archived',
+                  archivedAt: timestamp,
+                  updatedAt: timestamp,
+                },
+                'The previous active season could not be archived.',
+              );
+              await db.seasons.put(archived);
+              await recordLocalChange(db, {
+                entityType: 'season',
+                entityId: archived.id,
+                operation: 'upsert',
+                at: timestamp,
+              });
+            }
+
+            const restored = parseWithSchema(
+              seasonEntitySchema,
+              { ...target, status: 'active', archivedAt: null, updatedAt: timestamp },
+              'The season could not be restored.',
+            );
+            await db.seasons.put(restored);
+            await recordLocalChange(db, {
+              entityType: 'season',
+              entityId: restored.id,
+              operation: 'upsert',
+              at: timestamp,
+            });
+
             const settings = await readSettings(context);
             await db.settings.put(
               parseWithSchema(
                 settingsEntitySchema,
-                { ...settings, activeSeasonId: target.id, updatedAt: timestamp },
+                { ...settings, activeSeasonId: restored.id, updatedAt: timestamp },
                 'The active season could not be selected.',
               ),
             );
-            return target;
-          }
+            await recordLocalChange(db, {
+              entityType: 'settings',
+              entityId: 'app',
+              operation: 'upsert',
+              at: timestamp,
+            });
 
-          const activeSeasons = await db.seasons.where('status').equals('active').toArray();
-
-          for (const active of activeSeasons) {
-            const archived = parseWithSchema(
-              seasonEntitySchema,
-              {
-                ...active,
-                status: 'archived',
-                archivedAt: timestamp,
-                updatedAt: timestamp,
-              },
-              'The previous active season could not be archived.',
-            );
-            await db.seasons.put(archived);
-          }
-
-          const restored = parseWithSchema(
-            seasonEntitySchema,
-            { ...target, status: 'active', archivedAt: null, updatedAt: timestamp },
-            'The season could not be restored.',
-          );
-          await db.seasons.put(restored);
-
-          const settings = await readSettings(context);
-          await db.settings.put(
-            parseWithSchema(
-              settingsEntitySchema,
-              { ...settings, activeSeasonId: restored.id, updatedAt: timestamp },
-              'The active season could not be selected.',
-            ),
-          );
-
-          return restored;
-        });
+            return restored;
+          },
+        );
       });
     },
 
@@ -326,11 +418,15 @@ export function createSeasonRepository(context: RepositoryContext): SeasonReposi
       return withStorageErrors(async () => {
         return db.transaction(
           'rw',
-          db.seasons,
-          db.recipients,
-          db.gifts,
-          db.ideas,
-          db.settings,
+          [
+            db.seasons,
+            db.recipients,
+            db.gifts,
+            db.ideas,
+            db.settings,
+            db.syncOutbox,
+            db.syncTombstones,
+          ],
           async () => {
             const season = await readSeason(context, id);
 
@@ -350,20 +446,65 @@ export function createSeasonRepository(context: RepositoryContext): SeasonReposi
               ]);
             }
 
+            const timestamp = context.nowIso();
+            const giftIds = (await db.gifts.where('seasonId').equals(id).primaryKeys()) as string[];
+            const ideaIds = (await db.ideas.where('seasonId').equals(id).primaryKeys()) as string[];
+            const recipientIds = (await db.recipients
+              .where('seasonId')
+              .equals(id)
+              .primaryKeys()) as string[];
+
             await db.gifts.where('seasonId').equals(id).delete();
             await db.ideas.where('seasonId').equals(id).delete();
             await db.recipients.where('seasonId').equals(id).delete();
             await db.seasons.delete(id);
+
+            for (const giftId of giftIds) {
+              await recordLocalChange(db, {
+                entityType: 'gift',
+                entityId: giftId,
+                operation: 'delete',
+                at: timestamp,
+              });
+            }
+            for (const ideaId of ideaIds) {
+              await recordLocalChange(db, {
+                entityType: 'idea',
+                entityId: ideaId,
+                operation: 'delete',
+                at: timestamp,
+              });
+            }
+            for (const recipientId of recipientIds) {
+              await recordLocalChange(db, {
+                entityType: 'recipient',
+                entityId: recipientId,
+                operation: 'delete',
+                at: timestamp,
+              });
+            }
+            await recordLocalChange(db, {
+              entityType: 'season',
+              entityId: id,
+              operation: 'delete',
+              at: timestamp,
+            });
 
             const settings = await readSettings(context);
             if (settings.activeSeasonId === id) {
               await db.settings.put(
                 parseWithSchema(
                   settingsEntitySchema,
-                  { ...settings, activeSeasonId: null, updatedAt: context.nowIso() },
+                  { ...settings, activeSeasonId: null, updatedAt: timestamp },
                   'The active season could not be cleared.',
                 ),
               );
+              await recordLocalChange(db, {
+                entityType: 'settings',
+                entityId: 'app',
+                operation: 'upsert',
+                at: timestamp,
+              });
             }
           },
         );
@@ -372,10 +513,17 @@ export function createSeasonRepository(context: RepositoryContext): SeasonReposi
 
     copyRecipients(fromId, toId) {
       return withStorageErrors(async () => {
-        return db.transaction('rw', db.seasons, db.recipients, async () => {
-          await assertWritableSeason(context, toId);
-          return copyRecipientsIntoSeason(context, fromId, toId);
-        });
+        return db.transaction(
+          'rw',
+          db.seasons,
+          db.recipients,
+          db.syncOutbox,
+          db.syncTombstones,
+          async () => {
+            await assertWritableSeason(context, toId);
+            return copyRecipientsIntoSeason(context, fromId, toId);
+          },
+        );
       });
     },
   };

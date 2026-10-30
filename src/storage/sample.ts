@@ -9,6 +9,7 @@ import {
 } from '../domain/schemas';
 import { withStorageErrors } from './errors';
 import { readSettings, type RepositoryContext } from './repositories/context';
+import { assertDeviceNotLinked } from './syncLink';
 
 export const SAMPLE_SEASON_ID = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d' as SeasonId;
 
@@ -227,6 +228,8 @@ export async function loadSampleData(context: RepositoryContext): Promise<LoadSa
   return withStorageErrors(async () => {
     const { db } = context;
 
+    await assertDeviceNotLinked(db);
+
     return db.transaction(
       'rw',
       [db.seasons, db.recipients, db.gifts, db.ideas, db.settings],
@@ -280,6 +283,8 @@ export async function removeSampleData(
 ): Promise<RemoveSampleDataResult> {
   return withStorageErrors(async () => {
     const { db } = context;
+
+    await assertDeviceNotLinked(db);
 
     return db.transaction(
       'rw',

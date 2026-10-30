@@ -81,9 +81,9 @@ describe('application shell', () => {
 
     const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
     expect(
-      within(dialog).getByText('Milestone 10 of 12: Validated offline delivery.'),
+      within(dialog).getByText('Milestone 11 of 12: Online accounts and synchronization.'),
     ).toBeVisible();
-    expect(within(dialog).getByText(/Local and account-free/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/Local-first by default/i)).toBeInTheDocument();
 
     await user.click(within(dialog).getByRole('button', { name: 'Close dialog' }));
     expect(screen.queryByRole('dialog', { name: 'About this preview' })).not.toBeInTheDocument();
@@ -128,6 +128,20 @@ describe('application shell', () => {
       screen.getByRole('heading', { level: 1, name: 'This page slipped out of the stocking.' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Back to dashboard/i })).toBeInTheDocument();
+  });
+
+  it('keeps the offline edition free of account navigation and routes', async () => {
+    await renderApp(['/account']);
+    expect(await screen.findByText('No active season')).toBeInTheDocument();
+
+    const primaryNavigation = screen.getByRole('navigation', { name: 'Primary navigation' });
+    expect(
+      within(primaryNavigation).queryByRole('link', { name: 'Account' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'This page slipped out of the stocking.' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Sign in to your account')).not.toBeInTheDocument();
   });
 
   it('shows recovery UI when a render error escapes the app', () => {

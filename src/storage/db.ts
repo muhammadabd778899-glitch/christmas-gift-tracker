@@ -12,9 +12,17 @@ import type {
   Season,
   SeasonId,
 } from '../domain/entities';
+import type {
+  SyncConflict,
+  SyncEntityType,
+  SyncLink,
+  SyncOutboxEntry,
+  SyncRecordState,
+  SyncTombstone,
+} from './syncTypes';
 
 export const APP_DATABASE_NAME = 'christmas-gift-tracker';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const V1_STORES = {
   meta: 'key',
@@ -25,6 +33,14 @@ export const V1_STORES = {
   ideas: 'id, seasonId, recipientId, status, convertedGiftId, updatedAt',
 } as const;
 
+export const V2_SYNC_STORES = {
+  syncOutbox: '[entityType+entityId], queuedAt',
+  syncTombstones: '[entityType+entityId], deletedAt',
+  syncState: '[entityType+entityId], serverRevision',
+  syncConflicts: '[entityType+entityId], detectedAt',
+  syncMeta: 'key',
+} as const;
+
 export class GiftTrackerDatabase extends Dexie {
   meta!: Table<MetaRecord, MetaKey>;
   settings!: Table<AppSettings, 'app'>;
@@ -32,11 +48,17 @@ export class GiftTrackerDatabase extends Dexie {
   recipients!: Table<Recipient, RecipientId>;
   gifts!: Table<Gift, GiftId>;
   ideas!: Table<Idea, IdeaId>;
+  syncOutbox!: Table<SyncOutboxEntry, [SyncEntityType, string]>;
+  syncTombstones!: Table<SyncTombstone, [SyncEntityType, string]>;
+  syncState!: Table<SyncRecordState, [SyncEntityType, string]>;
+  syncConflicts!: Table<SyncConflict, [SyncEntityType, string]>;
+  syncMeta!: Table<SyncLink, 'link'>;
 
   constructor(name = APP_DATABASE_NAME) {
     super(name);
 
-    this.version(SCHEMA_VERSION).stores(V1_STORES);
+    this.version(1).stores(V1_STORES);
+    this.version(2).stores(V2_SYNC_STORES);
   }
 }
 

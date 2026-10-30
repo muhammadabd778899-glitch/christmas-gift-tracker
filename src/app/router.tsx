@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import { createBrowserRouter, createHashRouter, type RouteObject } from 'react-router-dom';
+import { AccountPage } from '@edition';
 import { AppShell } from './AppShell';
 import { RouteErrorPage } from './boundaries/RouteErrorPage';
 import { DashboardPage } from '../pages/DashboardPage';
@@ -26,6 +28,18 @@ export const routes: RouteObject[] = [
       { path: 'shopping', element: <ShoppingPage /> },
       { path: 'seasons', element: <SeasonsPage /> },
       { path: 'settings', element: <SettingsPage /> },
+      ...(AccountPage
+        ? [
+            {
+              path: 'account',
+              element: (
+                <Suspense fallback={null}>
+                  <AccountPage />
+                </Suspense>
+              ),
+            },
+          ]
+        : []),
       { path: 'onboarding', element: <SeasonSetupPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],

@@ -8,6 +8,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
+import { accountNavItem } from '@edition';
 
 export interface NavItem {
   to: string;
@@ -42,6 +43,7 @@ export const navSections: NavSection[] = [
     items: [
       { to: '/seasons', label: 'Seasons', icon: Archive },
       { to: '/settings', label: 'Settings', icon: Settings },
+      ...(accountNavItem ? [accountNavItem] : []),
     ],
   },
 ];
@@ -55,6 +57,7 @@ const pageTitles: Record<string, string> = {
   '/seasons': 'Seasons & archives',
   '/settings': 'Settings',
   '/onboarding': 'Set up your season',
+  ...(accountNavItem ? { '/account': 'Account' } : {}),
 };
 
 export function getPageTitle(pathname: string): string {

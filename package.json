@@ -1,7 +1,7 @@
 {
   "name": "christmas-gift-tracker",
   "private": true,
-  "version": "0.10.0",
+  "version": "0.11.0",
   "type": "module",
   "description": "A local-first Christmas gift planning application.",
   "engines": {
@@ -9,8 +9,12 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:online": "vite --mode online",
     "build": "tsc -b && vite build",
+    "build:online": "tsc -b && vite build --mode online",
     "build:standalone": "tsc -b && vite build --config vite.config.standalone.ts",
+    "verify:bundle": "node scripts/check-offline-bundle.mjs",
+    "verify:supabase": "node --env-file-if-exists=.env.online.local scripts/verify-supabase.mjs",
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "test": "vitest run",
@@ -21,6 +25,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "dexie": "^4.4.7",
     "lucide-react": "^1.61.0",
     "react": "^19.3.1",

@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Data Model
 
-> Status: Normative; version-1 storage implemented in Milestone 2 · Version 0.7 · 2026-10-30
-> Implements the requirements in `docs/PRODUCT_SPEC.md`. `src/domain` and `src/storage` follow this document; later sections (backup, CSV, sample loader, online sync) remain planned.
+> Status: Normative; version-2 storage with sync bookkeeping implemented in Milestone 11 · Version 0.11 · 2026-10-30
+> Implements the requirements in `docs/PRODUCT_SPEC.md`. `src/domain`, `src/storage`, and `src/sync` follow this document; the optional online edition mirrors these entities in Supabase through revision-checked RPCs.
 
 ---
 
@@ -286,7 +286,8 @@ Meta is device-local and is **not** included in backups.
 
 - IndexedDB, accessed through **Dexie 4**. Reactive reads use Dexie's `liveQuery` through the typed `useLiveQueryState` hook (D-025), not `dexie-react-hooks`.
 - Database name: `christmas-gift-tracker`.
-- Database version: `1` at launch.
+- Database version: `2`.
+- Version 1 holds the domain entities; version 2 adds sync outbox, tombstones, per-record state, conflicts, and link metadata. The upgrade adds stores only and preserves every version-1 record.
 - All structured data lives here. `localStorage` is used only for the theme pre-paint mirror (D-017); it is never a database.
 
 Rationale for Dexie over a hand-written wrapper: reliable versioned migrations, transactions, compound indexes, and reactive queries reduce the risk of inconsistent data and stale dashboards. See `docs/DECISIONS.md` D-003 and D-025.
@@ -304,6 +305,26 @@ db.version(1).stores({
 });
 ```
 
+### 4.3 Sync bookkeeping stores (version 2)
+
+```ts
+db.version(2).stores({
+  syncOutbox:     '[entityType+entityId], queuedAt',
+  syncTombstones: '[entityType+entityId], deletedAt',
+  syncState:      '[entityType+entityId], serverRevision',
+  syncConflicts:  '[entityType+entityId], detectedAt',
+  syncMeta:       'key',
+});
+```
+
+Records:
+
+- `syncOutbox` — one coalesced pending upsert per `(entityType, entityId)`, with `queuedAt`.
+- `syncTombstones` — one pending delete per `(entityType, entityId)`, with `deletedAt`; deleting a record removes any pending upsert.
+- `syncState` — the last acknowledged cloud revision and timestamp per record, used as the next base revision.
+- `syncConflicts` — unchanged local and cloud versions, the conflict kind (`update` or `delete`), and detection time; resolved only by an explicit user choice.
+- `syncMeta` — the `link` singleton holding the account ID, email, and linking timestamp. Absence means the device is not linked.
+
 Notes:
 
 - Booleans (`bought`, `wrapped`, `sent`) are stored as values but not indexed, because IndexedDB keys cannot be booleans. Filtering happens in memory over the active season's small dataset.
@@ -313,7 +334,7 @@ Notes:
 - No index is added speculatively without a documented query.
 - Dexie encodes application schema version `1` as IndexedDB version `10` (`verno × 10`). The app and health report expose `db.verno` as `1`; a raw DevTools/`indexedDB.databases()` reading of `10` is expected, not a second schema version.
 
-### 4.3 IndexedDB transactions
+### 4.4 IndexedDB transactions
 
 - Every multi-record write uses one read-write transaction spanning all affected stores.
 - Repository functions validate before opening the transaction, then re-check critical preconditions inside it (e.g. recipient still exists, idea still active).
@@ -321,8 +342,9 @@ Notes:
 - Bulk restore uses a single transaction across settings, seasons, recipients, gifts, and ideas.
 - Reads for a page use live queries scoped to the active season.
 - Cross-tab changes propagate through Dexie live queries; the app does not maintain a duplicate in-memory database.
+- When the device is linked, each repository write queues its outbox/tombstone entry inside the same transaction, so a rolled-back write leaves no pending sync work. Applying remote rows runs with change capture suppressed.
 
-### 4.4 Repository surface
+### 4.5 Repository surface
 
 The storage layer exposes typed functions, not raw tables:
 
@@ -693,7 +715,14 @@ progress       = calculateProgress(recipientGifts)
 - Write `meta.schemaVersion = 1`, `databaseId`, `appVersion`, `lastOpenedAt` on first open.
 - On subsequent opens, update `lastOpenedAt` and `appVersion`; never touch user records.
 
-### 8.3 Future migration example (illustrative, not implemented)
+### 8.3 Version 2
+
+- Adds the five sync stores in §4.3. No entity store is rewritten, and existing records are copied forward untouched.
+- `meta.schemaVersion` becomes `2` and the diagnostics surface reports `db.verno`.
+- The upgrade is covered by a fixture that creates a version-1 database, opens it with version 2, and asserts every legacy record is unchanged with empty sync tables.
+- A device is not linked by upgrading; linking is always a later explicit action.
+
+### 8.4 Future migration example (illustrative, not implemented)
 
 Adding gift photos at version 2 would add a `photos` store and a migration that leaves existing gifts unchanged; backup format version increments with an optional `photos` array. The plan must document the compatibility window and update import validation.
 
@@ -749,20 +778,20 @@ Errors carry a stable machine code, a human message, and optional field details.
 
 1. Read the file with a 25 MB cap.
 2. Parse JSON; reject invalid syntax with a clear message.
-3. Check `format`, `formatVersion` (must be 1 for launch), and `schemaVersion` (equal to current; older schemas have no migration at launch, newer ones are rejected).
+3. Check `format`, `formatVersion` (must be 1), and `schemaVersion` (1 or 2; newer schemas are rejected).
 4. Validate every entity and the complete data set per §5, including duplicate IDs across record types, at most one active season, settings consistency, foreign keys, and cross-season references.
 5. Show a summary: seasons, recipients, gifts, ideas, date exported, app version, and the fact that all current data will be replaced.
 6. Require a **fresh download of the current data** before the restore action is enabled. The download is offered in the summary step.
 7. Require typed confirmation `RESTORE`.
-8. In one transaction: clear settings, seasons, recipients, gifts, and ideas, then bulk insert validated records. Preserve `meta.databaseId`; update `meta.appVersion` and `schemaVersion` outside the data transaction if needed.
+8. Refuse restore while the device is linked; disconnect first. In one transaction: clear settings, seasons, recipients, gifts, and ideas plus all sync stores, then bulk insert validated records. Preserve `meta.databaseId`; update `meta.appVersion` and `schemaVersion` outside the data transaction if needed.
 9. On any failure, abort the transaction and leave the previous data intact.
 10. Reload app state and land on the Dashboard or the no-active-season state.
 
-Replace-all is the only launch mode. Merge is deferred. Validation returns a summary; `restoreBackup` re-validates the file before writing so a file cannot be swapped between checks.
+Replace-all is the only restore mode. Merge is deferred. Validation returns a summary; `restoreBackup` re-validates the file before writing so a file cannot be swapped between checks.
 
 ### 10.3 Backward compatibility
 
-- Version 1 is the only format at launch.
+- Format version 1 is the only backup format. Schema 1 and schema 2 envelopes are accepted; a schema-1 file imports its entities into the current stores without sync bookkeeping.
 - Future format versions must define a migration path and be tested with real fixture files.
 - Unknown extra properties are ignored, but unknown structural changes are rejected.
 - A backup with duplicate IDs, dangling references, or invariant violations is rejected as a whole; no “best effort” repair.
@@ -836,22 +865,58 @@ The health check never mutates data. It offers a copyable text report containing
 
 ---
 
-## 13. Future online synchronization (design constraints)
+## 13. Online synchronization (implemented in the online edition)
 
-Not implemented at launch. The following constraints must shape the schema now:
+### 13.1 Storage relationship
 
-- Stable client-generated UUIDs allow offline creation and later upload without renumbering.
-- `updatedAt` on every entity supports change detection.
-- No derived totals are stored, so merging records cannot leave stale totals.
-- The local database remains the working copy; cloud sync must not block offline reads/writes.
-- Additions planned for Milestone 11:
-  - A cloud mirror of each table with `user_id`, `server_revision`, and `deleted_at`.
-  - A local outbox for pending mutations and tombstones for deletions.
-  - Per-record optimistic concurrency: if the server revision changed since the last sync, mark a conflict and present both versions; never silently overwrite.
-  - Sync status per record and globally, with actionable errors.
-  - Server-side Row Level Security keyed to the authenticated user.
-- Hard deletes in the launch schema require the sync milestone to introduce a tombstone/outbox migration. This is a known, documented migration, not a redesign.
-- Backups remain local and complete; cloud export mirrors the same format where practical.
+- The local IndexedDB database remains the working copy and the source of truth for offline use. Cloud rows are a mirror, not a replacement.
+- The online edition sends entity payloads that are identical to the local shapes in §3. It adds no derived totals, so merging cannot leave stale calculations.
+- One cloud row exists per `(user_id, entity_type, entity_id)`. Settings always use the entity ID `app`.
+- Stable client-generated UUIDs mean offline-created records keep their identity when uploaded.
+
+### 13.2 Cloud schema
+
+`public.sync_records`:
+
+| Column | Meaning |
+| --- | --- |
+| `user_id` | Auth user UUID; part of the primary key and every RLS predicate |
+| `entity_type` | `season`, `recipient`, `gift`, `idea`, or `settings` |
+| `entity_id` | Entity UUID, or `app` for settings |
+| `data` | Entity JSON, `null` when soft-deleted |
+| `revision` | Starts at 1 and increments on each accepted write |
+| `server_seq` | Monotonic sequence from `public.sync_server_seq`, used as the pull cursor |
+| `updated_at` | Client timestamp accepted with the write |
+| `deleted_at` | Soft-delete tombstone timestamp, or `null` |
+
+Constraints enforce the allowed entity types, the settings ID, non-negative revisions, and the invariant that `data` is present exactly when `deleted_at` is null. An index on `(user_id, server_seq)` supports ordered pulls.
+
+The migration creates `sync_upsert`, `sync_delete`, `sync_list_changes`, `sync_count_rows`, `export_my_account`, and `delete_my_account`. Row-level security covers select, insert, update, and delete for `authenticated`; `anon` has no table access. Direct table writes are not part of the client contract.
+
+### 13.3 Concurrency, retries, and deletion
+
+- The client sends the `base_revision` it last acknowledged.
+- If the row is absent and the base is 0, the server inserts revision 1.
+- If the base matches the current revision, the server writes `revision + 1` and a new `server_seq`.
+- If the base does not match, the server returns `conflict` with the current row; the client stores both versions and asks the user.
+- Re-sending an identical timestamp and payload for a matching revision is idempotent and does not bump the revision.
+- Deletes are soft (`deleted_at`, `data = null`) and follow the same revision rules. Deleting an absent row with base 0 is a no-op; an already-deleted row returns the existing tombstone.
+- A pull returns rows with `server_seq` greater than the stored cursor, ordered by `server_seq`; the cursor advances only after records are applied in one transaction. Interrupted sync retries safely from the last applied cursor, and the outbox retains unacknowledged work.
+- Conflicts are resolved only by explicit choices: keep this device's version (push at the current cloud revision) or accept the cloud version/deletion (apply remotely and drop local pending work).
+
+### 13.4 Connection, disconnect, export, and deletion
+
+- Planning compares local records with the caller's cloud records and classifies them as identical, local-only, cloud-only, or conflicting.
+- Empty cloud → upload; empty device → download; both populated → merge. Merge requires a fresh backup and never deletes or overwrites either side; conflicts are attached to their records.
+- While linked, restore, reset, and sample-data operations are refused. Disconnecting keeps all planner records and clears only link metadata, credentials, outbox, tombstones, sync state, and conflicts.
+- `export_my_account` returns the caller's account email, export time, and live records; it never includes deleted rows or another user's data.
+- `delete_my_account` deletes the authenticated user; cascade removes their rows. The local planner is deliberately untouched and the device is disconnected afterward.
+
+### 13.5 Known limits
+
+- Server-side verification requires the owner's dedicated Supabase project; the local fake cloud exercises the same contract but is not a substitute for the live RLS run.
+- Sync is last-writer-with-conflict-detection, not real-time collaboration; two devices editing the same record simultaneously produce a conflict rather than a merged field set.
+- A soft-deleted cloud row keeps its `entity_id` reserved; recreating the same UUID later follows the normal revision rules.
 
 ---
 
@@ -870,6 +935,10 @@ Not implemented at launch. The following constraints must shape the schema now:
 | Replace-all restore | D-010 |
 | Unique `sourceIdeaId` omission rule | D-019 |
 | Zero active seasons allowed | D-018 |
+| Two build editions | D-031 |
+| Cloud mirror and surfaced conflicts | D-032 |
+| Device linkage guards destructive tools | D-033 |
+| Non-destructive first connection | D-034 |
 
 ---
 

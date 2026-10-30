@@ -5,6 +5,7 @@ import { createId } from '../lib/ids';
 import { createDefaultSettings, createMetaRecords } from './defaults';
 import { withStorageErrors } from './errors';
 import type { RepositoryContext } from './repositories/context';
+import { assertDeviceNotLinked } from './syncLink';
 
 export interface ResetAllDataOptions {
   confirmation: string;
@@ -30,9 +31,23 @@ export async function resetAllData(
 
     const { db } = context;
 
+    await assertDeviceNotLinked(db);
+
     return db.transaction(
       'rw',
-      [db.settings, db.seasons, db.recipients, db.gifts, db.ideas, db.meta],
+      [
+        db.settings,
+        db.seasons,
+        db.recipients,
+        db.gifts,
+        db.ideas,
+        db.meta,
+        db.syncMeta,
+        db.syncOutbox,
+        db.syncTombstones,
+        db.syncState,
+        db.syncConflicts,
+      ],
       async () => {
         const existingDatabaseId = await db.meta.get('databaseId');
         const databaseId =
@@ -49,6 +64,11 @@ export async function resetAllData(
           db.gifts.clear(),
           db.ideas.clear(),
           db.meta.clear(),
+          db.syncMeta.clear(),
+          db.syncOutbox.clear(),
+          db.syncTombstones.clear(),
+          db.syncState.clear(),
+          db.syncConflicts.clear(),
         ]);
 
         const meta: MetaRecord[] = createMetaRecords({

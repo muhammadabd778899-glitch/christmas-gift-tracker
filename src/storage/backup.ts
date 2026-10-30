@@ -15,9 +15,12 @@ import type { MetaRecord } from '../domain/entities';
 import { SCHEMA_VERSION } from './db';
 import { withStorageErrors } from './errors';
 import type { RepositoryContext } from './repositories/context';
+import { assertDeviceNotLinked } from './syncLink';
 
 export const BACKUP_FORMAT = 'christmas-gift-tracker-backup';
 export const BACKUP_FORMAT_VERSION = 1;
+/** Schema 2 added sync-only tables; the backup payload shape is unchanged. */
+export const OLDEST_SUPPORTED_BACKUP_SCHEMA = 1;
 export const MAX_BACKUP_BYTES = 25 * 1024 * 1024;
 
 const MAX_SEASONS = 500;
@@ -293,7 +296,7 @@ export async function validateBackup(source: BackupSource): Promise<ValidatedBac
     );
   }
 
-  if (candidate.schemaVersion < SCHEMA_VERSION) {
+  if (candidate.schemaVersion < OLDEST_SUPPORTED_BACKUP_SCHEMA) {
     throw new ImportError(
       `This backup uses schema version ${candidate.schemaVersion}. No safe migration to schema ${SCHEMA_VERSION} exists in this build, so it cannot be restored.`,
     );
@@ -411,9 +414,23 @@ export async function restoreBackup(
   return withStorageErrors(async () => {
     const { db } = context;
 
+    await assertDeviceNotLinked(db);
+
     return db.transaction(
       'rw',
-      [db.settings, db.seasons, db.recipients, db.gifts, db.ideas, db.meta],
+      [
+        db.settings,
+        db.seasons,
+        db.recipients,
+        db.gifts,
+        db.ideas,
+        db.meta,
+        db.syncMeta,
+        db.syncOutbox,
+        db.syncTombstones,
+        db.syncState,
+        db.syncConflicts,
+      ],
       async () => {
         const timestamp = context.nowIso();
         const existingDatabaseId = await db.meta.get('databaseId');
@@ -428,6 +445,11 @@ export async function restoreBackup(
           db.recipients.clear(),
           db.gifts.clear(),
           db.ideas.clear(),
+          db.syncMeta.clear(),
+          db.syncOutbox.clear(),
+          db.syncTombstones.clear(),
+          db.syncState.clear(),
+          db.syncConflicts.clear(),
         ]);
 
         await db.settings.add(envelope.data.settings);

@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Architecture
 
-> Status: Version 0.10 · 2026-10-30 · Milestone 10 offline delivery recorded
-> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, recipient, gift, idea, shopping, search/filter, recipient-detail, season/archive, backup/restore, CSV, sample-data, reset, and installable offline PWA workflows now exist; later sections remain target architecture.
+> Status: Version 0.11 · 2026-10-30 · Milestone 11 online accounts and synchronization recorded
+> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-2 storage, recipient, gift, idea, shopping, search/filter, recipient-detail, season/archive, backup/restore, CSV, sample-data, reset, installable offline PWA, and optional online account/sync workflows now exist.
 
 ---
 
@@ -35,10 +35,19 @@ Non-goals for the launch architecture: SSR, microservices, real-time collaborati
 └──────────────────────────────────────────────────────────────┘
 
 Offline edition: no server calls for core features.
-Online edition (V2): adds Auth + Postgres + sync adapter; local DB remains the working copy.
+Online edition: Auth + Postgres + sync adapter; local DB remains the working copy.
+
+        Online edition only (opt-in device link)
+┌──────────────┐   anon key + RLS   ┌─────────────────────────┐
+│ Sync engine  │ ─────────────────> │ Supabase Auth/Postgres  │
+│ outbox +     │ <───── RPCs ────── │ sync_records per user   │
+│ tombstones   │                    │ server sequence cursor  │
+└──────────────┘                    └─────────────────────────┘
 ```
 
-External services at launch: none required. Optional static hosting for initial PWA installation. No fonts, scripts, icons, or analytics loaded from third parties at runtime.
+The default build never imports the online modules; the online build adds the Account route and provider at compile time through an `@edition` alias. The offline bundle scanner fails the build if Supabase, auth, sync RPCs, or privileged-key strings appear in the offline artifact.
+
+External services at launch: none required. Optional static hosting for initial PWA installation. No fonts, scripts, icons, or analytics loaded from third parties at runtime. The online build additionally contacts the configured Supabase project only after the user signs in and links the device.
 
 ---
 
@@ -59,6 +68,8 @@ External services at launch: none required. Optional static hosting for initial 
 | Unit/integration tests | Vitest + Testing Library + `fake-indexeddb` | Fast, jsdom-based, storage-realistic |
 | Browser tests | Playwright | Real workflows, offline emulation, viewports, print media |
 | Offline | `vite-plugin-pwa` (Workbox) | Precaching, update flow, SPA navigation fallback |
+| Online backend | Supabase (`@supabase/supabase-js`) Auth + Postgres + RLS | Managed email auth and per-user row isolation without a custom server; public anon key only |
+| Sync transport | Supabase RPCs (`sync_upsert`, `sync_delete`, `sync_list_changes`) | Revision-checked writes and a sequence pull cursor; no direct table writes from the client |
 | Lint/format | ESLint + typescript-eslint + jsx-a11y, Prettier | Consistency and accessibility checks |
 | CI | GitHub Actions | Repeatable verification from Milestone 1 onward |
 
@@ -69,7 +80,7 @@ External services at launch: none required. Optional static hosting for initial 
 - **Redux/Zustand:** unnecessary; live queries plus local form state cover the needs.
 - **Tailwind:** no hard requirement; tokens + CSS Modules keep the bundle and design system explicit. Revisit only if velocity suffers.
 - **date-fns / dayjs:** native `Intl` plus ~100 lines of date helpers is sufficient and removes a dependency.
-- **Cloud backend now:** deferred to Milestone 11; not needed to validate the product.
+- **Cloud backend now:** Supabase is implemented for the optional online edition (D-012). The offline edition still has no backend dependency.
 - **Desktop wrapper / Electron / Tauri:** not built. Milestone 10 validated the PWA as sufficient; O-12 keeps a wrapper out of scope unless a separate owner decision reverses that.
 
 Dependency policy: pin with a lockfile, avoid CDN/runtime remote assets, review licenses before packaging, and do not add a dependency for a single trivial function.
@@ -419,7 +430,7 @@ Only Microsoft Edge 156 (Chromium) was available on the test host. Firefox, Safa
 - Backups are unencrypted at launch and clearly labeled as sensitive.
 - Privacy copy is part of Settings, not buried in a README.
 - Dependency audit and license review before packaging.
-- Online edition (V2): server-side authorization and Row Level Security; never trust client-provided `user_id`.
+- Online edition: server-side authorization and Row Level Security; never trust client-provided `user_id`.
 
 ---
 
@@ -462,9 +473,13 @@ GitHub Actions from Milestone 1: install with a locked lockfile, typecheck, lint
 
 ## 13. Build and release
 
-- `npm run dev` — local development.
-- `npm run build` — `tsc --noEmit` (or project build) then Vite production build.
+- `npm run dev` — local development (offline edition).
+- `npm run dev:online` — development with the online edition.
+- `npm run build` — `tsc -b` then Vite production build (offline edition).
+- `npm run build:online` — production build with accounts and sync (requires Supabase env values).
 - `npm run preview` — serve the production build for verification.
+- `npm run verify:bundle` — scan the built offline artifact for account, Supabase, sync-RPC, privileged-key, and third-party runtime strings.
+- `npm run verify:supabase` — run the live cross-account RLS and sync checks against the dedicated test project.
 - `npm run test`, `npm run test:coverage`, `npm run test:e2e`.
 - Output in `dist/`; source maps evaluated for size/privacy before release.
 - Static hosting with HTTPS, SPA fallback, correct MIME types, and cache headers for hashed assets.
@@ -474,37 +489,46 @@ GitHub Actions from Milestone 1: install with a locked lockfile, typecheck, lint
 
 ---
 
-## 14. Future online edition (Milestone 11 boundaries)
+## 14. Online edition (Milestone 11, implemented)
 
-### 14.1 Recommended backend
+### 14.1 Backend and security
 
-Supabase (managed PostgreSQL, Auth, Row Level Security) for the first online release:
+Supabase provides managed PostgreSQL, email/password Auth, and Row Level Security. The migration `supabase/migrations/20261030000100_online_sync.sql` is the source of truth:
 
-- Email/password auth plus password recovery.
-- One row per entity, scoped by `user_id`.
-- RLS policies on every table; no cross-account reads/writes.
-- No service-role key in the client.
-- Account deletion and data export implemented server-side or via a secured function.
+- `sync_records` stores one row per `(user_id, entity_type, entity_id)` with `revision`, `server_seq`, `deleted_at`, `updated_at`, and JSON `data`.
+- RLS is enabled with four policies, each restricting `user_id` to `(select auth.uid())`; `anon` has no table access, and `authenticated` receives CRUD plus sequence usage only.
+- `sync_upsert` and `sync_delete` validate the session, entity type, ID, base revision, and timestamp; a stale base revision returns a conflict containing the current server row instead of overwriting. Retries of an identical timestamp/data payload are idempotent.
+- `sync_list_changes` returns only the caller’s rows with `server_seq` greater than the cursor, capped and ordered for resumable pulls; `sync_count_rows` supports the connection plan.
+- `export_my_account` returns only the caller’s live records; `delete_my_account` is a `SECURITY DEFINER` function that deletes the authenticated user, which cascades the rows.
+- The client receives only the project URL and public anon key. The service-role key and database connection string are prohibited from the client and the repository.
+- Register, recover, and delete operations use Supabase Auth. Failure messages avoid disclosing whether an account exists where the provider allows it.
 
-Alternative: a small custom API with Postgres and an auth provider, if Supabase constraints prove unsuitable. The domain layer remains unchanged either way.
+### 14.2 Local sync model
 
-### 14.2 Sync design constraints
+- Schema version 2 adds `syncOutbox`, `syncTombstones`, `syncState`, `syncConflicts`, and `syncMeta`; existing records are preserved by the version-1 to version-2 upgrade.
+- Repository writes capture an outbox upsert/tombstone inside the same IndexedDB transaction, coalescing repeated edits. Applying remote data runs with capture suppressed.
+- The engine pushes in dependency order (season, recipient, gift, idea, settings), pulls with a stored `server_seq` cursor, and records per-entity revision state.
+- A push result is `applied`, `conflict`, or `gone`; conflicts store both local and cloud versions and require an explicit keep-local or accept-cloud decision. There is no last-write-wins.
+- A failed or interrupted run leaves pending work in the outbox, so retry is safe; applied writes are removed only after the server acknowledges them. Entity IDs and revisions make duplicate submissions idempotent.
+- Sync status is derived as synced, pending, syncing, offline, conflict, error, or disconnected and is visible in the shell and on the Account page.
 
-- Stable UUIDs and `updatedAt` already exist.
-- Local DB remains authoritative for offline work; a sync engine pushes/pulls changes.
-- Add a local outbox and tombstones (migration) for pending creates/updates/deletes.
-- Per-record optimistic concurrency: detect server revision changes and surface conflicts; never silently overwrite.
-- Duplicate prevention by primary key and idempotent operations.
-- Sync status is visible; failures are actionable and retryable.
-- Full-database sync between unrelated accounts is prohibited.
-- The offline build must continue to function without auth or cloud access.
+### 14.3 Linking, editions, and destructive guardrails
 
-### 14.3 Code boundaries
+- Linking requires a signed-in user, an explicit connection plan, and the typed word `CONNECT`. The plan reports local, cloud, identical, local-only, cloud-only, and conflicting counts:
+  - empty cloud → upload;
+  - empty device → download;
+  - both sides populated → merge, which requires a fresh backup download and never deletes or overwrites either side.
+- While a device is linked, restore, reset, and sample-data tools are blocked; tracking stays enabled even when signed out so local edits still queue.
+- Disconnecting keeps every local planner record and clears only credentials, link metadata, outbox, tombstones, sync state, and conflicts.
+- Account deletion removes cloud data after the typed phrase `DELETE MY ACCOUNT` and explains that the local planner is unchanged; after deletion the device is disconnected.
+- The compile-time `@edition` alias selects `offlineEdition.ts` (no provider or Account route) or `onlineEdition.tsx` (provider, lazy Account page, sync indicator, Account navigation). `npm run verify:bundle` enforces the offline boundary.
 
-- Domain stays pure and shared.
-- A cloud adapter implements the same repository contract semantics for sync; UI does not call Supabase directly.
-- Build-time edition flag excludes auth/sync code from the offline bundle where practical.
-- Shared components remain edition-agnostic.
+### 14.4 Code boundaries
+
+- Domain stays pure and shared; no business rules live in the cloud schema or adapter.
+- `src/sync/cloud.ts` defines the mirror contract; `src/sync/supabase/` implements it. UI calls the provider, never Supabase directly.
+- Shared components remain edition-agnostic; online-only context and navigation live under `src/app/online/` and `src/features/account/`.
+- The offline edition continues to function without auth or network access.
 
 ---
 
@@ -546,7 +570,8 @@ Required platform features: IndexedDB, service workers, `crypto.randomUUID`, ES2
 | Calculation drift between screens | Medium | Medium | Single domain module; no totals in components or storage |
 | Archive leakage into current totals | High | Low | Season-scoped queries and explicit archived-season tests |
 | iOS storage eviction | High | Medium | Document; recommend install + backups; avoid promising permanence |
-| Sync conflicts (V2) | High | High | Deferred; conservative conflict surfacing design before implementation |
+| Sync conflicts | High | Medium | Per-record revisions, both versions stored, explicit user choice, no last-write-wins; fake-cloud and live RLS checks |
+| Online account takeover/cross-account access | High | Low–Medium | Supabase Auth, RLS on every row, validated RPCs, anon key only, remote isolation script |
 | Accessibility regressions | Medium | Medium | jsx-a11y, keyboard tests, manual audit in Milestone 9 |
 | Scope creep | High | High | Milestone gates, protocol, owner approval, no auto-advance |
 | Third-party dependency risk | Medium | Low–Medium | Minimal pinned dependencies, no CDN, license review, audit |
@@ -570,7 +595,7 @@ Required platform features: IndexedDB, service workers, `crypto.randomUUID`, ES2
 | Archives read-only | D-009 |
 | Replace-all restore | D-010 |
 | PWA-first offline | D-011 |
-| Supabase for V2 | D-012 |
+| Supabase backend | D-012 |
 | No runtime CDN | D-013 |
 | Testing gates | D-014 |
 | Currency scaling | D-015 |
@@ -584,6 +609,16 @@ Required platform features: IndexedDB, service workers, `crypto.randomUUID`, ES2
 | CSV privacy defaults | D-023 |
 | Wrapped progress denominator | D-024 |
 | Typed liveQuery hook | D-025 |
+| Shopping List derivation | D-026 |
+| Local search/filter state | D-027 |
+| Recipient detail reuse | D-028 |
+| Destructive-tool gates | D-029 |
+| User-initiated persistence | D-030 |
+| Two build editions | D-031 |
+| Cloud mirror and conflicts | D-032 |
+| Device linkage guards | D-033 |
+| Non-destructive first connection | D-034 |
+| Dedicated-project live verification | D-035 |
 
 The full rationale and open questions are in `docs/DECISIONS.md`.
 

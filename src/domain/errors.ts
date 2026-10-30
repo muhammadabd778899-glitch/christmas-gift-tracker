@@ -91,6 +91,30 @@ export class MigrationError extends AppError {
   }
 }
 
+export class AuthError extends AppError {
+  constructor(message: string, options: { cause?: unknown; recovery?: string } = {}) {
+    super(message, {
+      code: 'AUTH_FAILED',
+      cause: options.cause,
+      recovery:
+        options.recovery ??
+        'Check your email and password, then try again. Your local plans are unchanged.',
+    });
+  }
+}
+
+export class SyncError extends AppError {
+  constructor(message: string, options: { cause?: unknown; recovery?: string } = {}) {
+    super(message, {
+      code: 'SYNC_FAILED',
+      cause: options.cause,
+      recovery:
+        options.recovery ??
+        'Your local plans are safe. Check your connection and try again, or keep working offline.',
+    });
+  }
+}
+
 export class ImportError extends AppError {
   constructor(message: string, options: { cause?: unknown } = {}) {
     super(message, {

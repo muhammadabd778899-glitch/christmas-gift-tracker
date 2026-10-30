@@ -359,6 +359,8 @@
 | AC-11.16 | Architecture, deployment, setup, and privacy docs are updated. | D |
 | AC-11.17 | No payment processing or subscription enforcement was added. | Code review |
 
+**Verification status (2026-10-30):** AC-11.01, 11.02, 11.05–11.14, 11.16, and 11.17 are covered by the automated suite, the offline bundle scan, and manual review. AC-11.03, 11.04, 11.09, 11.10, 11.11, and 11.15 are exercised against the committed fake cloud in tests and by the SQL review, but the live Supabase RLS/cross-account run (`npm run verify:supabase`) remains pending the owner's dedicated test project. See `docs/MILESTONE_11_REPORT.md` §5.
+
 ---
 
 ## Milestone 12 — Final QA, packaging, and Etsy release

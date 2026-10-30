@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ValidationError } from '../domain/errors';
 import { MAX_BACKUP_BYTES } from './backup';
+import { SCHEMA_VERSION } from './db';
 import { createTestStorage, type TestStorage } from '../test/storage';
 
 let storage: TestStorage;
@@ -97,7 +98,7 @@ describe('JSON backup export', () => {
 
     expect(envelope.format).toBe('christmas-gift-tracker-backup');
     expect(envelope.formatVersion).toBe(1);
-    expect(envelope.schemaVersion).toBe(1);
+    expect(envelope.schemaVersion).toBe(SCHEMA_VERSION);
     expect(envelope.appVersion).toBe('0.2.0-test');
     expect(backup.filename).toMatch(/^christmas-gift-tracker-backup-\d{4}-\d{2}-\d{2}\.json$/);
     expect(envelope.data.seasons).toHaveLength(2);
@@ -219,11 +220,22 @@ describe('invalid backups', () => {
 
   it('rejects a newer schema version with a clear message', async () => {
     const envelope = await exportedEnvelope();
-    envelope.schemaVersion = 2;
+    envelope.schemaVersion = SCHEMA_VERSION + 1;
 
     await expect(
       storage.repositories.data.validateBackup(backupFile(JSON.stringify(envelope))),
     ).rejects.toThrow(/newer version of the planner/);
+  });
+
+  it('accepts a schema 1 backup because the payload shape is unchanged', async () => {
+    const envelope = await exportedEnvelope();
+    envelope.schemaVersion = 1;
+
+    const validated = await storage.repositories.data.validateBackup(
+      backupFile(JSON.stringify(envelope)),
+    );
+
+    expect(validated.summary.seasons).toBe(envelope.data.seasons.length);
   });
 
   it('rejects an older schema version instead of importing it partially', async () => {

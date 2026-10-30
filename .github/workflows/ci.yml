@@ -40,3 +40,9 @@ jobs:
 
       - name: Build production bundle
         run: npm run build
+
+      - name: Verify the offline bundle excludes accounts and sync
+        run: npm run verify:bundle
+
+      - name: Build the online edition
+        run: npm run build:online

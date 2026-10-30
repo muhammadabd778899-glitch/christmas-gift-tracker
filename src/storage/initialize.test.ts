@@ -19,12 +19,24 @@ afterEach(async () => {
 });
 
 describe('database initialization', () => {
-  it('opens the version-1 stores and indexes from the data model', async () => {
+  it('opens the current stores and indexes from the data model', async () => {
     const { db } = await testStorage();
 
     expect(db.verno).toBe(SCHEMA_VERSION);
     expect(db.tables.map((table) => table.name).sort()).toEqual(
-      ['gifts', 'ideas', 'meta', 'recipients', 'seasons', 'settings'].sort(),
+      [
+        'gifts',
+        'ideas',
+        'meta',
+        'recipients',
+        'seasons',
+        'settings',
+        'syncConflicts',
+        'syncMeta',
+        'syncOutbox',
+        'syncState',
+        'syncTombstones',
+      ].sort(),
     );
 
     expect(db.seasons.schema.indexes.map((index) => index.name)).toEqual(

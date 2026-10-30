@@ -41,13 +41,15 @@ const included = [
   'An update prompt that waits for consent and never reloads over unsaved form work',
   'Truthful offline status plus persistent-storage requests with clear explanations',
   'Install guidance for desktop Chromium, Android, iPhone/iPad, and Firefox',
+  'An optional online edition with account sign-up, sign-in, password recovery, and account deletion',
+  'Device linking with a plan preview, typed confirmations, and a fresh backup before merging',
+  'Automatic sync with an offline outbox, retry, duplicate protection, and record-by-record conflict choices',
+  'Cross-account isolation enforced by database row-level security',
+  'A compile-time edition split so the offline bundle contains no account or sync code',
   'Automated tests, type checking, linting, and a production build',
 ];
 
-const upcoming = [
-  'Online accounts and synchronization (Milestone 11)',
-  'Release hardening and Etsy packaging (Milestone 12)',
-];
+const upcoming = ['Release hardening and Etsy packaging (Milestone 12)'];
 
 export function AboutDialog({ open, onClose }: AboutDialogProps) {
   return (
@@ -69,12 +71,12 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
             Milestone {APP_MILESTONE}
           </Badge>
           <p>
-            The planner now manages several seasons with one active at a time and read-only
-            archives. It can export a complete JSON backup, validate and restore one atomically,
-            export CSV for spreadsheets, load isolated sample data, and reset only after a fresh
-            backup. This build also installs as an offline-first app: assets are cached after one
-            online visit, the app launches and reloads without a connection, and new versions are
-            offered rather than forced. Cloud sync and accounts are not implemented yet.
+            The planner manages several seasons with one active at a time and read-only archives,
+            complete JSON backups, CSV exports, isolated sample data, and a guarded reset. This
+            build also installs as an offline-first app: assets are cached after one online visit,
+            the app launches and reloads without a connection, and new versions are offered rather
+            than forced. An optional online edition adds an account, cloud sync, and conflict
+            handling; the default offline edition still needs no account.
           </p>
         </div>
 
@@ -104,10 +106,12 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
         </div>
 
         <div className={styles.notice}>
-          <strong>Local and account-free.</strong> Seasons, recipients, gifts, ideas, and budget
-          records are stored only in this browser. Backups and CSV exports are the deliberate ways
-          to take a copy with you; nothing is uploaded or synced. The first online visit is required
-          before the app can launch offline, and clearing site data deletes the planner.
+          <strong>Local-first by default.</strong> The offline edition keeps seasons, recipients,
+          gifts, ideas, and budget records only in this browser; backups and CSV exports are the
+          deliberate ways to take a copy with you. In the online edition, connecting a device
+          uploads the same records to your own account so they can sync, protected per account by
+          row-level security. There is no tracking, telemetry, or third-party advertising, and the
+          first online visit is required before the app can launch offline.
         </div>
       </div>
     </Dialog>

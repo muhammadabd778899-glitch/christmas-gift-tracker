@@ -111,7 +111,7 @@ const milestones: Milestone[] = [
     number: '11',
     title: 'Online edition',
     focus: 'Accounts, cloud storage, sync, and conflict resolution',
-    status: 'Planned',
+    status: 'Complete',
   },
   {
     number: '12',

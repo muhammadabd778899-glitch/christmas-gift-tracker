@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { OnlineSyncProvider, SyncStatusIndicator } from '@edition';
 import { AboutDialog } from './AboutDialog';
 import { ConnectionStatus } from '../components/layout/ConnectionStatus';
 import { Header } from '../components/layout/Header';
@@ -83,7 +84,7 @@ export function AppShell() {
     };
   }, [location.pathname, location.hash]);
 
-  return (
+  const shell = (
     <div className={styles.shell}>
       <ThemeController />
       <a className="skip-link" href="#main-content">
@@ -105,6 +106,7 @@ export function AppShell() {
           <span>Built for calmer Christmases.</span>
           <span className={styles.footerDivider} aria-hidden="true" />
           <ConnectionStatus />
+          {SyncStatusIndicator ? <SyncStatusIndicator /> : null}
           <span className={styles.footerVersion}>v{APP_VERSION}</span>
         </footer>
       </div>
@@ -114,4 +116,11 @@ export function AppShell() {
       <UpdatePrompt />
     </div>
   );
+
+  if (!OnlineSyncProvider) {
+    return shell;
+  }
+
+  const Provider = OnlineSyncProvider;
+  return <Provider>{shell}</Provider>;
 }

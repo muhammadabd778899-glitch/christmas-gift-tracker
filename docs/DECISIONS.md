@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Decision Log
 
-> Status: Approved through Milestone 10; later decisions remain proposed · Version 0.10 · 2026-10-30
+> Status: Milestones 0–11 approved and implemented; Milestone 12 not started · Version 0.11 · 2026-10-30
 > Format: lightweight ADRs. Statuses: **Proposed**, **Accepted**, **Superseded**, **Rejected**.
 > Decisions marked Proposed become binding when the owner approves the milestone that depends on them.
 
@@ -162,13 +162,13 @@
 
 ### D-012 — Supabase is the recommended V2 online backend
 
-**Status:** Proposed · **Milestone:** 11
+**Status:** Accepted 2026-10-30 for Milestone 11 · **Milestone:** 11
 
 **Context:** The online edition needs authentication, a relational database, and strong per-user isolation without building a large backend.
 
-**Decision:** Use Supabase (PostgreSQL, Auth, Row Level Security) for the first online edition unless Milestone 11 documents a compelling constraint. Domain logic remains shared; the client never holds service-role keys.
+**Decision:** Use Supabase (PostgreSQL, Auth, Row Level Security) for the first online edition. Domain logic remains shared; the client holds only the public anon key, and never a service-role or secret key. Server-side RLS and `SECURITY INVOKER` RPCs enforce ownership.
 
-**Consequences:** Fast, secure baseline with RLS. Vendor dependency and pricing to monitor. A custom backend remains possible without changing the domain.
+**Consequences:** Fast, secure baseline with RLS. Vendor dependency and pricing to monitor. A custom backend remains possible without changing the domain. A dedicated Supabase project is the verification environment; it contains no customer data.
 
 ---
 
@@ -388,6 +388,66 @@
 
 ---
 
+### D-031 — One codebase, two build editions
+
+**Status:** Accepted 2026-10-30 for Milestone 11 · **Milestone:** 11
+
+**Context:** The offline edition must stay account-free, and shipping Supabase client code or an account route inside the Etsy artifact would add risk and contradict the offline promise. The online edition still needs the same domain and UI.
+
+**Decision:** `npm run build` produces the offline edition with no edition flag. `npm run build:online` runs Vite in `online` mode, reading `.env.online` and a git-ignored `.env.online.local`. Online routes, navigation, bootstrap, and Supabase modules are gated by a compile-time edition constant and loaded lazily, so the offline bundle contains no Supabase client, auth route, or sync runtime. Only the public anon key is embedded in the online bundle; RLS enforces ownership. Both editions share Dexie schema version 2.
+
+**Consequences:** Two artifacts can be produced and verified from one repository. The offline bundle is scanned to prove the exclusion. One origin should host one edition, because both share the same IndexedDB database.
+
+---
+
+### D-032 — Cloud mirror, per-record concurrency, and surfaced conflicts
+
+**Status:** Accepted 2026-10-30 for Milestone 11 · **Milestone:** 11
+
+**Context:** The offline database is the working copy. Cloud sync must never block planning, duplicate records on retry, or silently overwrite a newer edit.
+
+**Decision:** Each account gets a private mirror of seasons, recipients, gifts, ideas, and settings. Every cloud row carries `user_id`, a per-record `server_revision`, a global `server_seq` used as the pull cursor, and `deleted_at`. Client writes go through `SECURITY INVOKER` RPCs that compare the caller's base revision and, inside the function, set the revision and sequence on an accepted write and return either the applied row or both versions. A retry that matches the next revision and the pending `updatedAt` is treated as an idempotent replay. Local changes are captured transactionally in an outbox (upserts) or tombstones (deletions). Pull applies a remote row only when the record has no pending local change; otherwise both versions are stored and shown as a conflict. Resolution is per record — keep this device, use the cloud version, or confirm a deletion — with no automatic merge, last-write-wins, or silent overwrite. Sample records sync with their `isSample` flag; cloud schemas mirror domain fields but store no calculated totals.
+
+**Consequences:** Offline behavior is unchanged and sync is retry-safe. Conflicts are visible and require a decision. The cloud duplicates field definitions, so schema changes must update both the Zod layer and the SQL migration.
+
+---
+
+### D-033 — Device linkage controls tracking and destructive data tools
+
+**Status:** Accepted 2026-10-30 for Milestone 11 · **Milestone:** 11
+
+**Context:** Signing out must not discard queued edits. Replace-all restore, full reset, and account switching while linked could desynchronize the cloud or upload one account's data into another.
+
+**Decision:** The local database records its linked account. Transactional change tracking is enabled whenever a device is linked, including while signed out; edits queue locally until the same account signs in again. Full restore, full reset, and the local sample tools are blocked while a device is linked. The user must explicitly disconnect the device — which keeps all local plans and clears sync state — before those tools run. Account deletion removes cloud rows and clears the link, but keeps local plans; removing local plans remains a separate `DELETE`-gated action. Connecting a different account while local plans exist requires a typed confirmation. Restore and reset also clear sync metadata, so a later connection starts from a fresh merge.
+
+**Consequences:** No silent cross-account upload and no local destructive action can invalidate sync. Signing out is safe. Disconnecting is a deliberate, reversible-from-backup step rather than an implicit side effect.
+
+---
+
+### D-034 — Initial connection merges instead of replacing
+
+**Status:** Accepted 2026-10-30 for Milestone 11 · **Milestone:** 11
+
+**Context:** A device and an account may both already contain plans when sync is connected. Automatically picking one side would lose data; automatically unioning without review could hide conflicts.
+
+**Decision:** On first connection, an empty cloud is filled from this device after explicit confirmation; an empty device is filled from the account; when both have plans, the app unions records by stable id. Identical records are marked synced, local-only records are queued for upload, cloud-only records are applied locally, and same-id differences become conflicts. A fresh backup download is required before a merge. The merge never deletes records on either side and never overwrites a differing record automatically. Cloud deletions are represented by tombstones after the initial merge.
+
+**Consequences:** Connection cannot lose plans. Users resolve discovered conflicts individually. Replacing one side with the other requires an explicit offline reset/restore instead of an ambiguous merge option.
+
+---
+
+### D-035 — Live sync verification uses a dedicated, disposable Supabase project
+
+**Status:** Accepted 2026-10-30 for Milestone 11 · **Milestone:** 11
+
+**Context:** Row-level security and cross-account isolation cannot be proven by a fake adapter alone. Running those checks against a production project could expose real customer data, and a database connection string or service-role key in the client would be a critical leak.
+
+**Decision:** The owner creates a throwaway Supabase project used only for verification. The project URL and public anon key go in a git-ignored `.env.online.local` (or CI secrets); the database connection string is used only in the migration shell and is never committed. The service-role key is prohibited from the client, the repository, and the offline bundle. `npm run verify:supabase` creates disposable accounts, proves cross-account reads/writes are blocked, exercises validation, idempotent replay, conflicts, soft deletes, export, and account deletion, and removes its accounts. No real customer data is entered in that project. `.env.online.example` documents the variable names without values.
+
+**Consequences:** Remote verification is explicit and repeatable without touching customer data. If the test project is unavailable, the milestone reports the local fake-cloud evidence and leaves the remote ACs pending rather than claiming they passed.
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Confidence | Impact if wrong |
@@ -417,7 +477,7 @@ Each row states the recommendation. Approving this specification approves the re
 | O-2 | Final product name and visual brand? | Keep “Christmas Gift Tracker” as a working name; finalize before M9 | M9, packaging | Decided 2026-10-30 — keep the name and refine the warm/evergreen/burgundy/gold identity |
 | O-3 | Currency defaults and presets? | USD `$` 2 decimals default; presets for EUR, GBP, CAD, AUD, JPY (0 decimals); custom symbol/code; no conversion | M2/M9 | Decided 2026-10-26 |
 | O-4 | Recipient deletion behavior? | Block; offer reassign or explicit cascade (D-007) | M3 | Decided 2026-10-26 |
-| O-5 | Include the online edition in the first Etsy release? | No; ship and validate offline first (D-011) | M11, listing | Open |
+| O-5 | Include the online edition in the first Etsy release? | No; ship and validate offline first (D-011) | M11, listing | Decided 2026-10-30 — the first Etsy release remains the account-free offline edition; M11 is built and verified as a separate online edition |
 | O-6 | Backup restore mode? | Replace-all only with pre-restore backup (D-010) | M8 | Decided 2026-10-30 |
 | O-7 | Sample data behavior when real data exists? | Add as an archived sample season; never mix (D-016) | M2/M8/M12 | Decided 2026-10-26 |
 | O-8 | Allow zero active seasons? | Yes, with a dedicated empty state (D-018) | M2/M3 | Decided 2026-10-26 |
@@ -446,7 +506,7 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 10:** Resolved 2026-10-30. The owner authorized Milestone 10 and approved D-011 with O-1 (PWA-first plus a standalone spike; ship the file only if it passes the full matrix) and O-12 (no desktop wrapper in M10; revisit only if PWA delivery proves insufficient). D-030 records the user-initiated persistence request.
 
-**Approval needed before Milestone 11:** D-012, O-5.
+**Approval needed before Milestone 11:** Resolved 2026-10-30. The owner authorized Milestone 11 and approved D-012 (Supabase) and O-5 (the online edition is not part of the first Etsy release). A dedicated Supabase project was approved as the verification environment. D-031 through D-034 record the edition split, sync model, device linkage, and initial-connection behavior.
 
 ---
 
@@ -480,3 +540,5 @@ Each row states the recommendation. Approving this specification approves the re
 | 2026-10-30 | D-027 and D-028 accepted for Milestone 7; implementation recorded in `MILESTONE_7_REPORT.md` | AI |
 | 2026-10-30 | D-010, D-023, and D-029 accepted; O-6 decided for Milestone 8; implementation recorded in `MILESTONE_8_REPORT.md` | AI |
 | 2026-10-30 | D-011 accepted and O-1/O-12 decided for Milestone 10; D-030 accepted for user-initiated persistent storage; implementation recorded in `MILESTONE_10_REPORT.md` | AI |
+| 2026-10-30 | D-012 accepted and O-5 decided for Milestone 11; D-031–D-034 accepted for the edition split, sync model, device linkage, and initial connection | AI |
+| 2026-10-30 | D-035 accepted for dedicated-project live verification and secret handling; Milestone 11 implementation recorded in `MILESTONE_11_REPORT.md` | AI |
