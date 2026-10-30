@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestones 0–7 complete and verified; Milestone 8 not started · Version 0.7 · 2026-10-30
+> Status: Milestones 0–8 complete and verified; Milestone 9 not started · Version 0.8 · 2026-10-30
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -10,13 +10,13 @@
 | Item | State |
 | --- | --- |
 | Repository | Runnable React/TypeScript/Vite application, approved specification, and tested local storage |
-| Current milestone | **Milestone 7 - Search, filters, and recipient details** (complete; awaiting owner review before M8) |
+| Current milestone | **Milestone 8 - Seasons, archives, backup, and export** (complete; awaiting owner review before M9) |
 | Application runnable | Yes - development server, tests, coverage, and production build pass |
-| Tests | 247 Vitest tests across 26 files passing; no Playwright suite yet |
-| Next milestone | Milestone 8 - Seasons, archives, backup, CSV (not started) |
-| Next action | Owner reviews `docs/MILESTONE_7_REPORT.md` and authorizes Milestone 8 |
+| Tests | 291 Vitest tests across 31 files passing; no Playwright suite yet |
+| Next milestone | Milestone 9 - Professional UI, themes, accessibility (not started) |
+| Next action | Owner reviews `docs/MILESTONE_8_REPORT.md` and authorizes Milestone 9 |
 
-**Do not start Milestone 8 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
+**Do not start Milestone 9 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
 
 ---
 
@@ -32,7 +32,7 @@
 | 5 | Budget engine + dashboard | Central calculations and live dashboard | Complete - verified |
 | 6 | Idea Bank + Shopping List | Ideas convert to gifts; derived shopping list | Complete — verified |
 | 7 | Search, filters, details | Find and review data at scale | Complete – verified |
-| 8 | Seasons, archives, backup | Reuse yearly; protect and export data | Not started |
+| 8 | Seasons, archives, backup | Reuse yearly; protect and export data | Complete — verified |
 | 9 | Professional UI | Themes, responsive polish, accessibility, print | Not started |
 | 10 | Offline delivery | Validated offline artifact and customer setup | Not started |
 | 11 | Online edition | Accounts, cloud, sync, conflicts | Not started |
@@ -206,7 +206,7 @@ Order rationale:
 - A minimal `/onboarding` page creates one season from an explicit form. It never redirects automatically, never selects a season on the user's behalf, and never seeds recipients.
 - Pages read typed repositories through `StorageProvider`. A custom `useLiveQueryState` wraps Dexie's `liveQuery` to expose explicit loading, success, and error states. This supersedes D-003's specific `dexie-react-hooks` wording through D-025.
 - Recipient metrics come from pure functions in `src/domain/calculations/recipients.ts`; no selected, planned, spent, or remaining totals are persisted.
-- Archived seasons render read-only. Normal archive selection and restore controls remain Milestone 8.
+- Archived seasons render read-only. Milestone 8 adds archive, restore, and delete controls on `/seasons`.
 - The app does not call `navigator.storage.persist()`. Persistence timing and the buyer-facing browser-storage explanation remain open; no eviction-protection claim is made.
 - Native `<dialog>` supplies modal focus containment and Escape handling. Focus returns to the invoking control after closing, with a fallback to the main content when the invoking control no longer exists.
 
@@ -391,6 +391,8 @@ Order rationale:
 ---
 
 ## 11. Milestone 8 — Seasons, archives, backup, and export
+
+**Status:** Complete and verified on 2026-10-30. See `docs/MILESTONE_8_REPORT.md`.
 
 **Depends on:** M7; D-009, D-010, D-023; O-6.
 
@@ -675,9 +677,9 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews the Gifts search/filter controls, recipient detail pages, and `docs/MILESTONE_7_REPORT.md`.
+1. Owner reviews the `/seasons` surface, backup/restore and CSV downloads, and `docs/MILESTONE_8_REPORT.md`.
 2. Owner confirms the remaining browser-storage persistence timing and buyer-facing explanation before release packaging.
-3. Owner authorizes Milestone 8 — Seasons, archives, backup, CSV.
-4. Only then begin season management, archive, backup, and CSV work.
+3. Owner authorizes Milestone 9 — Professional UI, themes, accessibility.
+4. Only then begin theme, accessibility, and visual-polish work.
 
-Milestone 8 is **not started**. Until authorization: **stop.**
+Milestone 9 is **not started**. Until authorization: **stop.**

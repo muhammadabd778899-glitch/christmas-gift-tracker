@@ -199,8 +199,8 @@ export function DashboardPage() {
                   <Link className={buttonStyles({ variant: 'primary' })} to="/onboarding">
                     Create your first season
                   </Link>
-                  <Link className={buttonStyles({ variant: 'secondary' })} to="/settings">
-                    See data guidance
+                  <Link className={buttonStyles({ variant: 'secondary' })} to="/seasons">
+                    Seasons &amp; archives
                   </Link>
                 </div>
               }
@@ -229,6 +229,11 @@ export function DashboardPage() {
         badge={
           archived ? (
             <Badge tone="neutral">Archived · read only</Badge>
+          ) : season.isSample ? (
+            <Badge tone="gold">
+              <Sparkles size={12} aria-hidden="true" />
+              Sample data
+            </Badge>
           ) : (
             <Badge tone="gold">Milestone {APP_MILESTONE} preview</Badge>
           )
@@ -270,14 +275,10 @@ export function DashboardPage() {
               <ShoppingBag size={17} aria-hidden="true" />
               Shopping list
             </Link>
-            <Button
-              variant="ghost-inverse"
-              disabled
-              title="Backup arrives in Milestone 8. No backup exists yet."
-            >
+            <Link className={buttonStyles({ variant: 'ghost-inverse' })} to="/seasons">
               <Download size={17} aria-hidden="true" />
-              Backup (M8)
-            </Button>
+              Backup & archives
+            </Link>
           </div>
         </div>
 
@@ -310,8 +311,8 @@ export function DashboardPage() {
           </p>
           {countdown.state === 'past' && !archived ? (
             <p className={styles.countdownNote}>
-              When you are ready, archive this season or start the next one. Archive management
-              arrives in Milestone 8.
+              When you are ready, archive this season or start the next one from Seasons &amp;
+              archives.
             </p>
           ) : null}
           {archived ? (

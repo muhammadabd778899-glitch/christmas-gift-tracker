@@ -24,6 +24,10 @@ const included = [
   'Recipient detail pages with caps, planned and spent totals, utilisation, progress, and gift editing',
   'Mark bought from the shopping list with the same status rules',
   'A print view that hides navigation and controls',
+  'Season management with one active season, read-only archives, and recipient copying',
+  'Complete JSON backups with validation, atomic replace-all restore, and a required fresh backup',
+  'CSV export for one or all seasons, with formula guard and optional sensitive columns',
+  'Optional sample data that stays isolated, plus a guarded reset that requires a backup',
   'Confirmation before un-buying or deleting a gift',
   'Safe deletion that returns converted ideas to the Idea Bank',
   'Accessible dialogs, forms, tables, and responsive navigation',
@@ -32,9 +36,9 @@ const included = [
 ];
 
 const upcoming = [
-  'Season archives, backup, and CSV (Milestone 8)',
   'Professional UI, themes, and accessibility polish (Milestone 9)',
   'Offline delivery and packaging (Milestone 10)',
+  'Release hardening for the remaining milestones',
 ];
 
 export function AboutDialog({ open, onClose }: AboutDialogProps) {
@@ -57,10 +61,10 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
             Milestone {APP_MILESTONE}
           </Badge>
           <p>
-            The planner can now create a season, keep a recipient list, track gifts, search and
-            filter them, open a recipient detail page, capture ideas, convert them into gifts, and
-            build a grouped shopping list from unbought gifts. Budget figures still come from saved
-            gift records. Backup and offline packaging are not implemented yet.
+            The planner now manages several seasons with one active at a time and read-only
+            archives. It can export a complete JSON backup, validate and restore one atomically,
+            export CSV for spreadsheets, load isolated sample data, and reset only after a fresh
+            backup. Offline packaging, themes, and cloud sync are not implemented yet.
           </p>
         </div>
 
@@ -91,8 +95,8 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
 
         <div className={styles.notice}>
           <strong>Local and account-free.</strong> Seasons, recipients, gifts, ideas, and budget
-          records are stored only in this browser. There is no backup, cloud sync, or proven
-          recovery from cleared browser data, and no data is sent anywhere.
+          records are stored only in this browser. Backups and CSV exports are the deliberate ways
+          to take a copy with you; nothing is uploaded or synced.
         </div>
       </div>
     </Dialog>

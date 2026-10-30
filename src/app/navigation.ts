@@ -40,7 +40,7 @@ export const navSections: NavSection[] = [
   {
     label: 'Organize',
     items: [
-      { to: '/seasons', label: 'Archives', icon: Archive },
+      { to: '/seasons', label: 'Seasons', icon: Archive },
       { to: '/settings', label: 'Settings', icon: Settings },
     ],
   },
@@ -52,7 +52,7 @@ const pageTitles: Record<string, string> = {
   '/recipients': 'Recipients',
   '/ideas': 'Idea Bank',
   '/shopping': 'Shopping List',
-  '/seasons': 'Archives',
+  '/seasons': 'Seasons & archives',
   '/settings': 'Settings',
   '/onboarding': 'Set up your season',
 };

@@ -22,6 +22,7 @@ import {
 
 export interface SeasonCreateOptions {
   copyRecipientsFromId?: SeasonId;
+  archiveCurrent?: boolean;
 }
 
 export interface SeasonRepository {
@@ -132,14 +133,39 @@ export function createSeasonRepository(context: RepositoryContext): SeasonReposi
           const timestamp = context.nowIso();
           const status = parsed.status ?? 'active';
 
-          if (status === 'active') {
-            const activeCount = await db.seasons.where('status').equals('active').count();
+          if (options.archiveCurrent && status !== 'active') {
+            throw new ValidationError('Only a new active season can archive the current one.', [
+              {
+                path: 'status',
+                message: 'Create the season as active to archive the current season.',
+              },
+            ]);
+          }
 
-            if (activeCount > 0) {
-              throw new ConflictError(
-                'Another season is already active.',
-                'Archive the current season before creating a new active season.',
-              );
+          if (status === 'active') {
+            const activeSeasons = await db.seasons.where('status').equals('active').toArray();
+
+            if (activeSeasons.length > 0) {
+              if (!options.archiveCurrent) {
+                throw new ConflictError(
+                  'Another season is already active.',
+                  'Archive the current season before creating a new active season.',
+                );
+              }
+
+              for (const active of activeSeasons) {
+                const archived = parseWithSchema(
+                  seasonEntitySchema,
+                  {
+                    ...active,
+                    status: 'archived',
+                    archivedAt: timestamp,
+                    updatedAt: timestamp,
+                  },
+                  'The current season could not be archived.',
+                );
+                await db.seasons.put(archived);
+              }
             }
           }
 

@@ -1,0 +1,237 @@
+.form,
+.confirmBody {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.formError {
+  padding: 11px 13px;
+  border: 1px solid var(--color-burgundy-200);
+  border-radius: var(--radius-sm);
+  background: var(--color-burgundy-50);
+  color: var(--color-burgundy-800);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.choiceGroup {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choiceGroup legend {
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.checkboxRow {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  cursor: pointer;
+}
+
+.checkboxRow input {
+  margin-top: 3px;
+  accent-color: var(--color-evergreen-700);
+}
+
+.checkboxRow strong,
+.checkboxRow span:not(:first-child) {
+  display: block;
+}
+
+.checkboxRow strong {
+  color: var(--color-text);
+  font-size: 0.81rem;
+}
+
+.checkboxRow span span {
+  margin-top: 2px;
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.choiceField {
+  margin-left: 30px;
+}
+
+.callout {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  border: 1px solid var(--color-gold-200);
+  border-radius: var(--radius-md);
+  background: var(--color-gold-50);
+}
+
+.calloutIcon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(255 253 249 / 70%);
+  color: var(--color-gold-700);
+}
+
+.callout strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 0.84rem;
+}
+
+.callout p {
+  margin: 3px 0 var(--space-3);
+  color: var(--color-text-soft);
+  font-size: 0.79rem;
+  line-height: 1.5;
+}
+
+.callout .checkboxRow {
+  background: rgb(255 253 249 / 66%);
+}
+
+.simpleNote {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.factList {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-text-soft);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.factList strong {
+  color: var(--color-text);
+}
+
+.dangerSummary {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  border: 1px solid var(--color-burgundy-200);
+  border-radius: var(--radius-md);
+  background: var(--color-burgundy-50);
+}
+
+.dangerIcon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(255 253 249 / 70%);
+  color: var(--color-burgundy-700);
+}
+
+.dangerSummary strong {
+  display: block;
+  color: var(--color-burgundy-800);
+  font-size: 0.84rem;
+}
+
+.dangerSummary p {
+  margin-top: 3px;
+  color: var(--color-burgundy-700);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.status {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--color-text-soft);
+  font-size: 0.84rem;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold-500);
+  box-shadow: 0 0 0 5px rgb(189 145 70 / 12%);
+}
+
+.previewDialog {
+  width: min(920px, calc(100vw - 32px));
+  max-width: min(920px, calc(100vw - 32px));
+}
+
+.previewBody {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.previewTotals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.previewTotals > div {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+}
+
+.previewTotals dt {
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.previewTotals dd {
+  margin: 4px 0 0;
+  color: var(--color-text);
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.previewSection {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.previewSection h3 {
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 560px) {
+  .choiceField {
+    margin-left: 0;
+  }
+}

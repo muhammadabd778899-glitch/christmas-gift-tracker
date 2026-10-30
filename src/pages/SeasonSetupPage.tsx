@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import {
+  Archive,
   ArrowRight,
   CalendarDays,
   Check,
@@ -8,7 +9,7 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
@@ -44,7 +45,9 @@ function initialValues(): SetupValues {
 export function SeasonSetupPage() {
   const repositories = useRepositories();
   const navigate = useNavigate();
+  const location = useLocation();
   const active = useActiveSeason();
+  const notice = (location.state as { notice?: string } | null)?.notice ?? null;
   const [values, setValues] = useState<SetupValues>(initialValues);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -99,7 +102,7 @@ export function SeasonSetupPage() {
           title={archived ? 'This season is archived' : 'Your season is ready'}
           description={
             archived
-              ? 'Archived seasons are read-only. Season restoration arrives with the archive tools in Milestone 8.'
+              ? 'Archived seasons are read-only. Restore this season from Seasons & archives when you want to edit it.'
               : 'You have already set up an active season. Add the people you are planning for next.'
           }
           badge={
@@ -109,10 +112,16 @@ export function SeasonSetupPage() {
             </Badge>
           }
           actions={
-            <Link className={buttonStyles({ variant: 'primary' })} to="/recipients">
-              {archived ? 'View recipients' : 'Manage recipients'}
-              <ArrowRight size={17} aria-hidden="true" />
-            </Link>
+            <div className={styles.headerActions}>
+              <Link className={buttonStyles({ variant: 'secondary' })} to="/seasons">
+                <Archive size={16} aria-hidden="true" />
+                Seasons &amp; archives
+              </Link>
+              <Link className={buttonStyles({ variant: 'primary' })} to="/recipients">
+                {archived ? 'View recipients' : 'Manage recipients'}
+                <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+            </div>
           }
         />
 
@@ -218,6 +227,11 @@ export function SeasonSetupPage() {
 
   return (
     <div className={styles.page}>
+      {notice ? (
+        <p className={styles.notice} role="status" aria-live="polite">
+          {notice}
+        </p>
+      ) : null}
       <PageHeader
         eyebrow="First season"
         title="Set the scene for this Christmas"
@@ -234,8 +248,8 @@ export function SeasonSetupPage() {
             </Badge>
             <CardTitle as="h2">Your first season</CardTitle>
             <CardDescription>
-              These three details are enough to begin. Season editing arrives with the archive tools
-              in Milestone 8.
+              These three details are enough to begin. You can edit them later from Seasons &amp;
+              archives.
             </CardDescription>
           </CardHeader>
           <CardContent>

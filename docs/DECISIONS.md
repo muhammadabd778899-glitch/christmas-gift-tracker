@@ -128,7 +128,7 @@
 
 ### D-010 — Launch restore is replace-all only
 
-**Status:** Proposed · **Milestone:** 8
+**Status:** Accepted 2026-10-30 for Milestone 8 · **Milestone:** 8
 
 **Context:** Merging two datasets by stable ID is a conflict-resolution problem that is easy to get wrong and can silently overwrite records.
 
@@ -292,7 +292,7 @@
 
 ### D-023 — CSV excludes notes and addresses by default
 
-**Status:** Proposed · **Milestone:** 8
+**Status:** Accepted 2026-10-30 for Milestone 8 · **Milestone:** 8
 
 **Context:** CSV is often shared or opened in cloud spreadsheets; notes and addresses are sensitive.
 
@@ -362,6 +362,18 @@
 
 ---
 
+### D-029 — Destructive data tools require a fresh backup and a typed word
+
+**Status:** Accepted 2026-10-30 for Milestone 8 · **Milestone:** 8
+
+**Context:** Replace-all restore and full reset can erase every season. A single confirm click is too easy to trigger and gives the user no recovery copy.
+
+**Decision:** Restore is enabled only after the app has downloaded a fresh backup of the current data **and** the user types `RESTORE`. Reset is enabled only after a fresh backup download **and** the user types `DELETE`. Deleting an archived season requires its exact trimmed name. The repository separately re-checks the required words, so the gate is not only a disabled button.
+
+**Consequences:** Two deliberate actions are needed before irreversible replacement, and the user always holds a recoverable file first. The extra steps are slightly slower but predictable. The repository check is the binding rule; UI state is a usability layer.
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Confidence | Impact if wrong |
@@ -392,7 +404,7 @@ Each row states the recommendation. Approving this specification approves the re
 | O-3 | Currency defaults and presets? | USD `$` 2 decimals default; presets for EUR, GBP, CAD, AUD, JPY (0 decimals); custom symbol/code; no conversion | M2/M9 | Decided 2026-10-26 |
 | O-4 | Recipient deletion behavior? | Block; offer reassign or explicit cascade (D-007) | M3 | Decided 2026-10-26 |
 | O-5 | Include the online edition in the first Etsy release? | No; ship and validate offline first (D-011) | M11, listing | Open |
-| O-6 | Backup restore mode? | Replace-all only with pre-restore backup (D-010) | M8 | Open |
+| O-6 | Backup restore mode? | Replace-all only with pre-restore backup (D-010) | M8 | Decided 2026-10-30 |
 | O-7 | Sample data behavior when real data exists? | Add as an archived sample season; never mix (D-016) | M2/M8/M12 | Decided 2026-10-26 |
 | O-8 | Allow zero active seasons? | Yes, with a dedicated empty state (D-018) | M2/M3 | Decided 2026-10-26 |
 | O-9 | Include “mark bought” on the Shopping List? | Yes, excluded from print; same status rules | M6 | Decided 2026-10-28 |
@@ -414,7 +426,7 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 7:** Resolved 2026-10-30. The owner authorized Milestone 7; D-027 and D-028 record the local filter-state and recipient-detail composition choices.
 
-**Approval needed before Milestone 8:** D-010, D-023, O-6. D-009 and D-016 are accepted for the storage layer.
+**Approval needed before Milestone 8:** Resolved 2026-10-30. The owner authorized Milestone 8; D-010 and D-023 are accepted and O-6 is decided (replace-all restore with a required fresh backup and `RESTORE`). D-009 and D-016 are applied in the UI. D-029 records the backup/typed-word safety gates.
 
 **Approval needed before Milestone 9:** D-015, D-017, O-2.
 
@@ -452,3 +464,4 @@ Each row states the recommendation. Approving this specification approves the re
 | 2026-10-26 | D-025 accepted for Milestone 3; the reactive-hook portion of D-003 is superseded; recipient implementation recorded in `MILESTONE_3_REPORT.md` | AI |
 | 2026-10-28 | O-9 decided for Milestone 6; D-026 accepted for the derived Shopping List and print behavior; implementation recorded in `MILESTONE_6_REPORT.md` | AI |
 | 2026-10-30 | D-027 and D-028 accepted for Milestone 7; implementation recorded in `MILESTONE_7_REPORT.md` | AI |
+| 2026-10-30 | D-010, D-023, and D-029 accepted; O-6 decided for Milestone 8; implementation recorded in `MILESTONE_8_REPORT.md` | AI |

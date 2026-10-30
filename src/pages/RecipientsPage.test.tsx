@@ -362,7 +362,7 @@ describe('Recipients page', () => {
 
     expect(await screen.findAllByText('Archived · read only')).not.toHaveLength(0);
     expect(
-      screen.getByText(/Recipients are read-only\. Restore the season to make changes/),
+      screen.getByText(/Recipients are read-only\. Restore the season from Seasons & archives/),
     ).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Add recipient' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Edit Archived Person' })).not.toBeInTheDocument();

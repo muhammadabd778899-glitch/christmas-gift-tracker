@@ -327,7 +327,7 @@ Notes:
 The storage layer exposes typed functions, not raw tables:
 
 ```
-seasons:   list(), get(id), getActive(), create(input), update(id, input),
+seasons:   list(), get(id), getActive(), create(input, options?), update(id, input),
            archive(id), restore(id), delete(id, confirmationName), copyRecipients(fromId, toId)
 settings:  get(), update(patch), setActiveSeason(id | null)
 recipients:listBySeason(seasonId), get(id), create(input), update(id, input),
@@ -336,10 +336,12 @@ gifts:     listBySeason(seasonId), listByRecipient(recipientId), get(id),
            create(input), update(id, input), setPurchaseState(id, state), delete(id)
 ideas:     listBySeason(seasonId), get(id), create(input), update(id, input),
            convert(id, recipientId), delete(id), reopen(id)
-data:      exportBackup(), validateBackup(file), restoreBackup(file, mode),
-           exportCsv(scope, options), loadSampleData(), removeSampleData(),
-           resetAllData(), healthCheck()
+data:      exportBackup(), validateBackup(file), restoreBackup(file, confirmation),
+           exportCsv(options), loadSampleData(), removeSampleData(),
+           resetAllData(confirmation), healthCheck()
 ```
+
+`SeasonCreateOptions` supports `copyRecipientsFromId` and `archiveCurrent`. `archiveCurrent` is valid only when the new season is active; it archives every existing active season in the same transaction and then creates/selects the new one. Without it, creating a second active season raises `ConflictError`.
 
 All writes return the stored entity. All errors are typed (see §9).
 
@@ -496,8 +498,8 @@ Reopen:
 
 - Loading the sample season is one transaction with fixed IDs.
 - If a sample season already exists, the operation is a no-op that focuses it (no duplicates).
-- Sample data never alters real seasons. If real data exists and no active season exists, the sample may be created as archived to avoid hijacking the dashboard; the UI explains the result.
-- Removing sample data deletes only the season where `isSample = true` and its children.
+- Sample data never alters real seasons or real totals. If **any** season already exists (real or archived), the sample is created as archived; it becomes active only when the planner has no seasons at all, so it can tour the app. The UI explains which outcome occurred.
+- Removing sample data deletes only the season where `isSample = true` and its children, and clears the active selection if it pointed at the sample.
 
 ### 6.8 Reset all data
 
@@ -741,21 +743,22 @@ Errors carry a stable machine code, a human message, and optional field details.
 - Sensitive fields (`address`, `notes`) are included because a backup must be complete. The UI warns accordingly.
 - JSON is UTF-8, pretty-printed, with a filename like `christmas-gift-tracker-backup-2026-12-01.json`.
 - No personal data is added to the filename.
+- Limits: 25 MB file size, up to 500 seasons, and up to 10,000 recipients, gifts, or ideas per season. Files beyond these limits are rejected before any write.
 
 ### 10.2 Restore procedure
 
 1. Read the file with a 25 MB cap.
-2. Parse JSON; reject invalid syntax with line/position context if available.
-3. Check `format`, `formatVersion` (must be 1 for launch), and `schemaVersion` (≤ current).
-4. Validate the complete data set per §5.
-5. Show a summary: seasons, recipients, gifts, ideas, date exported, and the fact that all current data will be replaced.
-6. Offer/perform a pre-restore backup download.
-7. Require typed confirmation.
+2. Parse JSON; reject invalid syntax with a clear message.
+3. Check `format`, `formatVersion` (must be 1 for launch), and `schemaVersion` (equal to current; older schemas have no migration at launch, newer ones are rejected).
+4. Validate every entity and the complete data set per §5, including duplicate IDs across record types, at most one active season, settings consistency, foreign keys, and cross-season references.
+5. Show a summary: seasons, recipients, gifts, ideas, date exported, app version, and the fact that all current data will be replaced.
+6. Require a **fresh download of the current data** before the restore action is enabled. The download is offered in the summary step.
+7. Require typed confirmation `RESTORE`.
 8. In one transaction: clear settings, seasons, recipients, gifts, and ideas, then bulk insert validated records. Preserve `meta.databaseId`; update `meta.appVersion` and `schemaVersion` outside the data transaction if needed.
 9. On any failure, abort the transaction and leave the previous data intact.
 10. Reload app state and land on the Dashboard or the no-active-season state.
 
-Replace-all is the only launch mode. Merge is deferred.
+Replace-all is the only launch mode. Merge is deferred. Validation returns a summary; `restoreBackup` re-validates the file before writing so a file cannot be swapped between checks.
 
 ### 10.3 Backward compatibility
 
@@ -784,6 +787,9 @@ Sent,Sent Date,Delivery Method,Source
 - Booleans are `Yes`/`No`.
 - Dates are `YYYY-MM-DD`; empty values are empty cells.
 - Delivery method uses human labels (e.g. "Hand delivered").
+- Rows are sorted by holiday date, season name, recipient name, then gift name, so repeated exports are stable.
+- Choosing the active season when none exists raises `ExportError`; "all seasons" is still available.
+- The filename is `christmas-gift-tracker-gifts-YYYY-MM-DD.csv`.
 
 ### 11.2 Encoding and safety
 

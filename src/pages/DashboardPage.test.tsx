@@ -277,6 +277,6 @@ describe('dashboard', () => {
     expect(budgetCard.getByText('Read-only archived season')).toBeInTheDocument();
     expect(budgetCard.queryByRole('button', { name: 'Edit budget' })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Needs attention' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Backup (M8)' })).toBeDisabled();
+    expect(screen.getByRole('link', { name: 'Backup & archives' })).toBeInTheDocument();
   });
 });

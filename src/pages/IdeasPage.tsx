@@ -210,8 +210,8 @@ export function IdeasPage() {
             <div>
               <strong>{season.name} is archived.</strong>
               <p>
-                {seasonDate} · Ideas are read-only. Restore the season to make changes. Season and
-                archive controls arrive in Milestone 8.
+                {seasonDate} · Ideas are read-only. Restore the season from Seasons &amp; archives
+                to make changes.
               </p>
             </div>
           </div>

@@ -3,6 +3,22 @@
   gap: var(--space-7);
 }
 
+.notice {
+  padding: 12px 15px;
+  border: 1px solid var(--color-evergreen-200);
+  border-radius: var(--radius-md);
+  background: var(--color-evergreen-50);
+  color: var(--color-evergreen-800);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);

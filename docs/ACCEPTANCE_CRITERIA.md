@@ -1,8 +1,8 @@
 # Christmas Gift Tracker — Acceptance Criteria
 
-> Status: Approved; Milestones 0-4 verified · Version 0.4 · 2026-10-28
+> Status: Approved; Milestones 0-8 verified · Version 0.8 · 2026-10-30
 > A milestone is complete only when every criterion marked for it passes. Verification methods: **U** = unit, **I** = integration (fake-indexeddb), **C** = component, **E** = Playwright E2E, **M** = manual/real browser, **D** = document review.
-> Playwright remains deferred and no E2E suite exists. For Milestones 3 and 4, criteria marked **E** were verified manually in the production preview, and each milestone report records that substitution.
+> Playwright remains deferred and no E2E suite exists. For Milestones 3–8, criteria marked **E** were verified with UI/integration tests and manual checks in the production preview where stated; each milestone report records that substitution.
 
 ---
 
@@ -243,6 +243,8 @@
 ---
 
 ## Milestone 8 — Seasons, archives, backup, and export
+
+**Status:** Complete and verified on 2026-10-30. Criterion-by-criterion evidence is in `docs/MILESTONE_8_REPORT.md`. E-marked criteria were verified with UI/integration tests plus manual checks in the development build; no Playwright suite exists.
 
 | ID | Criterion | Verification |
 | --- | --- | --- |

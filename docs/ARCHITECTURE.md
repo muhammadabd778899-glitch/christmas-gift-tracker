@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Architecture
 
-> Status: Version 0.7 · 2026-10-30 · Milestone 7 search, filters, and recipient details recorded
-> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, recipient, gift, idea, shopping, search/filter, and recipient-detail workflows now exist; later sections remain target architecture.
+> Status: Version 0.8 · 2026-10-30 · Milestone 8 seasons, archives, and data portability recorded
+> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, recipient, gift, idea, shopping, search/filter, recipient-detail, season/archive, backup/restore, CSV, sample-data, and reset workflows now exist; later sections remain target architecture.
 
 ---
 
@@ -159,11 +159,13 @@ christmas-gift-tracker/
 │   │   ├── migrations.ts
 │   │   ├── health.ts
 │   │   ├── reset.ts
-│   │   ├── repositories/
-│   │   ├── backup/               # Milestone 8
-│   │   ├── csv/                  # Milestone 8
-│   │   └── sample/               # Milestone 8
+│   │   ├── backup.ts              # Milestone 8: export, validate, atomic restore
+│   │   ├── csv.ts                 # Milestone 8: RFC 4180 export
+│   │   ├── sample.ts              # Milestone 8: isolated sample season
+│   │   └── repositories/
 │   ├── lib/
+│   │   ├── download.ts            # Blob download helper (no network)
+│   │   └── ...
 │   ├── styles/
 │   ├── test/
 │   ├── main.tsx
@@ -243,7 +245,7 @@ Repositories are the only code that touches Dexie. They:
 - Return stored entities.
 - Throw typed errors.
 
-Bulk operations (restore, season delete, recipient cascade, conversion) are single transactions across all affected stores.
+Bulk operations (restore, season delete, recipient cascade, conversion) are single transactions across all affected stores. Milestone 8 adds `data.exportBackup`, `validateBackup`, `restoreBackup`, `exportCsv`, `loadSampleData`, and `removeSampleData` to the same repository boundary; only `restoreBackup` and reset write across every store, and each does so in one transaction.
 
 ### 7.3 Live data
 
@@ -309,8 +311,9 @@ Milestone 2 implements the health engine (`src/storage/health.ts`) but not the S
 - Lazy-load heavy routes/charts to keep initial load small.
 - Route-level error boundary with retry and a link home.
 - Unknown routes render the not-found page.
+- `/seasons` is the season and data-management surface: active-season card, archived list with preview, and backup/CSV/sample/reset tools.
 - No active season: data pages render a season-empty state without redirect loops.
-- Archived season: editing actions disabled and explained; data remains viewable.
+- Archived season: editing actions disabled and explained; pages point to `/seasons` for restore.
 
 ### 8.3 Forms
 
@@ -722,4 +725,35 @@ Milestone 7 does **not** implement global cross-entity search, saved filter pres
 - Filter and sort state lives only in the page session. Reloading or navigating away resets the controls; nothing is stored.
 - Money sorting places gifts without a planned budget or actual cost last in both directions, rather than treating a missing amount as zero.
 - Browser checks used Chromium at desktop widths. Firefox, Safari, mobile devices, and cross-tab updates remain unverified.
+- A production chunk-size warning remains because the main JavaScript chunk exceeds 500 kB.
+
+---
+
+## 25. Milestone 8 implementation boundaries
+
+Milestone 8 adds season management, archives, and local data portability:
+
+- `/seasons` (nav label "Seasons", page title "Seasons & archives") is implemented by `src/pages/SeasonsPage.tsx`. `useSeasonsPageData` runs one live query over settings and seasons, then loads each season's recipients, gifts, and ideas to build overviews with domain totals. No totals are stored.
+- At most one season is active. `seasons.create` accepts `archiveCurrent`; when true it archives every active season in the same transaction before creating and selecting the new one. Creating a second active season without that consent raises `ConflictError`.
+- New seasons can copy recipient names, relationships, caps, and notes from an existing season; gifts, ideas, and statuses are never copied.
+- Archive, restore, and delete are confirmed in dialogs. Restore archives the current active season in the same transaction. Delete is limited to archived seasons and requires the exact, trimmed, case-sensitive season name.
+- Archived seasons are read-only across the app; their pages and banners point to `/seasons`. A preview dialog shows recipients, gifts, statuses, and totals without edit controls.
+- `src/storage/backup.ts` owns the envelope, strict Zod entity validation, relation checks (duplicate IDs across record types, one active season, settings consistency, foreign keys, cross-season references, idea/gift agreement), size/count limits, and atomic replace-all restore. `restoreBackup` re-validates the source and requires `RESTORE` before writing.
+- The UI requires a fresh download of current data **and** the typed word `RESTORE`; the download and confirmation are separate deliberate actions.
+- `src/storage/csv.ts` owns deterministic row ordering, RFC 4180 quoting, BOM/CRLF output, decimal money, `Yes`/`No`, human delivery labels, source markers, formula neutralization, and opt-in `Address`/`Notes` columns.
+- `src/storage/sample.ts` writes a fixed sample season with fixed IDs. It is active only when no season exists; otherwise it is archived. Loading twice is a no-op, and removal deletes only `isSample` records.
+- Reset requires a downloaded backup and the typed word `DELETE`, then clears all data stores and returns to `/onboarding` with a notice.
+- `src/lib/download.ts` performs local Blob downloads; no network request is involved.
+
+Milestone 8 does **not** implement merge restore, automatic/scheduled backups, cloud sync, encryption, ZIP packaging, a printable backup, CSV import, global search, themes, service workers, or an offline package. Playwright remains unconfigured.
+
+### 25.1 Known M8 limitations
+
+- Backups and CSV files are generated on demand only. There is no automatic backup, reminder, or version history, and no protection from the browser clearing site data.
+- Restore is replace-all only. There is no merge, selective restore, or per-season import.
+- Backup validation rejects older schema versions because no migration exists yet.
+- The pre-restore download is a UI gate; a technically determined user could bypass the UI and call the repository directly.
+- Duplicate season names are allowed, so typed delete confirmation identifies the season by name rather than by a unique label.
+- CSV has no import path and no per-recipient export.
+- Browser checks used Chromium at desktop widths. Firefox, Safari, and mobile layouts remain unverified.
 - A production chunk-size warning remains because the main JavaScript chunk exceeds 500 kB.

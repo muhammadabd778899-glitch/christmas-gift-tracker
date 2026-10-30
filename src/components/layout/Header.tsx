@@ -47,19 +47,22 @@ export function Header({ onOpenNav, onOpenAbout }: HeaderProps) {
       </Link>
     );
   } else {
+    const sample = season.isSample;
     seasonContent = (
       <span
         className={styles.seasonChip}
         title={`${season.name}${dateLabel ? ` · ${dateLabel}` : ''}${
           archived ? ' · archived' : ''
-        }`}
+        }${sample ? ' · sample data' : ''}`}
         aria-label={`Season: ${season.name}${dateLabel ? `, ${dateLabel}` : ''}${
           archived ? ', archived' : ''
-        }`}
+        }${sample ? ', sample data' : ''}`}
       >
         <CalendarDays size={15} aria-hidden="true" />
         <span className={styles.seasonText}>{season.name}</span>
-        <span className={styles.seasonHint}>{archived ? 'Archived' : dateLabel}</span>
+        <span className={styles.seasonHint}>
+          {sample ? 'Sample' : archived ? 'Archived' : dateLabel}
+        </span>
       </span>
     );
   }

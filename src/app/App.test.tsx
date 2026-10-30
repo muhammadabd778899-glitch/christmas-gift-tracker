@@ -16,7 +16,7 @@ const destinations = [
   { link: 'Recipients', heading: 'Recipients' },
   { link: 'Idea Bank', heading: 'Idea Bank' },
   { link: 'Shopping List', heading: 'Shopping List' },
-  { link: 'Archives', heading: 'Archives' },
+  { link: 'Seasons', heading: 'Seasons & archives' },
   { link: 'Settings', heading: 'Settings' },
 ];
 
@@ -79,7 +79,7 @@ describe('application shell', () => {
 
     const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
     expect(
-      within(dialog).getByText('Milestone 7 of 12: Search, filters, and recipient details.'),
+      within(dialog).getByText('Milestone 8 of 12: Seasons, archives, and data portability.'),
     ).toBeVisible();
     expect(within(dialog).getByText(/Local and account-free/i)).toBeInTheDocument();
 

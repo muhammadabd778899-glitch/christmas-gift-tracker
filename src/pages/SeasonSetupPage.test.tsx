@@ -126,6 +126,6 @@ describe('Season setup page', () => {
       await screen.findByRole('heading', { level: 1, name: 'This season is archived' }),
     ).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Create season' })).not.toBeInTheDocument();
-    expect(screen.getByText(/archive tools in Milestone 8/)).toBeInTheDocument();
+    expect(screen.getByText(/Restore this season from Seasons & archives/)).toBeInTheDocument();
   });
 });

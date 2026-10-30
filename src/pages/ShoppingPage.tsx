@@ -183,7 +183,7 @@ export function ShoppingPage() {
                 <strong>{season.name} is archived.</strong>
                 <p>
                   This list is read-only, so gifts cannot be marked bought here. Restore the season
-                  to make changes. Season and archive controls arrive in Milestone 8.
+                  from Seasons &amp; archives to make changes.
                 </p>
               </div>
             </div>

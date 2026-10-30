@@ -75,7 +75,7 @@ const milestones: Milestone[] = [
     number: '8',
     title: 'Seasons, archives, backup',
     focus: 'Yearly reuse, protected archives, JSON backup, CSV export',
-    status: 'Planned',
+    status: 'Complete',
   },
   {
     number: '9',
@@ -104,22 +104,22 @@ const milestones: Milestone[] = [
 ];
 
 const buildFacts = [
-  ['Version', `v${APP_VERSION} · Milestone 7`],
+  ['Version', `v${APP_VERSION} · Milestone 8`],
   ['Framework', 'React 19 + TypeScript + Vite'],
   ['Styling', 'CSS Modules + design tokens'],
   ['Charts', 'Recharts with an accessible data table'],
   ['Storage', 'IndexedDB via Dexie — seasons, recipients, gifts, and ideas'],
+  ['Backup', 'Manual JSON backup with validated replace-all restore'],
+  ['Export', 'CSV with an optional sensitive-column switch'],
   ['Theme', 'Light theme only — dark mode in Milestone 9'],
   ['Offline', 'Not yet packaged — Milestone 10'],
-  ['Data', 'One active season with recipient, gift, and idea records'],
+  ['Data', 'One active season, archived seasons, and optional sample data'],
 ];
 
 const limitations = [
-  'Season switching and archive management are not available yet.',
-  'Season editing, switching, and restore controls arrive in Milestone 8.',
-  'No sample records are loaded, and startup never invents a season.',
   'The theme is light only until Milestone 9.',
-  'No backup, restore, or CSV export exists yet.',
+  'Backups and CSV exports are manual downloads; there is no automatic or cloud backup.',
+  'Restore replaces all current data. Combining two backups (merge) is not supported.',
   'No installable or offline package has been produced or verified.',
   'Printing uses the browser print dialog; there is no built-in PDF export or saved print file.',
   'Wrapped progress uses every gift as its denominator, so 100% may not be reachable for digital or retailer-direct gifts.',
@@ -136,7 +136,7 @@ export function SettingsPage() {
         eyebrow="Preferences and information"
         title="Settings"
         description="What this build includes, what it deliberately leaves for later, and how the product will protect your data."
-        badge={<Badge tone="gold">Milestone 7 preview</Badge>}
+        badge={<Badge tone="gold">Milestone 8 preview</Badge>}
       />
 
       <Card>
@@ -212,23 +212,25 @@ export function SettingsPage() {
             </span>
             <CardTitle as="h2">Local-first progress</CardTitle>
             <CardDescription>
-              The planner now uses a private, validated local database for real season, recipient,
-              gift, and budget records. Backup and offline delivery are still ahead.
+              The planner now uses a private, validated local database for real seasons, archived
+              seasons, recipients, gifts, budgets, and optional sample records. Backups and CSV
+              exports are manual downloads. Offline delivery is still ahead.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className={styles.privacyText}>
               IndexedDB opens on this device and startup creates only safe settings and diagnostics.
               It does not create a season, seed sample gifts, or delete records. A season exists
-              only after you explicitly create one. Dashboard totals are calculated from saved
-              records and are never stored as a competing source of truth. No account and no network
-              request are required for storage.
+              only after you explicitly create or restore one. Sample data appears only after an
+              explicit load, is flagged, and is never mixed into real-season totals. Dashboard
+              totals are calculated from saved records and are never stored as a competing source of
+              truth. No account and no network request are required for storage.
             </p>
             <div className={styles.claims}>
               <strong>Claims we will not make until verified</strong>
-              <span>Works fully offline</span>
-              <span>Data is backed up</span>
-              <span>Safe to use for a real Christmas plan</span>
+              <span>Data is backed up automatically</span>
+              <span>Works fully offline with no setup</span>
+              <span>Safe against a cleared browser profile</span>
             </div>
           </CardContent>
         </Card>

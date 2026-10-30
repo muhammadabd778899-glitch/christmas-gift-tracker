@@ -2,15 +2,15 @@
 
 A local-first Christmas gift planning application: recipients, gifts, budgets, ideas, shopping lists, seasons, backups, and offline use.
 
-> **Status: Milestone 7 — Search, filters, and recipient details complete and verified.**
-> The shell is runnable, responsive, and tested. A private local IndexedDB database stores real seasons, recipients, gifts, ideas, and season budgets, and no customer plan or sample records are created automatically. Nothing is transmitted.
+> **Status: Milestone 8 — Seasons, archives, and data portability complete and verified.**
+> The shell is runnable, responsive, and tested. A private local IndexedDB database stores real seasons, recipients, gifts, ideas, and season budgets, and no customer plan or sample records are created automatically. Backups and CSV exports are explicit local downloads. Nothing is transmitted.
 
 ---
 
 ## What works today
 
 - A React + TypeScript + Vite application with a locked dependency tree.
-- Seven navigable destinations: Dashboard, Recipients, Gifts, Idea Bank, and Shopping List are implemented; Archives remains a labeled preview. Settings is available.
+- Seven navigable destinations: Dashboard, Recipients, Gifts, Idea Bank, Shopping List, Seasons & archives, and Settings are implemented.
 - A responsive application shell with a desktop sidebar, mobile navigation drawer, skip link, and visible focus states.
 - Warm design tokens for typography, spacing, surfaces, borders, radii, shadows, and brand/status colors.
 - Reusable primitives: Button, IconButton, Input, Textarea, Select, Card, Badge, Dialog, Table, EmptyState, PageHeader, and error states.
@@ -41,15 +41,25 @@ A local-first Christmas gift planning application: recipients, gifts, budgets, i
 - A Shopping List derived from unbought gifts, grouped case-insensitively by store with “No store specified” last, plus group subtotals and a visible total.
 - Optional “Mark bought” from the Shopping List using the existing gift status rules; the item disappears immediately and the dashboard updates live.
 - A print view containing the list title, season, print date, groups, rows, and totals, with navigation and controls hidden.
-- Archived-season recipient, gift, and idea views are read-only and explain how to proceed later.
+- Archived-season recipient, gift, and idea views are read-only and link to Seasons & archives for restore.
+- A Seasons & archives page with one active season, archived season cards, read-only preview, and clear zero-active state.
+- Season creation with optional recipient copying and a required consent step before archiving the current active season.
+- Confirmed archive, restore-and-switch, and exact-name deletion flows; no season operation silently replaces another.
+- Complete JSON backup export with format, formatVersion, and schemaVersion, including settings and every season.
+- Strict backup validation before any write: format, versions, entity fields, duplicate IDs, settings consistency, foreign keys, cross-season references, and size/count limits.
+- Atomic replace-all restore that requires a fresh backup download and the typed word `RESTORE`, preserves `databaseId`, and leaves data untouched on failure.
+- CSV export for the active season or all seasons with RFC 4180 quoting, UTF-8 BOM, CRLF, ISO dates, decimal money, `Yes`/`No`, human delivery labels, source markers, and formula-injection protection.
+- CSV privacy default: addresses and notes are excluded unless explicitly included, with a visible warning.
+- Optional sample data with a fixed, clearly labeled sample season; it is archived when any season exists, never mixes into real totals, and is idempotent to load.
+- Sample removal that deletes only sample records, plus a reset flow that requires a downloaded backup and the typed word `DELETE`.
 - A version-1 Dexie/IndexedDB schema with typed validation for seasons, recipients, gifts, ideas, settings, and diagnostics.
-- Typed repositories with cross-season checks, transactional recipient policies, idea conversion, gift integrity, and explicit season lifecycle operations.
+- Typed repositories with cross-season checks, transactional recipient policies, idea conversion, gift integrity, season lifecycle operations, and data portability.
 - Safe startup: settings and meta are created only when absent; startup never creates a season, seeds sample data, or deletes records.
-- A boot screen, a storage recovery screen with guidance, a health-check engine, a migration harness, and an explicit `DELETE`-confirmed reset API.
-- 247 Vitest tests across 26 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, and dashboard calculations.
+- A boot screen, a storage recovery screen with guidance, a health-check engine, a migration harness, and explicit restore/reset APIs.
+- 291 Vitest tests across 31 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, dashboard calculations, season lifecycle, backup export/validation/restore, CSV encoding and safety, and sample-data isolation.
 - GitHub Actions CI for formatting, type checking, linting, tests, and the production build.
 
-Archive management, backup, export/import, and offline packaging remain deliberate placeholders. There are no sample records, invented totals, hidden calculations, or storage-management screens.
+Offline packaging and themes remain deliberate future milestones. There are no invented totals, hidden calculations, automatic cloud backups, or silent data repair.
 
 ---
 
@@ -83,7 +93,7 @@ Open `http://localhost:5173`.
 
 ## Current technology
 
-Installed through Milestone 7:
+Installed through Milestone 8:
 
 - React 19 + TypeScript
 - Vite 8
@@ -119,9 +129,9 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | `src/lib/` | Generic utilities |
 | `src/styles/` | Design tokens and global base styles |
 | `src/test/` | Test setup, memory-router helper, fake-indexeddb storage harness, and fixtures |
-| `src/features/` | Recipient, gift, dashboard, idea, and shopping cards, dialogs, page-data hooks, and feature styles |
+| `src/features/` | Recipient, gift, dashboard, idea, shopping, and season cards, dialogs, page-data hooks, and feature styles |
 | `src/domain/` | Branded entities, Zod schemas, money/date/locale utilities, and typed errors |
-| `src/storage/` | Dexie schema, initialization, repositories, migration harness, health, and reset |
+| `src/storage/` | Dexie schema, initialization, repositories, migration harness, health, reset, backup, CSV, and sample data |
 | `e2e/` | Reserved for an end-to-end suite; Playwright is not installed yet |
 | `docs/` | Product, architecture, data, decisions, acceptance criteria, and reports |
 | `.github/workflows/ci.yml` | Continuous verification on push and pull request |
@@ -144,6 +154,7 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | `docs/MILESTONE_5_REPORT.md` | Budget engine and dashboard milestone report and verification evidence |
 | `docs/MILESTONE_6_REPORT.md` | Idea Bank and Shopping List milestone report and verification evidence |
 | `docs/MILESTONE_7_REPORT.md` | Search, filters, and recipient details milestone report and verification evidence |
+| `docs/MILESTONE_8_REPORT.md` | Seasons, archives, and data portability milestone report and verification evidence |
 | `AI_DEVELOPMENT_PROTOCOL.md` | Permanent working rules for the AI agent |
 
 **Reading order for a new session:** protocol → product spec → architecture → data model → acceptance criteria → decisions → implementation plan → latest milestone report.
@@ -162,39 +173,40 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | 5 | Budget engine and dashboard | Complete — verified |
 | 6 | Idea Bank and Shopping List | Complete — verified |
 | 7 | Search, filters, recipient details | Complete — verified |
-| 8 | Seasons, archives, backup, CSV | Not started |
+| 8 | Seasons, archives, backup, CSV | Complete — verified |
 | 9 | Professional UI, themes, accessibility | Not started |
 | 10 | Offline delivery | Not started |
 | 11 | Online edition and sync | Not started |
 | 12 | QA, packaging, Etsy launch | Not started |
 
-Milestone 7 is complete and verified. Milestone 8 — Seasons, archives, backup, CSV — begins only after owner review and authorization.
+Milestone 8 is complete and verified. Milestone 9 — Professional UI, themes, accessibility — begins only after owner review and authorization.
 
 ---
 
 ## Data, privacy, and offline status
 
-- **Storage:** a version-1 local IndexedDB database stores the active season, its optional overall budget, recipients, gifts, and ideas. Startup creates settings and diagnostics only when needed; it never creates a season, seeds sample data, or deletes records. A season exists only after an explicit first-season setup action.
+- **Storage:** a version-1 local IndexedDB database stores seasons (at most one active), their optional overall budgets, recipients, gifts, and ideas. Startup creates settings and diagnostics only when needed; it never creates a season, seeds sample data, or deletes records. A season exists only after an explicit setup, restore, or sample-load action.
 - **Calculations:** season budget, planned, actual, remaining, and unallocated figures, recipient metrics, progress, chart series, data-quality findings, countdown, Idea Bank search results, gift search/filter/sort results, recipient detail figures, and the Shopping List are derived from saved records through pure domain functions. No totals, filter state, or shopping-list snapshots are stored. Unbought gifts do not count as spent, and a bought gift without an actual cost contributes zero.
 - **Shopping List:** generated at read time from unbought gifts. Marking a gift bought writes through the gift repository, removes the row, and updates budgets. The print view is browser printing only; there is no saved PDF export.
-- **Backup and reset:** a tested explicit reset API requires the confirmation `DELETE` and preserves `databaseId`; it has no UI and is never called automatically. Backup/restore and CSV export are not implemented.
+- **Backup and reset:** JSON backups and CSV exports are downloaded locally on demand. Restore is replace-all only and requires a fresh backup download plus the typed word `RESTORE`; reset requires a fresh backup plus `DELETE`. Both preserve `databaseId` and never run automatically. There is no cloud, scheduled, or automatic backup, and no merge restore.
+- **Sample data:** optional and explicit. It uses a flagged sample season, stays isolated from real totals, is archived whenever any season exists, and can be removed independently.
 - **Accounts and sync:** not implemented.
 - **Analytics/telemetry:** none.
 - **Browser storage risk:** the app does not call `navigator.storage.persist()` yet. Browser cleanup or site-data clearing can remove local records. The current UI does not claim protection from eviction; persistence timing and buyer-facing explanation remain open for a later milestone.
 - **Offline delivery:** not built or verified. The intended launch edition is an installable offline-first PWA, with the actual artifact validated in Milestone 10. A raw `file://` HTML file is not assumed to persist data and will not be advertised without passing the browser test matrix.
 - **Customer data:** entered season, budget, recipient, gift, and idea data stays in the browser profile. No names, addresses, notes, or diagnostics are transmitted. Diagnostic health reports contain counts, codes, and storage estimates only.
 
-The interface copy is intentionally conservative until backup and offline behavior are implemented and tested.
+The interface copy is intentionally conservative: local downloads are offered, but no automatic, cloud, or guaranteed recovery is claimed.
 
 ---
 
 ## Current next step
 
-1. Owner reviews `docs/MILESTONE_7_REPORT.md`, the Gifts search/filter controls, and the recipient detail page.
-2. Owner authorizes Milestone 8 — Seasons, archives, backup, CSV.
-3. Milestone 8 must use the existing repositories and domain rules, and must not bypass validation or create sample data.
+1. Owner reviews `docs/MILESTONE_8_REPORT.md`, the Seasons & archives page, and the backup/restore and CSV downloads.
+2. Owner authorizes Milestone 9 — Professional UI, themes, accessibility.
+3. Milestone 9 must use the existing repositories and domain rules, and must not weaken the data-safety gates.
 
-Until authorized: **do not start Milestone 8.**
+Until authorized: **do not start Milestone 9.**
 
 ---
 

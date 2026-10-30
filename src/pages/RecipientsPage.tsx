@@ -144,8 +144,8 @@ export function RecipientsPage() {
             <div>
               <strong>{season.name} is archived.</strong>
               <p>
-                {seasonDate} · Recipients are read-only. Restore the season to make changes. Season
-                and archive controls arrive in Milestone 8.
+                {seasonDate} · Recipients are read-only. Restore the season from Seasons &amp;
+                archives to make changes.
               </p>
             </div>
           </div>
