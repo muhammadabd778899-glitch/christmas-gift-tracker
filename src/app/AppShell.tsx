@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { AboutDialog } from './AboutDialog';
+import { ConnectionStatus } from '../components/layout/ConnectionStatus';
 import { Header } from '../components/layout/Header';
 import { MobileNav } from '../components/layout/MobileNav';
 import { Sidebar } from '../components/layout/Sidebar';
+import { UpdatePrompt } from '../components/layout/UpdatePrompt';
 import { APP_VERSION } from '../lib/appInfo';
 import { getPageTitle } from './navigation';
 import { ThemeController } from './ThemeController';
@@ -101,12 +103,15 @@ export function AppShell() {
           <span>Christmas Gift Tracker</span>
           <span className={styles.footerDivider} aria-hidden="true" />
           <span>Built for calmer Christmases.</span>
+          <span className={styles.footerDivider} aria-hidden="true" />
+          <ConnectionStatus />
           <span className={styles.footerVersion}>v{APP_VERSION}</span>
         </footer>
       </div>
 
       <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
       <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />
+      <UpdatePrompt />
     </div>
   );
 }

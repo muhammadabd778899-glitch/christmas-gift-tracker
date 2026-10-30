@@ -39,7 +39,7 @@ The first commercial release is a **single-user, account-free, offline-first web
 | Seasons and archives | Yes | Yes |
 | Export and backup | Yes | Yes |
 
-**Critical delivery caveat.** A hosted website that stops working without a network is not an offline product. A raw HTML file opened from `file://` also cannot be assumed to have reliable persistent storage across browsers. The launch offline edition is therefore defined as an **installable offline-first web application (PWA)**, with the exact delivery method confirmed by a technical spike in Milestone 10. See §11 and `docs/DECISIONS.md` (D-011). Marketing copy MUST match the tested behavior; "works offline forever with no setup" is not an approved claim until it is proven.
+**Critical delivery caveat.** A hosted website that stops working without a network is not an offline product. A raw HTML file opened from `file://` also cannot be assumed to have reliable persistent storage across browsers. The launch offline edition is therefore defined as an **installable offline-first web application (PWA)**, and the Milestone 10 spike confirmed this as the delivery method: the hosted PWA is shipped, while the single-file build is not advertised because it could not be tested across the required browsers. See §11 and `docs/DECISIONS.md` (D-011). Marketing copy MUST match the tested behavior; "works offline forever with no setup" is not an approved claim.
 
 Both editions share one codebase, one domain model, and one set of business rules. The online edition adds authentication, cloud persistence, and synchronization around the same core.
 
@@ -523,13 +523,10 @@ Input rules:
 
 ### Decision status
 
-The launch promise is **offline-first**, but the physical delivery method is provisional until Milestone 10 tests it. Two candidates:
+Decided 2026-10-30 in Milestone 10: **A. Installable PWA from a hosted URL** is the delivered offline edition. The customer opens a hosted page once, installs or saves it, and thereafter can launch and use it offline. Assets are precached; data lives in IndexedDB. One-time internet access is required, and install flows differ by browser; the setup guide states both.
 
-**A. Installable PWA from a hosted URL (recommended initially).**
-The customer opens a hosted page once, installs or saves it, and thereafter can launch and use it offline. Assets are precached; data lives in IndexedDB. Advantages: reliable service-worker caching, updates, one codebase. Limitation: one-time internet access is required, and install flows differ by browser.
-
-**B. Self-contained downloadable package (under evaluation).**
-A ZIP containing the built app and simple instructions, or a single HTML file. Advantages: feels like a classic digital download. Risks: `file://` origins have inconsistent IndexedDB behavior; service workers generally do not run from `file://`; updates are manual. A single HTML file MUST NOT be advertised as reliably storing data until it passes the Milestone 10 test matrix in the supported browsers. If it fails, the fallback is a thin local launcher/desktop wrapper (for example Tauri) or PWA-only delivery, and the Etsy copy must say so.
+**B. Self-contained downloadable package (evaluated, not shipped).**
+A single-file build was produced and tested from `file://` in Microsoft Edge: the app launched and kept IndexedDB records across reload and browser restart, but `file://` cannot register a service worker. Firefox, Safari, iOS/iPadOS, and Android were not available for testing. Because the full matrix is incomplete and the raw file would behave inconsistently, a standalone file is NOT advertised as reliably storing data, and no ZIP/HTML download is offered as the offline edition. A thin local launcher/desktop wrapper was considered (O-12) and is out of scope unless the owner reverses that decision.
 
 ### Requirements that apply regardless of method
 
@@ -544,7 +541,7 @@ A ZIP containing the built app and simple instructions, or a single HTML file. A
 
 ### Data persistence expectations
 
-- The app requests persistent storage (`navigator.storage.persist()`) where supported and explains the result. This is not implemented in Milestone 3; the request timing and wording remain open.
+- The app lets the user request persistent storage (`navigator.storage.persist()`) from Settings where supported and explains the result (**D-030**). It is user-initiated, not a startup prompt.
 - Backups are the ultimate recovery path; the UI recommends them, especially before clearing browser data or changing devices.
 - The app does not promise that clearing browser data, using private browsing, or storage eviction by the browser preserves records.
 - iOS storage eviction and install behavior are documented limitations.
@@ -600,7 +597,7 @@ Allowed after verification:
 
 - "Plan gifts, budgets, and shopping in one place."
 - "Your data stays on your device."
-- "Works offline after a one-time setup." (Only after Milestone 10 passes; instructions must state the setup accurately.)
+- "Works offline after a one-time setup." (Verified in Milestone 10 for the hosted PWA in Chromium; setup steps must state the one-time internet access and browser limitations.)
 - "No account required for the offline edition."
 - "Back up and restore your data."
 - "Reuse it year after year with seasons and archives."
@@ -658,7 +655,7 @@ These materially affect scope or promise. Recommendations are in `docs/DECISIONS
 
 | ID | Decision | Recommendation | Blocks |
 | --- | --- | --- | --- |
-| O-1 | Offline delivery: PWA-only, standalone HTML, or desktop wrapper | PWA first; test standalone in Milestone 10; add wrapper only if needed | Milestone 10, Etsy copy |
+| O-1 | Offline delivery: PWA-only, standalone HTML, or desktop wrapper | PWA first; test standalone in Milestone 10; add wrapper only if needed | Decided 2026-10-30 — hosted PWA shipped; single-file build not shipped |
 | O-2 | Product name and brand | Keep "Christmas Gift Tracker"; decided 2026-10-30 to refine the warm/evergreen/burgundy/gold identity rather than rename | Milestone 9, packaging |
 | O-3 | Currency defaults and supported presets | USD default; symbol + 0–3 fraction digits; no conversion | Milestone 2/9 |
 | O-4 | Recipient deletion default | Block; offer reassign or explicit cascade | Milestone 3 |
@@ -669,7 +666,7 @@ These materially affect scope or promise. Recommendations are in `docs/DECISIONS
 | O-9 | Store toggle for "mark bought from Shopping List" | Include as a convenience, excluded from print | Milestone 6 |
 | O-10 | Require actual cost when marking a gift bought? | No; allow and flag the missing cost | Milestone 4 |
 | O-11 | Add a "does not need wrapping" exemption? | No for launch; document the progress limitation | Milestone 5 |
-| O-12 | Support a standalone desktop wrapper for Etsy? | Only if Milestone 10 proves PWA delivery insufficient | Milestone 10/12 |
+| O-12 | Support a standalone desktop wrapper for Etsy? | Only if Milestone 10 proves PWA delivery insufficient | Decided 2026-10-30 — no wrapper; revisit only with a separate owner decision |
 
 Approval of this specification approves the recommendations unless an item is explicitly changed. Milestone 0 is complete when these are reviewed; Milestone 1 does not depend on O-1, O-2, O-5, O-6, O-11, or O-12.
 

@@ -24,6 +24,28 @@
   font-size: 0.8rem;
 }
 
+.persistence {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.persistence p {
+  color: var(--color-text-soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.persistenceResult {
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 .counts {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));

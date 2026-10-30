@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Architecture
 
-> Status: Version 0.8 · 2026-10-30 · Milestone 8 seasons, archives, and data portability recorded
-> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, recipient, gift, idea, shopping, search/filter, recipient-detail, season/archive, backup/restore, CSV, sample-data, and reset workflows now exist; later sections remain target architecture.
+> Status: Version 0.10 · 2026-10-30 · Milestone 10 offline delivery recorded
+> Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-1 storage, recipient, gift, idea, shopping, search/filter, recipient-detail, season/archive, backup/restore, CSV, sample-data, reset, and installable offline PWA workflows now exist; later sections remain target architecture.
 
 ---
 
@@ -70,7 +70,7 @@ External services at launch: none required. Optional static hosting for initial 
 - **Tailwind:** no hard requirement; tokens + CSS Modules keep the bundle and design system explicit. Revisit only if velocity suffers.
 - **date-fns / dayjs:** native `Intl` plus ~100 lines of date helpers is sufficient and removes a dependency.
 - **Cloud backend now:** deferred to Milestone 11; not needed to validate the product.
-- **Desktop wrapper / Electron / Tauri:** evaluate in Milestone 10 only if standalone file delivery is required and PWA is insufficient.
+- **Desktop wrapper / Electron / Tauri:** not built. Milestone 10 validated the PWA as sufficient; O-12 keeps a wrapper out of scope unless a separate owner decision reverses that.
 
 Dependency policy: pin with a lockfile, avoid CDN/runtime remote assets, review licenses before packaging, and do not add a dependency for a single trivial function.
 
@@ -367,42 +367,43 @@ Tokens were defined in Milestone 1 and refined in Milestone 9; components never 
 
 ---
 
-## 10. Offline architecture (Milestone 10)
+## 10. Offline architecture (implemented in Milestone 10)
 
 ### 10.1 PWA baseline
 
-- `vite-plugin-pwa` with `registerType: 'prompt'` (never silently reload).
-- Precache the built HTML, JS, CSS, fonts, icons, and manifest.
-- SPA navigation fallback to `index.html`.
-- No runtime caching of third-party origins; there are none.
-- Update flow: detect a waiting service worker, show "A new version is ready", let the user reload when safe.
-- Register the service worker only in production builds to avoid dev-server confusion.
+- `vite-plugin-pwa` 2 with `registerType: 'prompt'` and `injectRegister: false`; the app registers through `virtual:pwa-register/react`. It never silently reloads.
+- Precache the built HTML, JS, CSS, fonts, icons, and manifest: 21 entries / 1279.74 KiB in the 0.10.0 build, emitted as `sw.js` plus the Workbox runtime.
+- SPA navigation fallback to `index.html`; no runtime caching of third-party origins; there are none.
+- Update flow: the waiting service worker surfaces a banner with “Reload to update” and “Later.” A reload is refused while any `<dialog open>` exists, so an open form is not discarded. `skipWaiting` and `clientsClaim` stay false until the user consents.
+- The service worker is not enabled in the development server; tests and the standalone spike alias the virtual module to a no-op stub.
+- `public/icons/` contains 192/512 px PNGs, a maskable 512 px icon, an SVG, and an Apple touch icon; the manifest supplies name, colors, scope, standalone display, and portrait orientation.
 
 ### 10.2 Data
 
 - IndexedDB is independent of the service worker and works offline.
-- Request persistent storage where supported; explain browser eviction and the backup habit.
-- Clearing site data deletes records; the UI warns and recommends backups.
+- Settings explains browser eviction and offers a user-initiated persistent-storage request (**D-030**). Granted, declined, unsupported, and unavailable results are reported in plain language with backup guidance.
+- Clearing site data deletes records; the UI warns and recommends backups. No code path clears or repairs user data automatically.
+- Storage-unavailable and quota errors keep the recovery page and now state explicitly that data was not deleted and that a backup should be downloaded before freeing space.
 
 ### 10.3 Delivery validation
 
-Milestone 10 must test the actual artifact:
+The actual production artifact was tested, not the development server:
 
-1. Install or load the PWA per documented steps.
-2. Disable the network.
-3. Launch/reload.
-4. Create and edit records.
-5. Verify dashboard, search, ideas, shopping, archives, backup, and CSV offline.
-6. Restart the browser and confirm persistence.
-7. Repeat in Chrome/Edge, Firefox, and Safari (including iOS if available).
-8. Evaluate a standalone `file://` build and record the result honestly.
+1. Installed/served the built PWA and loaded it once online.
+2. Disabled the network through browser protocol emulation.
+3. Launched and reloaded while offline.
+4. Created and edited seasons, recipients, and gifts offline.
+5. Verified dashboard, search/filters, ideas, shopping, archives, backup, and CSV offline.
+6. Restarted the browser with the same profile and confirmed the records and cached app remained.
+7. Exercised the update flow with a second build, including the open-dialog guard.
+8. Built the standalone `file://` spike and recorded the result.
 
-If a self-contained HTML file cannot persist data reliably, it is not shipped as the offline edition without an approved alternative (thin launcher/desktop wrapper). The listing copy is updated to match.
+Only Microsoft Edge 156 (Chromium) was available on the test host. Firefox, Safari, iOS/iPadOS, and Android were not tested. The single-file build launched from `file://` and persisted IndexedDB records across reload and browser restart, but `file://` cannot register a service worker; because the required browser matrix is incomplete, the file is **not shipped**. The hosted PWA is the offline edition, and the listing copy states the one-time online visit.
 
 ### 10.4 Online/offline indicator
 
-- Offline edition: a subtle "Saved on this device" status is sufficient; connectivity is not required.
-- Online edition: show "Synced / Offline — changes queued / Sync error" with details.
+- Offline edition: the footer shows “Saved on this device” while online and “Offline — all data saved on this device” while offline; the wording makes no sync claim.
+- Online edition: show “Synced / Offline — changes queued / Sync error” with details.
 - Never claim data is synced when it is not.
 
 ---
@@ -515,7 +516,7 @@ Alternative: a small custom API with Postgres and an auth provider, if Supabase 
 | Firefox (desktop, Android) | Current and previous major | PWA install UX differs; offline via service worker works; persistence support varies |
 | Safari 16.4+ (macOS, iOS/iPadOS) | Supported with caveats | Add to Home Screen recommended; storage eviction risk for unused sites; test IndexedDB persistence carefully |
 | Internet Explorer | Not supported | — |
-| `file://` HTML | Not promised | IndexedDB/service-worker behavior is inconsistent; only ship if Milestone 10 proves it |
+| `file://` HTML | Not shipped | The Milestone 10 spike launched and persisted data in Edge, but service workers are unavailable and Firefox/Safari/iOS were not tested; the file is not the offline edition |
 
 Required platform features: IndexedDB, service workers, `crypto.randomUUID`, ES2022, CSS custom properties, `Intl`. Feature detection shows a clear incompatibility message rather than failing silently.
 

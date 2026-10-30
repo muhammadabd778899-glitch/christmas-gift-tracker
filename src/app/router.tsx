@@ -1,4 +1,4 @@
-import { createBrowserRouter, type RouteObject } from 'react-router-dom';
+import { createBrowserRouter, createHashRouter, type RouteObject } from 'react-router-dom';
 import { AppShell } from './AppShell';
 import { RouteErrorPage } from './boundaries/RouteErrorPage';
 import { DashboardPage } from '../pages/DashboardPage';
@@ -33,5 +33,9 @@ export const routes: RouteObject[] = [
 ];
 
 export function createAppRouter() {
+  if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+    return createHashRouter(routes);
+  }
+
   return createBrowserRouter(routes);
 }

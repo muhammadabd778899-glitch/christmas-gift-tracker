@@ -11,7 +11,11 @@ describe('storage recovery page', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'We could not open your local planner.' }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/data has not been deleted/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Your data has not been deleted. Free up browser storage or export a backup, then try again.',
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reload app' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();

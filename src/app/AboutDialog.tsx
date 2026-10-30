@@ -37,11 +37,14 @@ const included = [
   'Responsive layouts with mobile gift and shopping cards at 360 px',
   'Accessible dialogs, forms, tables, and responsive navigation',
   'Versioned local storage with validation and transactions',
+  'An installable offline-first app with precached assets and offline navigation',
+  'An update prompt that waits for consent and never reloads over unsaved form work',
+  'Truthful offline status plus persistent-storage requests with clear explanations',
+  'Install guidance for desktop Chromium, Android, iPhone/iPad, and Firefox',
   'Automated tests, type checking, linting, and a production build',
 ];
 
 const upcoming = [
-  'Offline delivery and packaging (Milestone 10)',
   'Online accounts and synchronization (Milestone 11)',
   'Release hardening and Etsy packaging (Milestone 12)',
 ];
@@ -69,9 +72,9 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
             The planner now manages several seasons with one active at a time and read-only
             archives. It can export a complete JSON backup, validate and restore one atomically,
             export CSV for spreadsheets, load isolated sample data, and reset only after a fresh
-            backup. This build also adds light, dark, and system themes, responsive layouts,
-            keyboard-accessible tooltips, and a rebuilt Settings page. Offline packaging and cloud
-            sync are not implemented yet.
+            backup. This build also installs as an offline-first app: assets are cached after one
+            online visit, the app launches and reloads without a connection, and new versions are
+            offered rather than forced. Cloud sync and accounts are not implemented yet.
           </p>
         </div>
 
@@ -103,7 +106,8 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
         <div className={styles.notice}>
           <strong>Local and account-free.</strong> Seasons, recipients, gifts, ideas, and budget
           records are stored only in this browser. Backups and CSV exports are the deliberate ways
-          to take a copy with you; nothing is uploaded or synced.
+          to take a copy with you; nothing is uploaded or synced. The first online visit is required
+          before the app can launch offline, and clearing site data deletes the planner.
         </div>
       </div>
     </Dialog>

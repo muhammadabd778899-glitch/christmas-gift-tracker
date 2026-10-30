@@ -2,8 +2,8 @@
 
 A local-first Christmas gift planning application: recipients, gifts, budgets, ideas, shopping lists, seasons, backups, and offline use.
 
-> **Status: Milestone 9 — Professional interface, themes, and accessibility complete and verified.**
-> The shell is runnable, responsive, themed, and tested. A private local IndexedDB database stores real seasons, recipients, gifts, ideas, and season budgets, and no customer plan or sample records are created automatically. Light, dark, and system themes apply before first paint; currency formatting, diagnostics, and privacy details live in Settings. Backups and CSV exports are explicit local downloads. Nothing is transmitted.
+> **Status: Milestone 10 — Validated offline delivery complete and verified.**
+> The app is an installable offline-first PWA. The shell is runnable, responsive, themed, and tested; a private local IndexedDB database stores real seasons, recipients, gifts, ideas, and season budgets, and no customer plan or sample records are created automatically. After one online visit, the production app launches and works with the network disabled. Light, dark, and system themes apply before first paint; currency formatting, diagnostics, privacy details, install guidance, and persistent-storage requests live in Settings. Backups and CSV exports are explicit local downloads. Nothing is transmitted.
 
 ---
 
@@ -58,14 +58,20 @@ A local-first Christmas gift planning application: recipients, gifts, budgets, i
 - Responsive polish at 360/768/1024/1440 px, including stacked gift and shopping cards, full-width mobile actions, and 44×44 px targets.
 - Keyboard-accessible metric explanations for planned, spent, remaining, unallocated, and utilization figures, plus visible gold focus rings in both themes.
 - Accessible chart equivalents, reduced-motion support, and screen-only mobile table rules that keep the print layout tabular.
+- An installable offline-first PWA built with `vite-plugin-pwa`: web manifest, 192/512 px and maskable icons, Apple touch icon, and 21 precached assets with an SPA navigation fallback.
+- A consent-based update banner: the app reports a waiting version, never reloads on its own, and refuses to reload while a dialog with unsaved work is open.
+- A truthful footer connection status (“Saved on this device” / “Offline — all data saved on this device”) that never claims cloud sync.
+- Settings install guidance for Chrome/Edge desktop, Android, iPhone/iPad Safari, and Firefox, plus a one-time-online-visit explanation.
+- A user-initiated persistent-storage request with plain-language granted/declined/unsupported results and backup guidance; storage-unavailable and quota messages explain that data was not deleted and recommend a backup before freeing space.
+- The production artifact was verified offline: cached launch and reload, all seven routes, create/edit across seasons, recipients, and gifts, persistence after browser restart, backup/CSV downloads offline, and the update flow.
 - A version-1 Dexie/IndexedDB schema with typed validation for seasons, recipients, gifts, ideas, settings, and diagnostics.
 - Typed repositories with cross-season checks, transactional recipient policies, idea conversion, gift integrity, season lifecycle operations, and data portability.
 - Safe startup: settings and meta are created only when absent; startup never creates a season, seeds sample data, or deletes records.
 - A boot screen, a storage recovery screen with guidance, a health-check engine, a migration harness, and explicit restore/reset APIs.
-- 307 Vitest tests across 33 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, dashboard calculations, season lifecycle, backup export/validation/restore, CSV encoding and safety, sample-data isolation, theme resolution and pre-paint behavior, and the Settings flows.
+- 327 Vitest tests across 37 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, dashboard calculations, season lifecycle, backup export/validation/restore, CSV encoding and safety, sample-data isolation, theme resolution and pre-paint behavior, Settings flows, install-prompt behavior, offline status, update consent, and persistent-storage results.
 - GitHub Actions CI for formatting, type checking, linting, tests, and the production build.
 
-Offline packaging remains a deliberate future milestone. There are no invented totals, hidden calculations, automatic cloud backups, or silent data repair.
+The hosted installable PWA is the delivered offline edition. A single-file build was produced and evaluated from `file://` but is **not shipped**, because service workers cannot run there and Firefox, Safari, and iOS were not available for the required matrix. There are no invented totals, hidden calculations, automatic cloud backups, or silent data repair.
 
 ---
 
@@ -90,7 +96,8 @@ Open `http://localhost:5173`.
 | `npm run test` | Run the Vitest suite once |
 | `npm run test:watch` | Run Vitest in watch mode |
 | `npm run test:coverage` | Run tests with V8 coverage |
-| `npm run build` | Type-check and produce the production bundle in `dist/` |
+| `npm run build` | Type-check and produce the production PWA bundle in `dist/` |
+| `npm run build:standalone` | Build the evaluated single-file `file://` spike into `dist-standalone/` (not shipped) |
 | `npm run preview` | Serve the production bundle locally |
 | `npm run format` | Format code and configuration with Prettier |
 | `npm run format:check` | Verify formatting without changing files |
@@ -99,7 +106,7 @@ Open `http://localhost:5173`.
 
 ## Current technology
 
-Installed through Milestone 9:
+Installed through Milestone 10:
 
 - React 19 + TypeScript
 - Vite 8
@@ -109,14 +116,18 @@ Installed through Milestone 9:
 - Dexie 4 for IndexedDB
 - Zod 4 for boundary validation
 - Recharts for the budget-vs-actual chart, loaded as a separate chunk
+- `vite-plugin-pwa` 2 / Workbox for the manifest, precache, service worker, and update flow
 - Vitest 5, Testing Library, `jsdom`, `fake-indexeddb`
 - ESLint 9, Prettier
 - GitHub Actions
 
+Evaluation-only tooling:
+
+- `vite-plugin-singlefile` builds the unshipped `file://` spike (`npm run build:standalone`).
+
 Not installed yet — each arrives with the milestone that needs it:
 
 - Playwright (no end-to-end suite has been installed yet; manual browser checks are recorded per milestone)
-- `vite-plugin-pwa` (Milestone 10)
 
 Reactive reads use a small typed `useLiveQueryState` hook over Dexie's own `liveQuery`, rather than the separate `dexie-react-hooks` package (D-025). Recipient and season forms use shared React state, the Zod schemas, and the existing validation utilities; React Hook Form is not installed.
 
@@ -133,6 +144,8 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | `src/components/ui/` | Reusable interface primitives with no domain knowledge |
 | `src/components/layout/` | Brand, sidebar, header, navigation, and mobile drawer |
 | `src/lib/` | Generic utilities |
+| `src/pwa/` | Service-worker update hook, install-prompt hook, support detection, and the test/standalone register stub |
+| `public/icons/` | PWA and Apple touch icons |
 | `src/styles/` | Design tokens and global base styles |
 | `src/test/` | Test setup, memory-router helper, fake-indexeddb storage harness, and fixtures |
 | `src/features/` | Recipient, gift, dashboard, idea, shopping, season, and settings cards, dialogs, page-data hooks, and feature styles |
@@ -162,6 +175,8 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | `docs/MILESTONE_7_REPORT.md` | Search, filters, and recipient details milestone report and verification evidence |
 | `docs/MILESTONE_8_REPORT.md` | Seasons, archives, and data portability milestone report and verification evidence |
 | `docs/MILESTONE_9_REPORT.md` | Professional interface, themes, and accessibility milestone report and verification evidence |
+| `docs/MILESTONE_10_REPORT.md` | Offline delivery milestone report and verification evidence |
+| `docs/OFFLINE_SETUP.md` | Customer-facing install and offline setup guide |
 | `AI_DEVELOPMENT_PROTOCOL.md` | Permanent working rules for the AI agent |
 
 **Reading order for a new session:** protocol → product spec → architecture → data model → acceptance criteria → decisions → implementation plan → latest milestone report.
@@ -182,11 +197,11 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | 7 | Search, filters, recipient details | Complete — verified |
 | 8 | Seasons, archives, backup, CSV | Complete — verified |
 | 9 | Professional UI, themes, accessibility | Complete — verified |
-| 10 | Offline delivery | Not started |
+| 10 | Offline delivery | Complete — verified |
 | 11 | Online edition and sync | Not started |
 | 12 | QA, packaging, Etsy launch | Not started |
 
-Milestone 9 is complete and verified. Milestone 10 — Offline delivery — begins only after owner review and authorization.
+Milestone 10 is complete and verified. Milestone 11 — Online edition and cloud synchronization — begins only after owner review and authorization.
 
 ---
 
@@ -200,8 +215,9 @@ Milestone 9 is complete and verified. Milestone 10 — Offline delivery — begi
 - **Theme and currency:** the theme choice (light, dark, or system) is stored in Settings and mirrored to `localStorage` only for first-paint styling; IndexedDB remains authoritative. Currency symbol, code, and fraction digits affect display only and never convert stored minor units.
 - **Accounts and sync:** not implemented.
 - **Analytics/telemetry:** none.
-- **Browser storage risk:** the app does not call `navigator.storage.persist()` yet. Browser cleanup or site-data clearing can remove local records. The current UI does not claim protection from eviction; persistence timing and buyer-facing explanation remain open for a later milestone.
-- **Offline delivery:** not built or verified. The intended launch edition is an installable offline-first PWA, with the actual artifact validated in Milestone 10. A raw `file://` HTML file is not assumed to persist data and will not be advertised without passing the browser test matrix.
+- **Browser storage risk:** browser cleanup or site-data clearing can remove local records. Settings explains this and offers a user-initiated `navigator.storage.persist()` request, reporting granted, declined, unsupported, or unavailable results. The app never claims protection from every eviction; backups remain the recovery path.
+- **Offline delivery:** the hosted app is an installable offline-first PWA. One online visit caches the app shell (21 precached assets), after which launch, reload, and all core workflows work without a network. The service worker updates only when the user chooses to reload, and it refuses while a dialog with unsaved work is open. A raw `file://` build was evaluated but is not shipped and is not advertised as reliably storing data. See `docs/OFFLINE_SETUP.md`.
+- **Offline status:** the footer states whether data is saved on this device and whether the app is offline; it makes no sync claim. The offline edition has no accounts, cloud backup, or cross-device access.
 - **Customer data:** entered season, budget, recipient, gift, and idea data stays in the browser profile. No names, addresses, notes, or diagnostics are transmitted. Diagnostic health reports contain counts, codes, and storage estimates only.
 
 The interface copy is intentionally conservative: local downloads are offered, but no automatic, cloud, or guaranteed recovery is claimed.
@@ -210,11 +226,13 @@ The interface copy is intentionally conservative: local downloads are offered, b
 
 ## Current next step
 
-1. Owner reviews `docs/MILESTONE_9_REPORT.md`, the light/dark/system themes, and the responsive layouts.
-2. Owner authorizes Milestone 10 — Offline delivery.
-3. Milestone 10 must use the existing repositories and domain rules, and must not weaken the data-safety gates.
+1. Owner reviews `docs/MILESTONE_10_REPORT.md`, the installable PWA, and `docs/OFFLINE_SETUP.md`.
+2. Owner confirms the hosted URL, hosting provider, and listing copy for the tested offline setup.
+3. Owner decides whether Firefox/Safari/iOS verification needs additional hardware before release.
+4. Owner authorizes Milestone 11 — Online edition and cloud synchronization.
+5. Milestone 11 must preserve the offline edition and use the existing repositories and domain rules.
 
-Until authorized: **do not start Milestone 10.**
+Until authorized: **do not start Milestone 11.**
 
 ---
 

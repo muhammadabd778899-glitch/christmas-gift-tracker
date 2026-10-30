@@ -52,7 +52,7 @@ export class ConflictError extends AppError {
 
 export class StorageUnavailableError extends AppError {
   constructor(
-    message = 'Local storage is unavailable in this browser.',
+    message = 'Local storage is unavailable in this browser. Your data has not been deleted. Check that this browser allows site storage, then reload the app.',
     options: { cause?: unknown; recovery?: string } = {},
   ) {
     super(message, {
@@ -67,12 +67,15 @@ export class StorageUnavailableError extends AppError {
 
 export class QuotaExceededError extends AppError {
   constructor(options: { cause?: unknown } = {}) {
-    super('The browser has run out of space for this planner.', {
-      code: 'QUOTA_EXCEEDED',
-      cause: options.cause,
-      recovery:
-        'Your data has not been deleted. Free up browser storage or export a backup, then try again.',
-    });
+    super(
+      'The browser has run out of space for this planner. Download a backup, then remove old seasons or free up browser storage and try again. Your data has not been deleted.',
+      {
+        code: 'QUOTA_EXCEEDED',
+        cause: options.cause,
+        recovery:
+          'Your data has not been deleted. Free up browser storage or export a backup, then try again.',
+      },
+    );
   }
 }
 

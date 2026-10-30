@@ -160,6 +160,25 @@ describe('Settings page', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('explains offline install steps and requests persistent storage', async () => {
+    const user = userEvent.setup();
+    const storage = await createTestStorage();
+    await renderApp(['/settings'], { storage });
+
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'Install and work offline' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('How to install')).toBeInTheDocument();
+    expect(screen.getByText('iPhone or iPad (Safari)')).toBeInTheDocument();
+    expect(screen.getByText(/one online visit is required/i)).toBeInTheDocument();
+
+    await user.click(await screen.findByRole('button', { name: 'Request persistent storage' }));
+
+    expect(
+      await screen.findByText(/does not support persistent storage requests/i),
+    ).toBeInTheDocument();
+  });
+
   it('links to the data tools section on the seasons page', async () => {
     const user = userEvent.setup();
     const storage = await createTestStorage();

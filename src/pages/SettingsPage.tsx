@@ -25,6 +25,7 @@ import {
   TableRow,
 } from '../components/ui/Table';
 import { AppearanceSettings } from '../features/settings/AppearanceSettings';
+import { OfflineSettings } from '../features/settings/OfflineSettings';
 import { StorageDiagnostics } from '../features/settings/StorageDiagnostics';
 import { APP_MILESTONE, APP_MILESTONE_LABEL, APP_VERSION } from '../lib/appInfo';
 import { toAppError } from '../storage/errors';
@@ -104,7 +105,7 @@ const milestones: Milestone[] = [
     number: '10',
     title: 'Offline delivery',
     focus: 'Validated offline artifact and customer setup',
-    status: 'Planned',
+    status: 'Complete',
   },
   {
     number: '11',
@@ -131,7 +132,8 @@ const buildFacts = [
   ['Theme', 'Light, dark, and system themes saved in this browser'],
   ['Currency', 'Display-only presets or custom code and symbol — no conversion'],
   ['Accessibility', 'Keyboard operation, visible focus, and 44px targets'],
-  ['Offline', 'Not yet packaged — Milestone 10'],
+  ['Offline', 'Installable app; one online visit before first offline launch'],
+  ['Updates', 'Offered in-app and never applied over unsaved form work'],
   ['Data', 'One active season, archived seasons, and optional sample data'],
 ];
 
@@ -139,7 +141,9 @@ const limitations = [
   'Currency is display-only. Changing it reformats amounts; it never converts or rewrites stored values.',
   'Backups and CSV exports are manual downloads; there is no automatic or cloud backup.',
   'Restore replaces all current data. Combining two backups (merge) is not supported.',
-  'No installable or offline package has been produced or verified.',
+  'Offline use needs one online visit and a per-browser install. Clearing site data deletes the planner, so keep backups.',
+  'Offline behavior is verified in Chromium browsers only; Firefox, Safari, and iOS remain unverified.',
+  'The single-file file:// edition is evaluated but not shipped; use the installable app.',
   'Printing uses the browser print dialog; there is no built-in PDF export or saved print file.',
   'Wrapped progress uses every gift as its denominator, so 100% may not be reachable for digital or retailer-direct gifts.',
 ];
@@ -221,6 +225,8 @@ export function SettingsPage() {
       <SettingsHeader />
 
       <AppearanceSettings settings={settings} />
+
+      <OfflineSettings />
 
       <StorageDiagnostics />
 
@@ -342,7 +348,9 @@ export function SettingsPage() {
               sample gifts, or delete records. A season exists only after you explicitly create or
               restore one. Dashboard totals are calculated from saved records and are never stored
               as a competing source of truth. Diagnostics show counts and integrity issues only — no
-              names, addresses, or notes. No account and no network request are required.
+              names, addresses, or notes. No account is required. Core screens make no network
+              requests; the first visit must be online so this browser can cache the app for offline
+              use.
             </p>
             <div className={styles.claims}>
               <strong>Claims we will not make until verified</strong>

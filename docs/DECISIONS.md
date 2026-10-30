@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Decision Log
 
-> Status: Approved through Milestone 6; later decisions remain proposed · Version 0.6 · 2026-10-28
+> Status: Approved through Milestone 10; later decisions remain proposed · Version 0.10 · 2026-10-30
 > Format: lightweight ADRs. Statuses: **Proposed**, **Accepted**, **Superseded**, **Rejected**.
 > Decisions marked Proposed become binding when the owner approves the milestone that depends on them.
 
@@ -140,7 +140,7 @@
 
 ### D-011 — Offline edition is PWA-first; standalone HTML is unproven
 
-**Status:** Proposed · **Milestone:** 10 · **Owner approval required**
+**Status:** Accepted 2026-10-30 for Milestone 10 · **Milestone:** 10
 
 **Context:** The Etsy promise includes offline use. A hosted site that merely loads once is not offline. A `file://` HTML file has inconsistent IndexedDB and service-worker behavior across browsers.
 
@@ -153,6 +153,8 @@
 5. Never claim “forever offline with no setup” or “any HTML file works.”
 
 **Consequences:** A reliable offline product with an honest setup requirement. Etsy copy must state the one-time internet access. A desktop wrapper would add build/signing/size complexity and is not assumed.
+
+**Outcome (2026-10-30):** The hosted installable PWA is the delivered offline edition. A single-file build (`vite-plugin-singlefile`, HashRouter, relative base) launched from `file://` in Microsoft Edge 156 and kept IndexedDB records across reloads and a browser restart, but service workers are unavailable on `file://`. Firefox, Safari, iOS/iPadOS, and Android were not available on the test host, so the single-file artifact did not pass the required browser matrix and is **not shipped**. The app now requires one online visit before its first offline launch, states that requirement in Settings and the About dialog, and never claims “forever offline.”
 
 **Why not decide standalone now:** The behavior depends on browser implementations and the final artifact, not on intent. Testing is the only credible basis for the promise.
 
@@ -374,6 +376,18 @@
 
 ---
 
+### D-030 — Persistent storage is requested by the user, not at startup
+
+**Status:** Accepted 2026-10-30 · **Milestone:** 10
+
+**Context:** `navigator.storage.persist()` may show a browser permission prompt or be declined. A startup prompt interrupts onboarding, and a decline recorded without context does not tell the customer what it means for their planner data.
+
+**Decision:** Explain browser eviction in Settings and offer a “Request persistent storage” button. Report the result in plain language — granted, declined, unsupported, or unavailable — and keep recommending backup downloads. Never claim that stored data cannot be evicted.
+
+**Consequences:** The request happens with context and clear intent. Customers who never open Settings remain on best-effort storage, which the diagnostics, setup guide, and About dialog state honestly. Browsers without the API receive instructions instead of a broken control.
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Confidence | Impact if wrong |
@@ -399,7 +413,7 @@ Each row states the recommendation. Approving this specification approves the re
 
 | ID | Question | Recommendation | Blocks | Status |
 | --- | --- | --- | --- | --- |
-| O-1 | What is the offline delivery method: PWA, standalone HTML, or desktop wrapper? | PWA-first; test standalone in M10; add a wrapper only if commercially necessary and approved | M10, Etsy copy | Open |
+| O-1 | What is the offline delivery method: PWA, standalone HTML, or desktop wrapper? | PWA-first; test standalone in M10; add a wrapper only if commercially necessary and approved | M10, Etsy copy | Decided 2026-10-30 — installable PWA is the delivered edition; the single-file spike is not shipped because the required browser matrix was not completed |
 | O-2 | Final product name and visual brand? | Keep “Christmas Gift Tracker” as a working name; finalize before M9 | M9, packaging | Decided 2026-10-30 — keep the name and refine the warm/evergreen/burgundy/gold identity |
 | O-3 | Currency defaults and presets? | USD `$` 2 decimals default; presets for EUR, GBP, CAD, AUD, JPY (0 decimals); custom symbol/code; no conversion | M2/M9 | Decided 2026-10-26 |
 | O-4 | Recipient deletion behavior? | Block; offer reassign or explicit cascade (D-007) | M3 | Decided 2026-10-26 |
@@ -410,7 +424,7 @@ Each row states the recommendation. Approving this specification approves the re
 | O-9 | Include “mark bought” on the Shopping List? | Yes, excluded from print; same status rules | M6 | Decided 2026-10-28 |
 | O-10 | Require actual cost when marking a gift bought? | No; allow and flag missing cost | M4 | Decided 2026-10-28 |
 | O-11 | Add a "does not need wrapping" exemption? | No for launch; document the limitation (D-024) | M5 | Decided 2026-10-28 |
-| O-12 | Support a standalone desktop wrapper for Etsy? | Only if M10 proves PWA delivery insufficient | M10/M12 | Open |
+| O-12 | Support a standalone desktop wrapper for Etsy? | Only if M10 proves PWA delivery insufficient | M10/M12 | Decided 2026-10-30 — no wrapper in M10; revisit only with a separate owner decision |
 
 **Approval needed before Milestone 1:** Resolved 2026-10-26. The owner authorized Milestone 1; D-001, D-013, D-014, and D-022 are accepted. All other decisions can be confirmed before their blocking milestone.
 
@@ -430,7 +444,7 @@ Each row states the recommendation. Approving this specification approves the re
 
 **Approval needed before Milestone 9:** Resolved 2026-10-30. The owner authorized Milestone 9 and approved D-015 and D-017; O-2 is decided (keep “Christmas Gift Tracker” and refine the existing warm/evergreen/burgundy/gold identity rather than renaming the product).
 
-**Approval needed before Milestone 10:** D-011, O-1, O-12.
+**Approval needed before Milestone 10:** Resolved 2026-10-30. The owner authorized Milestone 10 and approved D-011 with O-1 (PWA-first plus a standalone spike; ship the file only if it passes the full matrix) and O-12 (no desktop wrapper in M10; revisit only if PWA delivery proves insufficient). D-030 records the user-initiated persistence request.
 
 **Approval needed before Milestone 11:** D-012, O-5.
 
@@ -465,3 +479,4 @@ Each row states the recommendation. Approving this specification approves the re
 | 2026-10-28 | O-9 decided for Milestone 6; D-026 accepted for the derived Shopping List and print behavior; implementation recorded in `MILESTONE_6_REPORT.md` | AI |
 | 2026-10-30 | D-027 and D-028 accepted for Milestone 7; implementation recorded in `MILESTONE_7_REPORT.md` | AI |
 | 2026-10-30 | D-010, D-023, and D-029 accepted; O-6 decided for Milestone 8; implementation recorded in `MILESTONE_8_REPORT.md` | AI |
+| 2026-10-30 | D-011 accepted and O-1/O-12 decided for Milestone 10; D-030 accepted for user-initiated persistent storage; implementation recorded in `MILESTONE_10_REPORT.md` | AI |

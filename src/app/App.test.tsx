@@ -81,9 +81,7 @@ describe('application shell', () => {
 
     const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
     expect(
-      within(dialog).getByText(
-        'Milestone 9 of 12: Professional interface, themes, and accessibility.',
-      ),
+      within(dialog).getByText('Milestone 10 of 12: Validated offline delivery.'),
     ).toBeVisible();
     expect(within(dialog).getByText(/Local and account-free/i)).toBeInTheDocument();
 
