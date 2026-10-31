@@ -42,7 +42,8 @@ import {
 import { formatDateOnly } from '../domain/dates';
 import type { AppSettings } from '../domain/entities';
 import { formatMoney } from '../domain/money';
-import { APP_MILESTONE } from '../lib/appInfo';
+import { APP_VERSION } from '../lib/appInfo';
+import { EDITION_LABEL } from '../edition';
 import { toAppError } from '../storage/errors';
 import { SeasonBudgetDialog } from '../features/dashboard/SeasonBudgetDialog';
 import { useDashboardData } from '../features/dashboard/useDashboardData';
@@ -166,7 +167,11 @@ export function DashboardPage() {
           eyebrow="Overview"
           title="Dashboard"
           description="Your Christmas plan, at a glance."
-          badge={<Badge tone="gold">Milestone {APP_MILESTONE} preview</Badge>}
+          badge={
+            <Badge tone="gold">
+              {EDITION_LABEL} · v{APP_VERSION}
+            </Badge>
+          }
         />
         <Card>
           <CardContent className={styles.loadingCard} role="status" aria-live="polite">
@@ -199,7 +204,11 @@ export function DashboardPage() {
           eyebrow="Overview"
           title="Dashboard"
           description="Your Christmas plan, at a glance."
-          badge={<Badge tone="gold">Milestone {APP_MILESTONE} preview</Badge>}
+          badge={
+            <Badge tone="gold">
+              {EDITION_LABEL} · v{APP_VERSION}
+            </Badge>
+          }
         />
         <Card>
           <CardContent>
@@ -248,7 +257,9 @@ export function DashboardPage() {
               Sample data
             </Badge>
           ) : (
-            <Badge tone="gold">Milestone {APP_MILESTONE} preview</Badge>
+            <Badge tone="gold">
+              {EDITION_LABEL} · v{APP_VERSION}
+            </Badge>
           )
         }
       />

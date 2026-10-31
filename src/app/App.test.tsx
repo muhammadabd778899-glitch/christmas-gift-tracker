@@ -79,14 +79,14 @@ describe('application shell', () => {
 
     await user.click(screen.getByRole('button', { name: 'About this build' }));
 
-    const dialog = await screen.findByRole('dialog', { name: 'About this preview' });
-    expect(
-      within(dialog).getByText('Milestone 11 of 12: Online accounts and synchronization.'),
-    ).toBeVisible();
+    const dialog = await screen.findByRole('dialog', { name: 'About Christmas Gift Tracker' });
+    expect(within(dialog).getByText('Version 1.0.0 · Offline edition.')).toBeVisible();
     expect(within(dialog).getByText(/Local-first by default/i)).toBeInTheDocument();
 
     await user.click(within(dialog).getByRole('button', { name: 'Close dialog' }));
-    expect(screen.queryByRole('dialog', { name: 'About this preview' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('dialog', { name: 'About Christmas Gift Tracker' }),
+    ).not.toBeInTheDocument();
   });
 
   it('applies and persists the theme from the header toggle', async () => {

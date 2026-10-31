@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Data Model
 
-> Status: Normative; version-2 storage with sync bookkeeping implemented in Milestone 11 · Version 0.11 · 2026-10-30
+> Status: Normative; version-2 storage with sync bookkeeping implemented in Milestone 11, unchanged in release 1.0.0 · Version 1.0 · 2026-10-31
 > Implements the requirements in `docs/PRODUCT_SPEC.md`. `src/domain`, `src/storage`, and `src/sync` follow this document; the optional online edition mirrors these entities in Supabase through revision-checked RPCs.
 
 ---
@@ -753,7 +753,7 @@ Errors carry a stable machine code, a human message, and optional field details.
 {
   "format": "christmas-gift-tracker-backup",
   "formatVersion": 1,
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "appVersion": "1.0.0",
   "exportedAt": "2026-12-01T18:22:04.512Z",
   "data": {

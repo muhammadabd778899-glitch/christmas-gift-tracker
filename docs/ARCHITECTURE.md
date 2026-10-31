@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Architecture
 
-> Status: Version 0.11 · 2026-10-30 · Milestone 11 online accounts and synchronization recorded
+> Status: Version 1.0 · 2026-10-31 · Milestone 12 release 1.0.0 packaged; both editions build and the offline edition is verified
 > Companion to `docs/PRODUCT_SPEC.md` and `docs/DATA_MODEL.md`. The shell, version-2 storage, recipient, gift, idea, shopping, search/filter, recipient-detail, season/archive, backup/restore, CSV, sample-data, reset, installable offline PWA, and optional online account/sync workflows now exist.
 
 ---
@@ -383,7 +383,7 @@ Tokens were defined in Milestone 1 and refined in Milestone 9; components never 
 ### 10.1 PWA baseline
 
 - `vite-plugin-pwa` 2 with `registerType: 'prompt'` and `injectRegister: false`; the app registers through `virtual:pwa-register/react`. It never silently reloads.
-- Precache the built HTML, JS, CSS, fonts, icons, and manifest: 21 entries / 1279.74 KiB in the 0.10.0 build, emitted as `sw.js` plus the Workbox runtime.
+- Precache the built HTML, JS, CSS, fonts, icons, and manifest: 21 entries / 1284.84 KiB in the 1.0.0 offline build, emitted as `sw.js` plus the Workbox runtime. The online build precaches 25 entries / 1556.32 KiB.
 - SPA navigation fallback to `index.html`; no runtime caching of third-party origins; there are none.
 - Update flow: the waiting service worker surfaces a banner with “Reload to update” and “Later.” A reload is refused while any `<dialog open>` exists, so an open form is not discarded. `skipWaiting` and `clientsClaim` stay false until the user consents.
 - The service worker is not enabled in the development server; tests and the standalone spike alias the virtual module to a no-op stub.
@@ -485,6 +485,8 @@ GitHub Actions from Milestone 1: install with a locked lockfile, typecheck, lint
 - Static hosting with HTTPS, SPA fallback, correct MIME types, and cache headers for hashed assets.
 - Version shown in Settings and embedded in the build; backup envelope records `appVersion`.
 - Release checklist in Milestone 12 covers artifact testing, packaging, PDFs, and listing claims.
+- The validated 1.0.0 offline artifact is kept locally at `release/Offline-Edition/` (git-ignored build output; regenerate with `npm run build`) for hosting; the customer ZIP at `release/Christmas-Gift-Tracker-1.0.0.zip` contains the three PDF guides, the sample backup, and install notes rather than raw build files, because the app is delivered as a hosted PWA and does not support `file://` storage. The online edition remains a separate build (`npm run build:online`) and is not part of the first Etsy release.
+- Release documentation: `release/Listing-Copy.md`, `release/docs-source/`, and `docs/MILESTONE_12_REPORT.md`.
 - Git tags/checkpoints per milestone; never force-push or reset destructive work without owner approval.
 
 ---

@@ -1,0 +1,74 @@
+CHRISTMAS GIFT TRACKER 1.0.0 - OFFLINE EDITION
+Install notes
+==================================================
+
+WHAT YOU HAVE
+This edition is an installable web app. It runs in your
+browser and stores everything on your own device. There is
+no account, no sign-in, no cloud sync, and no subscription.
+
+The app is opened from the address supplied with your
+purchase. It is not opened from this folder and it does not
+run from a file:// address.
+
+FIRST VISIT
+1. Open the app address in a current Chrome or Edge window
+   while you are online.
+2. Wait for the page to finish loading. The footer changes
+   to "Saved on this device" when the local data is ready.
+3. If a banner says "Ready to work offline", choose Got it.
+   The app has cached what it needs for offline use.
+
+INSTALL (OPTIONAL BUT RECOMMENDED)
+Installing gives the planner its own window and icon.
+
+Chrome or Edge on a computer:
+  Use the install icon in the address bar, or open the
+  browser menu and choose "Install this site as an app".
+
+Android:
+  Open the browser menu and choose "Install app" or
+  "Add to Home screen".
+
+iPhone or iPad (Safari):
+  Tap Share, then "Add to Home Screen".
+
+Firefox on a computer:
+  No install is offered. Bookmark the page; offline use
+  still works after the first online visit.
+
+FIRST SEASON
+Choose a season name, the Christmas date, and an optional
+budget. You can also pick a theme and currency. To explore
+first, tick "Load the optional sample season". The sample is
+clearly flagged and can be removed later without touching
+real records.
+
+SAMPLE BACKUP
+The Sample-Data folder contains Sample-Backup.json, an
+optional example season with two recipients, three gifts,
+and two ideas. Restore it from Seasons & archives >
+Backup and restore. Restoring replaces the current data,
+so download a backup first if you already have records.
+
+YOUR DATA
+Recipients, gifts, ideas, budgets, and notes live in this
+browser's local database. Clearing site data, resetting the
+browser profile, or using some cleanup tools can delete the
+planner. Download a JSON backup regularly from
+Seasons & archives > Backup and restore.
+
+No cloud copy exists. The seller cannot recover data that is
+no longer on your device.
+
+SUPPORT
+Contact the seller through Etsy Messages using the same
+account that bought the product. Include the app version
+(1.0.0), your browser and device, the steps you took, what
+you expected, and what happened.
+
+See START-HERE.pdf for the quick start, User-Guide.pdf for
+every screen, and License-and-Support.pdf for terms and
+support details.
+
+Version 1.0.0 - Offline edition - 31 October 2026

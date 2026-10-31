@@ -1,4 +1,5 @@
-import { APP_MILESTONE, APP_MILESTONE_LABEL } from '../../lib/appInfo';
+import { APP_VERSION } from '../../lib/appInfo';
+import { EDITION_LABEL } from '../../edition';
 import { Dialog } from '../ui/Dialog';
 import { NavLinks } from './NavLinks';
 import styles from './MobileNav.module.css';
@@ -23,7 +24,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
       <div className={styles.footer}>
         <span className={styles.dot} aria-hidden="true" />
         <span>
-          Milestone {APP_MILESTONE} · {APP_MILESTONE_LABEL}
+          Version {APP_VERSION} · {EDITION_LABEL}
         </span>
       </div>
     </Dialog>

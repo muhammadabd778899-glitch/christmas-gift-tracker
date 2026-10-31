@@ -1,7 +1,7 @@
 # Christmas Gift Tracker — Product Specification
 
-> Status: Draft for owner approval · Version 0.1 · 2026-10-26
-> Scope: Milestone 0 only. This document defines the product. It does not describe implemented code.
+> Status: Approved 2026-10-26; implemented through Milestone 12 and released as version 1.0.0 · Version 1.0 · 2026-10-31
+> Scope: Product definition, decisions, and launch requirements. Implementation evidence is in the milestone reports.
 
 ---
 
@@ -669,6 +669,7 @@ These materially affect scope or promise. Recommendations are in `docs/DECISIONS
 | O-10 | Require actual cost when marking a gift bought? | No; allow and flag the missing cost | Milestone 4 |
 | O-11 | Add a "does not need wrapping" exemption? | No for launch; document the progress limitation | Milestone 5 |
 | O-12 | Support a standalone desktop wrapper for Etsy? | Only if Milestone 10 proves PWA delivery insufficient | Decided 2026-10-30 — no wrapper; revisit only with a separate owner decision |
+| O-13 | Where is the offline edition hosted? | Owner-selected HTTPS static host with SPA fallback | Open — owner action before the Etsy listing is published; docs say “the address supplied with your purchase” until a URL exists |
 
 Approval of this specification approves the recommendations unless an item is explicitly changed. Milestone 0 is complete when these are reviewed; Milestone 1 does not depend on O-1, O-2, O-5, O-6, O-11, or O-12.
 

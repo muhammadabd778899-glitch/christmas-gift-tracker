@@ -39,3 +39,6 @@ desktop.ini
 # Local customer data / backups (never commit real personal data)
 local-backups/
 *.private-backup.json
+
+# Validated offline build copy for hosting (reproducible with npm run build)
+/release/Offline-Edition/

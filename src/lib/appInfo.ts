@@ -1,3 +1,3 @@
-export const APP_VERSION = '0.11.0';
-export const APP_MILESTONE = 11;
-export const APP_MILESTONE_LABEL = 'Online accounts and synchronization';
+export const APP_VERSION = '1.0.0';
+export const APP_MILESTONE = 12;
+export const APP_MILESTONE_LABEL = 'Final QA, packaging, and Etsy launch';

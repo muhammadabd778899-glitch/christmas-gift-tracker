@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Implementation Plan
 
-> Status: Milestones 0–11 complete and verified locally; Milestone 12 not started · Version 0.11 · 2026-10-30
+> Status: Milestones 0–12 complete and verified locally; release 1.0.0 packaged · Version 1.0 · 2026-10-31
 > Build order is deliberately capability-based. Each milestone must leave a working, verified application.
 
 ---
@@ -9,14 +9,14 @@
 
 | Item | State |
 | --- | --- |
-| Repository | Runnable React/TypeScript/Vite application with two build editions, tested local storage, and an optional Supabase-backed online edition |
-| Current milestone | **Milestone 11 - Online accounts and synchronization** (complete locally; remote Supabase security run pending owner credentials) |
+| Repository | Release 1.0.0 React/TypeScript/Vite application with two build editions, tested local storage, and an optional Supabase-backed online edition; customer package prepared |
+| Current milestone | **Milestone 12 - Final QA, packaging, and Etsy launch** (complete locally; hosting, listing upload, and live Supabase verification are owner actions) |
 | Application runnable | Yes - development server, tests, coverage, offline PWA build, and online build pass |
-| Tests | 377 Vitest tests across 43 files passing; no Playwright suite yet |
-| Next milestone | Milestone 12 - QA, packaging, and Etsy release (not started) |
-| Next action | Owner reviews `docs/MILESTONE_11_REPORT.md` and runs `npm run verify:supabase` against the dedicated test project before authorizing Milestone 12 |
+| Tests | 382 Vitest tests across 44 files passing; no Playwright suite yet |
+| Next milestone | None planned; post-launch maintenance and optional online-edition verification |
+| Next action | Owner hosts `release/Offline-Edition/`, records the HTTPS app address, uploads `release/Christmas-Gift-Tracker-1.0.0.zip` to Etsy, and optionally runs `npm run verify:supabase` against the dedicated test project |
 
-**Milestone 11 is locally complete. Do not start Milestone 12 until the owner authorizes it. Storage mutations must go through the tested repositories; startup must never create a season or sample data.**
+**Release 1.0.0 is prepared and verified locally. Storage mutations must go through the tested repositories; startup must never create a season or sample data. The offline edition stays account-free.**
 
 ---
 
@@ -36,7 +36,7 @@
 | 9 | Professional UI | Themes, responsive polish, accessibility, print | Complete — verified |
 | 10 | Offline delivery | Validated offline artifact and customer setup | Complete — verified |
 | 11 | Online edition | Accounts, cloud, sync, conflicts | Complete — verified locally; remote RLS run pending credentials |
-| 12 | QA + packaging + launch | Tested, documented Etsy release | Not started |
+| 12 | QA + packaging + launch | Tested, documented Etsy release | Complete — 1.0.0 packaged and verified locally; hosting/listing upload pending |
 
 Order rationale:
 
@@ -549,6 +549,8 @@ Order rationale:
 
 ## 15. Milestone 12 — Final QA, packaging, and Etsy launch
 
+**Status:** Complete and verified locally on 2026-10-31. Release 1.0.0 is packaged at `release/Christmas-Gift-Tracker-1.0.0.zip`; evidence and limitations are in `docs/MILESTONE_12_REPORT.md`. Hosting, the public app address, the Etsy upload, and the live Supabase RLS run remain owner actions.
+
 **Depends on:** all shipped milestones; owner approval to release.
 
 **Objective:** A tested, documented, legally and practically complete digital product.
@@ -683,10 +685,10 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner reviews `docs/MILESTONE_11_REPORT.md`, both build editions, and `docs/ONLINE_SETUP.md`.
-2. Owner creates the dedicated Supabase test project, applies `supabase/migrations/20261030000100_online_sync.sql`, and supplies the URL and anon key through the git-ignored `.env.online.local` only.
-3. Run `npm run verify:supabase` to complete the remote RLS/cross-account verification and record the result in the milestone report.
-4. Owner confirms the M12 scope: final QA, packaging, listing copy, and Etsy release for the account-free offline edition.
-5. Only then begin Milestone 12.
+1. Owner chooses an HTTPS static host with SPA fallback and uploads the contents of `release/Offline-Edition/` (or rebuilds from the tagged release commit with `npm run build`).
+2. Owner verifies the hosted app once in a clean Chrome/Edge profile, then records the public app address in the Etsy listing and purchase message. The docs deliberately refer to “the address supplied with your purchase” until that address exists.
+3. Owner reviews `release/Listing-Copy.md`, the three customer PDFs, and the ZIP, then uploads `release/Christmas-Gift-Tracker-1.0.0.zip` to Etsy.
+4. Optional for the online edition: create the dedicated Supabase test project, apply `supabase/migrations/20261030000100_online_sync.sql`, supply `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` through the git-ignored `.env.online.local` only, and run `npm run verify:supabase`. AC-11.03, 11.04, 11.09, 11.10, 11.11, and 11.15 remain pending until that run succeeds.
+5. Re-run the release gates and the offline verification after any hosting, copy, or content change.
 
-Milestone 12 is **not started**. Until authorization: **stop.**
+Release 1.0.0 is prepared locally. No further milestone is authorized; hosting and the Etsy upload are external owner actions.

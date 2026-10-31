@@ -1,0 +1,158 @@
+{
+  "format": "christmas-gift-tracker-backup",
+  "formatVersion": 1,
+  "schemaVersion": 2,
+  "appVersion": "1.0.0",
+  "exportedAt": "2026-10-31T06:50:46.281Z",
+  "data": {
+    "settings": {
+      "id": "app",
+      "activeSeasonId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "currencyCode": "USD",
+      "currencySymbol": "$",
+      "fractionDigits": 2,
+      "locale": "en-US",
+      "theme": "light",
+      "hasCompletedOnboarding": true,
+      "createdAt": "2026-10-31T06:33:37.204Z",
+      "updatedAt": "2026-10-31T06:50:32.366Z"
+    },
+    "seasons": [
+      {
+        "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "name": "Sample Christmas",
+        "holidayDate": "2026-12-25",
+        "budgetMinor": 45000,
+        "status": "active",
+        "isSample": true,
+        "archivedAt": null,
+        "createdAt": "2026-10-31T06:50:32.366Z",
+        "updatedAt": "2026-10-31T06:50:32.366Z"
+      }
+    ],
+    "recipients": [
+      {
+        "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+        "seasonId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "name": "Alex",
+        "relationship": "Family",
+        "budgetCapMinor": 15000,
+        "notes": "Loves practical gifts and warm socks.",
+        "createdAt": "2026-10-31T06:50:32.366Z",
+        "updatedAt": "2026-10-31T06:50:32.366Z"
+      },
+      {
+        "id": "c3d4e5f6-a7b8-4c9d-8e1f-2a3b4c5d6e7f",
+        "seasonId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "name": "Priya",
+        "relationship": "Friend",
+        "budgetCapMinor": 10000,
+        "notes": "Prefers experiences over objects.",
+        "createdAt": "2026-10-31T06:50:32.366Z",
+        "updatedAt": "2026-10-31T06:50:32.366Z"
+      }
+    ],
+    "gifts": [
+      {
+        "id": "d4e5f6a7-b8c9-4d0e-9f1a-2b3c4d5e6f7a",
+        "seasonId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "recipientId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+        "name": "Wool scarf",
+        "category": "Clothing",
+        "store": "Local market",
+        "purchaseUrl": null,
+        "plannedBudgetMinor": 3500,
+        "actualCostMinor": 3200,
+        "bought": true,
+        "boughtOn": "2026-11-14",
+        "wrapped": true,
+        "wrappedOn": "2026-12-10",
+        "sent": false,
+        "sentOn": null,
+        "deliveryMethod": "hand_delivered",
+        "address": "12 Sample Street",
+        "notes": "Navy blue.",
+        "createdAt": "2026-10-31T06:50:32.366Z",
+        "updatedAt": "2026-10-31T06:50:32.366Z"
+      },
+      {
+        "id": "e5f6a7b8-c9d0-4e1f-8a2b-3c4d5e6f7a8b",
+        "seasonId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "recipientId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+        "name": "Board game",
+        "category": "Games",
+        "store": "High street toys",
+        "purchaseUrl": null,
+        "plannedBudgetMinor": 4500,
+        "actualCostMinor": null,
+        "bought": false,
+        "boughtOn": null,
+        "wrapped": false,
+        "wrappedOn": null,
+        "sent": false,
+        "sentOn": null,
+        "deliveryMethod": null,
+        "address": null,
+        "notes": null,
+        "createdAt": "2026-10-31T06:50:32.366Z",
+        "updatedAt": "2026-10-31T06:50:32.366Z"
+      },
+      {
+        "id": "f6a7b8c9-d0e1-4f2a-9b3c-4d5e6f7a8b9c",
+        "seasonId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "recipientId": "c3d4e5f6-a7b8-4c9d-8e1f-2a3b4c5d6e7f",
+        "name": "Ceramics workshop voucher",
+        "category": "Experience",
+        "store": "Studio visits",
+        "purchaseUrl": null,
+        "plannedBudgetMinor": 6000,
+        "actualCostMinor": 6000,
+        "bought": true,
+        "boughtOn": "2026-11-20",
+        "wrapped": false,
+        "wrappedOn": null,
+        "sent": true,
+        "sentOn": "2026-11-21",
+        "deliveryMethod": "digital",
+        "address": null,
+        "notes": "Booked for January.",
+        "createdAt": "2026-10-31T06:50:32.366Z",
+        "updatedAt": "2026-10-31T06:50:32.366Z"
+      }
+    ],
+    "ideas": [
+      {
+        "id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+        "seasonId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "recipientId": "c3d4e5f6-a7b8-4c9d-8e1f-2a3b4c5d6e7f",
+        "name": "Audiobook subscription",
+        "category": "Media",
+        "store": null,
+        "purchaseUrl": null,
+        "estimatedPriceMinor": 2500,
+        "notes": null,
+        "status": "active",
+        "convertedGiftId": null,
+        "convertedAt": null,
+        "createdAt": "2026-10-31T06:50:32.366Z",
+        "updatedAt": "2026-10-31T06:50:32.366Z"
+      },
+      {
+        "id": "1b2c3d4e-5f6a-4b7c-9d8e-0f1a2b3c4d5e",
+        "seasonId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "recipientId": null,
+        "name": "Cosy throw",
+        "category": "Home",
+        "store": null,
+        "purchaseUrl": null,
+        "estimatedPriceMinor": 4000,
+        "notes": "Unassigned idea from the sample bank.",
+        "status": "active",
+        "convertedGiftId": null,
+        "convertedAt": null,
+        "createdAt": "2026-10-31T06:50:32.366Z",
+        "updatedAt": "2026-10-31T06:50:32.366Z"
+      }
+    ]
+  }
+}

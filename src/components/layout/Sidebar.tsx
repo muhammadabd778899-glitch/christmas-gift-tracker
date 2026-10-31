@@ -1,4 +1,5 @@
-import { APP_MILESTONE, APP_MILESTONE_LABEL, APP_VERSION } from '../../lib/appInfo';
+import { APP_VERSION } from '../../lib/appInfo';
+import { EDITION_LABEL } from '../../edition';
 import { Brand } from './Brand';
 import { NavLinks } from './NavLinks';
 import styles from './Sidebar.module.css';
@@ -18,11 +19,11 @@ export function Sidebar() {
         <div className={styles.buildNote}>
           <span className={styles.buildDot} aria-hidden="true" />
           <div className={styles.buildCopy}>
-            <span className={styles.buildLabel}>Milestone {APP_MILESTONE}</span>
-            <span className={styles.buildText}>{APP_MILESTONE_LABEL}</span>
+            <span className={styles.buildLabel}>Version {APP_VERSION}</span>
+            <span className={styles.buildText}>{EDITION_LABEL}</span>
           </div>
         </div>
-        <p className={styles.version}>v{APP_VERSION} · Local-first by design</p>
+        <p className={styles.version}>Local-first by design</p>
       </div>
     </aside>
   );

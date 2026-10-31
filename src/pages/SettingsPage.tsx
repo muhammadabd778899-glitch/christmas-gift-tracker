@@ -28,6 +28,7 @@ import { AppearanceSettings } from '../features/settings/AppearanceSettings';
 import { OfflineSettings } from '../features/settings/OfflineSettings';
 import { StorageDiagnostics } from '../features/settings/StorageDiagnostics';
 import { APP_MILESTONE, APP_MILESTONE_LABEL, APP_VERSION } from '../lib/appInfo';
+import { EDITION_LABEL, IS_ONLINE_EDITION } from '../edition';
 import { toAppError } from '../storage/errors';
 import styles from './SettingsPage.module.css';
 
@@ -117,12 +118,12 @@ const milestones: Milestone[] = [
     number: '12',
     title: 'QA, packaging, launch',
     focus: 'Tested, documented Etsy release with honest claims',
-    status: 'Planned',
+    status: 'Complete',
   },
 ];
 
 const buildFacts = [
-  ['Version', `v${APP_VERSION} · Milestone ${APP_MILESTONE}`],
+  ['Version', `v${APP_VERSION} · ${EDITION_LABEL}`],
   ['Framework', 'React 19 + TypeScript + Vite'],
   ['Styling', 'CSS Modules with light and dark design tokens'],
   ['Charts', 'Recharts with a table alternative and reduced motion'],
@@ -135,17 +136,24 @@ const buildFacts = [
   ['Offline', 'Installable app; one online visit before first offline launch'],
   ['Updates', 'Offered in-app and never applied over unsaved form work'],
   ['Data', 'One active season, archived seasons, and optional sample data'],
+  ...(IS_ONLINE_EDITION
+    ? [['Sync', 'Optional account, per-record sync, and explicit conflict choices']]
+    : [['Accounts', 'No account, sign-in, or network requests in core screens']]),
 ];
 
 const limitations = [
   'Currency is display-only. Changing it reformats amounts; it never converts or rewrites stored values.',
-  'Backups and CSV exports are manual downloads; there is no automatic or cloud backup.',
+  IS_ONLINE_EDITION
+    ? 'Backups and CSV exports are manual downloads. Account sync copies records between your devices, but it is not a backup.'
+    : 'Backups and CSV exports are manual downloads; there is no automatic or cloud backup.',
   'Restore replaces all current data. Combining two backups (merge) is not supported.',
   'Offline use needs one online visit and a per-browser install. Clearing site data deletes the planner, so keep backups.',
   'Offline behavior is verified in Chromium browsers only; Firefox, Safari, and iOS remain unverified.',
   'The single-file file:// edition is evaluated but not shipped; use the installable app.',
   'Printing uses the browser print dialog; there is no built-in PDF export or saved print file.',
   'Wrapped progress uses every gift as its denominator, so 100% may not be reachable for digital or retailer-direct gifts.',
+  'When typing an amount, a single dot or comma is read as a decimal point only when it is followed by at most the configured fraction digits; otherwise it is a grouping separator. Check the money preview before saving.',
+  'Sample seasons are read-only examples. Removing one is permanent, and an archived sample season cannot be restored; real seasons can.',
 ];
 
 const dataTools = [
@@ -180,8 +188,12 @@ function SettingsHeader() {
     <PageHeader
       eyebrow="Preferences and information"
       title="Settings"
-      description="Choose how the planner looks and displays money, check local storage health, and see what this build includes."
-      badge={<Badge tone="gold">Milestone {APP_MILESTONE} preview</Badge>}
+      description="Choose how the planner looks and displays money, check local storage health, and see what this release includes."
+      badge={
+        <Badge tone="gold">
+          {EDITION_LABEL} · v{APP_VERSION}
+        </Badge>
+      }
     />
   );
 }
@@ -315,7 +327,7 @@ export function SettingsPage() {
       <div className={styles.twoColumn}>
         <Card>
           <CardHeader>
-            <Badge tone="neutral">This build</Badge>
+            <Badge tone="neutral">This release</Badge>
             <CardTitle as="h2">Honest specifics</CardTitle>
             <CardDescription>What is running today, without implied features.</CardDescription>
           </CardHeader>
@@ -336,21 +348,20 @@ export function SettingsPage() {
             <span className={styles.privacyIcon} aria-hidden="true">
               <ShieldCheck />
             </span>
-            <CardTitle as="h2">Local-first progress</CardTitle>
+            <CardTitle as="h2">
+              {IS_ONLINE_EDITION ? 'Local-first with optional sync' : 'Local-first progress'}
+            </CardTitle>
             <CardDescription>
-              Your planner lives in this browser’s IndexedDB. Themes, currency display, seasons,
-              people, gifts, and ideas all stay on this device.
+              {IS_ONLINE_EDITION
+                ? 'The offline edition keeps everything in this browser. When you connect a device, the online edition uploads the same records to your own account so they can sync.'
+                : 'Your planner lives in this browser’s IndexedDB. Themes, currency display, seasons, people, gifts, and ideas all stay on this device.'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className={styles.privacyText}>
-              Startup creates only safe settings and diagnostics. It does not create a season, seed
-              sample gifts, or delete records. A season exists only after you explicitly create or
-              restore one. Dashboard totals are calculated from saved records and are never stored
-              as a competing source of truth. Diagnostics show counts and integrity issues only — no
-              names, addresses, or notes. No account is required. Core screens make no network
-              requests; the first visit must be online so this browser can cache the app for offline
-              use.
+              {IS_ONLINE_EDITION
+                ? 'Startup creates only safe settings and diagnostics. It does not create a season, seed sample gifts, or delete records. A season exists only after you explicitly create or restore one. Connected devices upload records to your own account, where row-level security isolates them from other accounts. Dashboard totals are calculated from saved records and are never stored as a competing source of truth. Diagnostics show counts and integrity issues only — no names, addresses, or notes. There is no tracking or telemetry, and the first visit must be online so this browser can cache the app.'
+                : 'Startup creates only safe settings and diagnostics. It does not create a season, seed sample gifts, or delete records. A season exists only after you explicitly create or restore one. Dashboard totals are calculated from saved records and are never stored as a competing source of truth. Diagnostics show counts and integrity issues only — no names, addresses, or notes. No account is required. Core screens make no network requests; the first visit must be online so this browser can cache the app for offline use.'}
             </p>
             <div className={styles.claims}>
               <strong>Claims we will not make until verified</strong>
@@ -370,7 +381,8 @@ export function SettingsPage() {
           </Badge>
           <CardTitle as="h2">What is intentionally missing</CardTitle>
           <CardDescription>
-            Each limitation maps to a later milestone in the roadmap above.
+            Every milestone passed its acceptance criteria and verification commands. The
+            limitations below are deliberate and documented, not hidden.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -383,7 +395,8 @@ export function SettingsPage() {
       </Card>
 
       <p className={styles.footnote}>
-        Milestone {APP_MILESTONE}: {APP_MILESTONE_LABEL}. Version {APP_VERSION}.
+        Version {APP_VERSION} · {EDITION_LABEL}. Built through Milestone {APP_MILESTONE}:{' '}
+        {APP_MILESTONE_LABEL}.
       </p>
     </div>
   );

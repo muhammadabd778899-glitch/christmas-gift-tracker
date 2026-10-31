@@ -2,8 +2,8 @@
 
 A local-first Christmas gift planning application: recipients, gifts, budgets, ideas, shopping lists, seasons, backups, and offline use.
 
-> **Status: Milestone 11 — Online accounts and synchronization complete and verified locally.**
-> The delivered Etsy edition remains the account-free, offline-first PWA. The same codebase also builds an optional online edition (`npm run build:online`) with Supabase email/password accounts, password recovery, account export and deletion, device linking, automatic sync, retry, duplicate protection, and conflict choices. The private local IndexedDB database stays authoritative for offline work in both editions; nothing is transmitted unless the user links a device in the online edition. Light, dark, and system themes apply before first paint; currency formatting, diagnostics, privacy details, install guidance, and persistent-storage requests live in Settings. Backups and CSV exports are explicit local downloads.
+> **Status: Milestone 12 — Christmas Gift Tracker 1.0.0 prepared and verified locally.**
+> The delivered Etsy edition is the account-free, offline-first PWA. The release package contains three PDF guides, an optional sample backup, and install notes; the validated offline artifact is built locally at `release/Offline-Edition/` (git-ignored; regenerate with `npm run build`) for hosting. Hosting, the listing URL, and the Etsy upload remain owner actions. The same codebase also builds an optional online edition (`npm run build:online`) with Supabase email/password accounts, password recovery, account export and deletion, device linking, automatic sync, retry, duplicate protection, and conflict choices. The private local IndexedDB database stays authoritative for offline work in both editions; nothing is transmitted unless the user links a device in the online edition. Light, dark, and system themes apply before first paint; currency formatting, diagnostics, privacy details, install guidance, and persistent-storage requests live in Settings. Backups and CSV exports are explicit local downloads.
 
 ---
 
@@ -75,7 +75,7 @@ A local-first Christmas gift planning application: recipients, gifts, budgets, i
 - Typed repositories with cross-season checks, transactional recipient policies, idea conversion, gift integrity, season lifecycle operations, and data portability.
 - Safe startup: settings and meta are created only when absent; startup never creates a season, seeds sample data, or deletes records.
 - A boot screen, a storage recovery screen with guidance, a health-check engine, a migration harness, and explicit restore/reset APIs.
-- 377 Vitest tests across 43 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, dashboard calculations, season lifecycle, backup export/validation/restore, CSV encoding and safety, sample-data isolation, theme resolution and pre-paint behavior, Settings flows, install-prompt behavior, offline status, update consent, persistent-storage results, schema-2 upgrade, transactional change capture, connection planning, merge safety, push/pull retry, conflict resolution, fake-cloud isolation, and Account UI flows.
+- 382 Vitest tests across 44 files, including `fake-indexeddb` integration tests for persistence, validation, atomic rollback, health, migration failure, recipient policies, gift status transitions, first-season setup, the full recipient, gift, idea, and shopping workflows, gift search/filter/sort calculations, recipient detail calculations, dashboard calculations, season lifecycle, backup export/validation/restore, CSV encoding and safety, sample-data isolation, theme resolution and pre-paint behavior, Settings flows, install-prompt behavior, offline status, update consent, persistent-storage results, schema-2 upgrade, transactional change capture, connection planning, merge safety, push/pull retry, conflict resolution, fake-cloud isolation, Account UI flows, and validation/restore of the shipped `release/Sample-Data/Sample-Backup.json`.
 - GitHub Actions CI for formatting, type checking, linting, tests, and the production build.
 
 The hosted installable PWA is the delivered offline edition. A single-file build was produced and evaluated from `file://` but is **not shipped**, because service workers cannot run there and Firefox, Safari, and iOS were not available for the required matrix. There are no invented totals, hidden calculations, automatic cloud backups, or silent data repair.
@@ -206,9 +206,9 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | 9 | Professional UI, themes, accessibility | Complete — verified |
 | 10 | Offline delivery | Complete — verified |
 | 11 | Online edition and sync | Complete — verified locally; remote RLS run pending test credentials |
-| 12 | QA, packaging, Etsy launch | Not started |
+| 12 | QA, packaging, Etsy launch | Complete — 1.0.0 package prepared and verified locally; hosting/listing upload pending |
 
-Milestone 11 is complete locally. The remote Supabase cross-account run (`npm run verify:supabase`) still requires the owner’s dedicated test project; see `docs/ONLINE_SETUP.md`. Milestone 12 — final QA, packaging, and the Etsy release of the offline edition — begins only after owner review and authorization.
+Milestone 12 is complete locally. Version 1.0.0 passed typecheck, lint, 382 tests in 44 files, both production builds, the offline bundle scan, a clean-profile offline run, the sample-backup restore, and a large-data restore. The validated offline artifact is built locally at `release/Offline-Edition/` (git-ignored); the customer ZIP is `release/Christmas-Gift-Tracker-1.0.0.zip`. The Etsy listing needs an owner-supplied HTTPS hosting URL; the docs deliberately say “the address supplied with your purchase” instead of inventing one. The remote Supabase cross-account run (`npm run verify:supabase`) still requires the owner’s dedicated test project and remains pending; see `docs/ONLINE_SETUP.md` and `docs/MILESTONE_12_REPORT.md`.
 
 ---
 
@@ -233,16 +233,16 @@ The interface copy is intentionally conservative: local downloads are offered, b
 
 ## Current next step
 
-1. Owner reviews `docs/MILESTONE_11_REPORT.md`, the offline build, the online build, and `docs/ONLINE_SETUP.md`.
-2. Owner creates the dedicated Supabase test project, applies the migration, and supplies the URL and anon key through the git-ignored `.env.online.local` only.
-3. Owner runs `npm run verify:supabase`; the result completes the remote RLS/cross-account evidence.
-4. Owner authorizes Milestone 12 — final QA, packaging, and the Etsy release of the account-free offline edition.
-5. Milestone 12 must preserve both editions and keep the offline edition account-free.
+1. Owner chooses an HTTPS static host with SPA fallback for the offline edition and uploads the contents of `release/Offline-Edition/` (or rebuilds from this commit with `npm run build`).
+2. Owner verifies the hosted app once in a clean Chrome/Edge profile, then records the public app address in the Etsy listing and the purchase message. The release docs refer to “the address supplied with your purchase”.
+3. Owner reviews `release/Listing-Copy.md`, the three PDFs, and `release/Christmas-Gift-Tracker-1.0.0.zip`, then uploads the ZIP to Etsy.
+4. Optional, for the online edition: create the dedicated Supabase test project, apply the migration, supply the URL and anon key through the git-ignored `.env.online.local`, and run `npm run verify:supabase`. This does not block the offline Etsy release.
+5. Keep the offline edition account-free and verify it again after any hosting or content change.
 
-Until authorized: **do not start Milestone 12.**
+Release 1.0.0 is prepared. Hosting and Etsy upload are the remaining external actions.
 
 ---
 
 ## License and distribution
 
-This is intended to be a commercial digital product. Licensing, Etsy distribution terms, and support terms are to be finalized before the release milestone. Do not redistribute the source without the owner’s permission.
+The customer-facing license, privacy summary, and support terms are in `release/Christmas-Gift-Tracker-1.0.0/License-and-Support.pdf` (source: `release/docs-source/License-and-Support.html`). The product is an independent commercial digital product sold through Etsy. Do not redistribute the source without the owner’s permission.

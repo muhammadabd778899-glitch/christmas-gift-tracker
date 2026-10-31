@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Christmas Gift Tracker - User Guide</title>
+    <link rel="stylesheet" href="print.css" />
+  </head>
+  <body>
+    <header class="cover">
+      <p class="eyebrow">User guide</p>
+      <h1>Christmas Gift Tracker</h1>
+      <p class="subtitle">Plan the people, the gifts, and the budget without losing the thread.</p>
+      <div class="meta">
+        <span><strong>Edition</strong> Offline, account-free</span>
+        <span><strong>Version</strong> 1.0.0</span>
+        <span><strong>Guide updated</strong> 31 October 2026</span>
+      </div>
+    </header>
+
+    <p>
+      This guide explains every screen in the offline edition, how the totals are calculated, how
+      to protect your data, and what the app deliberately does not do. It is written for the tested
+      build. If the app and this guide ever disagree, the app’s on-screen explanations and the
+      current release notes take priority.
+    </p>
+
+    <nav class="toc" aria-label="Contents">
+      <ol>
+        <li><a href="#about">About this edition</a></li>
+        <li><a href="#first-run">First run and installation</a></li>
+        <li><a href="#dashboard">Dashboard</a></li>
+        <li><a href="#seasons">Seasons and archives</a></li>
+        <li><a href="#recipients">Recipients</a></li>
+        <li><a href="#gifts">Gifts and statuses</a></li>
+        <li><a href="#ideas">Idea Bank</a></li>
+        <li><a href="#shopping">Shopping List</a></li>
+        <li><a href="#search">Search, filters, and sorting</a></li>
+        <li><a href="#data">Backups, restore, CSV, and resets</a></li>
+        <li><a href="#appearance">Appearance and currency</a></li>
+        <li><a href="#offline">Offline use, updates, and storage</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#accessibility">Keyboard and accessibility</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#limitations">Known limitations</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="about">1. About this edition</h2>
+    <p>
+      Christmas Gift Tracker is a single-user Christmas gift planner. It keeps one season active at
+      a time, with older seasons kept as read-only archives. Recipients, gifts, ideas, budgets, and
+      notes live in this browser’s local database.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Included in this edition</th>
+          <th>Not included</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            Seasons and archives; recipients; gifts and statuses; budgets and dashboard; budget-vs-
+            actual chart; Idea Bank; Shopping List; search and filters; JSON backups; CSV export;
+            sample data; themes; currency display; print views; offline app installation.
+          </td>
+          <td>
+            Accounts, sign-in, cloud sync, automatic/cloud backups, built-in PDF export, merging two
+            backups, and verified Firefox/Safari/iOS behavior.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <h3>No account, no telemetry</h3>
+      <p>
+        The offline edition makes no network requests during core use. It has no account system, no
+        analytics, no advertising, and no third-party runtime assets. The only network activity
+        needed is the initial visit (and later app updates).
+      </p>
+    </div>
+
+    <h2 id="first-run" class="page-break">2. First run and installation</h2>
+    <h3>2.1 The one-time online visit</h3>
+    <ol>
+      <li>Open the app address supplied with your purchase in a current browser.</li>
+      <li>Let the page finish loading. The footer shows <strong>“Saved on this device”</strong> when online.</li>
+      <li>
+        A banner may say <strong>“Ready to work offline.”</strong> It means the app has cached its
+        files. Choose <strong>Got it</strong>.
+      </li>
+    </ol>
+    <p>
+      After this visit, the app can launch from its icon, home screen, or bookmark without a
+      connection. Do not open <span class="small">index.html</span> directly from a downloaded
+      folder: browser storage and offline caching require a hosted
+      <span class="small">https://</span> address.
+    </p>
+
+    <h3>2.2 Install (optional but recommended)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Device and browser</th>
+          <th>How to install</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Chrome or Edge on a computer</td>
+          <td>Use the install icon in the address bar, or browser menu &gt; <em>Install this site as an app</em>.</td>
+        </tr>
+        <tr>
+          <td>Android</td>
+          <td>Browser menu &gt; <em>Install app</em> or <em>Add to Home screen</em>.</td>
+        </tr>
+        <tr>
+          <td>iPhone or iPad (Safari)</td>
+          <td>Share &gt; <em>Add to Home Screen</em>.</td>
+        </tr>
+        <tr>
+          <td>Firefox on a computer</td>
+          <td>No app install is offered. Bookmark the page; offline use still works after the first visit.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="small">
+      Installation behavior differs by browser and version. Microsoft Edge 156 on Windows is the
+      configuration verified for this release. Chrome is expected to behave the same way. Safari,
+      Firefox, Android, and iOS installation flows are documented guidance, not verified behavior.
+    </p>
+
+    <h3>2.3 Create the first season</h3>
+    <p>
+      The setup form asks for a season name, a Christmas date, and an optional season budget. You
+      can also choose a light/dark/system theme and a currency. Nothing is saved until you submit
+      the form.
+    </p>
+    <p>
+      If you want to explore first, tick <strong>“Load the optional sample season.”</strong> The
+      sample is flagged with a <span class="tag">SAMPLE DATA</span> badge. It can be removed later
+      from <strong>Seasons &amp; archives</strong> without affecting real records.
+    </p>
+
+    <h2 id="dashboard" class="page-break">3. Dashboard</h2>
+    <figure>
+      <img
+        src="../screenshots/01-dashboard-light.png"
+        alt="Dashboard with the Sample Christmas season, countdown, and five budget cards."
+      />
+      <figcaption>The dashboard uses only saved records; totals are recalculated, never stored twice.</figcaption>
+    </figure>
+    <p>
+      The dashboard shows the active season (or an archived season, read-only). Each figure answers
+      a different question:
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Figure</th>
+          <th>Meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Season budget</strong></td>
+          <td>The overall amount you set for the season. It can be left blank.</td>
+        </tr>
+        <tr>
+          <td><strong>Planned spending</strong></td>
+          <td>The sum of planned budgets across all gifts, whether bought or not.</td>
+        </tr>
+        <tr>
+          <td><strong>Actual spending</strong></td>
+          <td>The sum of actual costs for gifts marked bought. Unbought gifts contribute nothing.</td>
+        </tr>
+        <tr>
+          <td><strong>Remaining budget</strong></td>
+          <td>Season budget minus actual spending.</td>
+        </tr>
+        <tr>
+          <td><strong>Unallocated budget</strong></td>
+          <td>Season budget minus planned spending. It is not the same as remaining budget.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      The countdown uses the season’s Christmas date. The chart compares planned and actual amounts
+      and includes an accessible table of the same numbers. Gift progress counts bought, wrapped,
+      and sent gifts. Data-quality alerts point out gaps such as a bought gift with no actual cost.
+    </p>
+    <div class="callout">
+      <h3>Why two “budget left” numbers?</h3>
+      <p>
+        <strong>Remaining</strong> reflects money you have already spent. <strong>Unallocated</strong>
+        reflects money not yet assigned to a gift plan. A season can have unallocated money and still
+        be over its actual budget, or the reverse.
+      </p>
+    </div>
+
+    <h2 id="seasons" class="page-break">4. Seasons and archives</h2>
+    <p>
+      Open <strong>Seasons &amp; archives</strong> from the sidebar. There is at most one active
+      season. Starting a new season archives the current one in the same step; records are never
+      merged between seasons.
+    </p>
+    <h3>4.1 Active season</h3>
+    <ul>
+      <li><strong>Open dashboard</strong> returns to the active season’s overview.</li>
+      <li><strong>Edit details</strong> changes the name, date, or budget.</li>
+      <li>
+        <strong>Archive season</strong> makes the season read-only and leaves the app with no active
+        season until you create or restore one.
+      </li>
+    </ul>
+    <h3>4.2 Archived seasons</h3>
+    <p>
+      Archived seasons are read-only: you can view, export, print, and include them in backups, but
+      not edit them. Restoring an archived season makes it active and archives the current active
+      season in the same transaction.
+    </p>
+    <h3>4.3 New season and recipient copying</h3>
+    <p>
+      Creating a new season archives the current one. You can copy recipients from the previous
+      season; their names, relationships, caps, and notes carry over, but gifts and ideas do not.
+    </p>
+    <h3>4.4 Delete an archived season</h3>
+    <p>
+      Deleting an archived season requires typing its exact name. The active season cannot be
+      deleted this way. Sample seasons follow the sample-data rules described in section 10.
+    </p>
+
+    <h2 id="recipients" class="page-break">5. Recipients</h2>
+    <p>
+      Each recipient belongs to one season. A recipient can have a relationship, an optional
+      spending cap, and notes. The recipients list shows planned and spent totals, while the detail
+      page shows cap utilisation and gift progress.
+    </p>
+    <figure>
+      <img
+        src="../screenshots/04-recipient-detail-light.png"
+        alt="Recipient detail page showing budget cap, planned, spent, cap left, utilisation, and gift progress."
+      />
+      <figcaption>A recipient detail page with cap left and progress for that person only.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Budget cap</strong> is the most this recipient should cost. It is a planning limit, not an enforced block.</li>
+      <li><strong>Planned</strong> sums planned budgets for that recipient’s gifts.</li>
+      <li><strong>Spent</strong> sums actual costs for that recipient’s bought gifts.</li>
+      <li><strong>Cap left</strong> is the cap minus spent. It can become negative and is labelled clearly.</li>
+    </ul>
+    <p>
+      Deleting a recipient who has gifts requires choosing what happens to those gifts: reassign
+      them to another recipient (typing the source recipient’s name to confirm) or delete them with
+      the recipient. Ideas linked to the recipient become unassigned.
+    </p>
+
+    <h2 id="gifts" class="page-break">6. Gifts and statuses</h2>
+    <figure>
+      <img
+        src="../screenshots/02-gifts-light.png"
+        alt="Gifts page with search, filters, and a table showing three gifts and their status toggles."
+      />
+      <figcaption>Gifts are scoped to the active season, with search, filters, and quick status toggles.</figcaption>
+    </figure>
+    <p>A gift can include:</p>
+    <table>
+      <tbody>
+        <tr>
+          <th>Required</th>
+          <td>Name and recipient.</td>
+        </tr>
+        <tr>
+          <th>Optional</th>
+          <td>
+            Planned budget, actual cost, category, store, purchase link, delivery method, address,
+            notes, and dates for bought, wrapped, and sent.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>6.1 Status rules</h3>
+    <ul>
+      <li><strong>Bought</strong> records that you paid for the gift.</li>
+      <li><strong>Wrapped</strong> and <strong>Sent</strong> require Bought. Their controls are disabled until Bought is ticked.</li>
+      <li>Wrapped and Sent are independent of each other; a gift can be sent without being marked wrapped.</li>
+      <li>
+        Un-buying a gift clears its wrapped and sent states. The app asks for confirmation before
+        doing so.
+      </li>
+    </ul>
+    <h3>6.2 Actual cost</h3>
+    <p>
+      Actual cost is optional. A bought gift with no actual cost appears in data-quality alerts so
+      you can fill it in. Until then, spending uses only costs that exist.
+    </p>
+    <h3>6.3 Purchase links</h3>
+    <p>
+      Purchase links must start with <span class="small">http://</span> or
+      <span class="small">https://</span>. Other schemes are rejected. Opening a link offline may
+      show the browser’s no-connection page; the planner stays open.
+    </p>
+    <h3>6.4 Deleting a gift</h3>
+    <p>
+      Deleting a gift asks for confirmation. If the gift came from an idea, deleting it reopens that
+      idea in the Idea Bank instead of losing it.
+    </p>
+
+    <h2 id="ideas" class="page-break">7. Idea Bank</h2>
+    <p>
+      The Idea Bank holds possibilities that are not yet gifts. Ideas do not count toward budgets,
+      progress, or the Shopping List until you convert one.
+    </p>
+    <ul>
+      <li>An idea can be assigned to a recipient or left unassigned.</li>
+      <li><strong>Convert to gift</strong> creates a gift and keeps the idea for reference. Conversion is duplicate-safe; clicking twice does not create a second gift.</li>
+      <li>If the converted gift is deleted, the idea reopens.</li>
+      <li>Search matches idea name, recipient, category, and store.</li>
+    </ul>
+
+    <h2 id="shopping">8. Shopping List</h2>
+    <p>
+      The Shopping List is generated from unbought gifts in the active season. It is never stored
+      separately. Items are grouped by store, with a subtotal for each group and a total planned
+      amount for the list.
+    </p>
+    <ul>
+      <li><strong>Mark bought</strong> uses the same status rules as the Gifts page and removes the item from the list.</li>
+      <li>Marking an item bought does not invent an actual cost; add that on the gift when you know it.</li>
+      <li><strong>Print list</strong> gives a clean print view with the season and date, without navigation or controls.</li>
+      <li>Archived seasons show no mark-bought controls.</li>
+    </ul>
+
+    <h2 id="search" class="page-break">9. Search, filters, and sorting</h2>
+    <p>
+      Gift search matches name, recipient, category, and store, ignoring case and common accent
+      differences. You can combine search with recipient, category, bought, wrapped, and sent
+      filters; all active conditions must match. Sorting covers name, planned budget, actual cost,
+      and status.
+    </p>
+    <p>
+      The Idea Bank has its own search. Use <strong>Clear all</strong> or <strong>Clear search</strong>
+      to reset the controls. Empty states explain how to remove filters when nothing matches.
+    </p>
+
+    <h2 id="data" class="page-break">10. Backups, restore, CSV, and resets</h2>
+    <div class="warning">
+      <h3>Your only portable copy is a backup file</h3>
+      <p>
+        The planner lives in this browser. Downloading a JSON backup is the deliberate way to keep a
+        copy you can move, archive, or restore. There is no automatic or cloud backup in this
+        edition.
+      </p>
+    </div>
+
+    <h3>10.1 Download a backup</h3>
+    <p>
+      Go to <strong>Seasons &amp; archives &gt; Backup and restore &gt; Download backup</strong>. The JSON
+      file includes settings, every season (active and archived), recipients, gifts, ideas,
+      addresses, and notes. Keep it private.
+    </p>
+
+    <h3>10.2 Restore a backup</h3>
+    <ol>
+      <li>Choose the JSON file. The app validates it before writing anything.</li>
+      <li>Review the summary: exported date, season counts, record counts, and app version.</li>
+      <li>Download the current data. Restore stays disabled until you do.</li>
+      <li>Type <strong>RESTORE</strong> exactly, then choose <strong>Restore backup (replace all data)</strong>.</li>
+    </ol>
+    <p>
+      Restore <strong>replaces</strong> everything on this device. It does not merge two backups.
+      Invalid, newer, or inconsistent files are rejected without changing current data.
+    </p>
+
+    <h3>10.3 CSV export</h3>
+    <p>
+      CSV export covers the active season or all seasons. Address and notes columns are off by
+      default. Exported text that looks like a spreadsheet formula is neutralized with a leading
+      apostrophe. The file is UTF-8 with a byte-order mark for Excel, Numbers, and Sheets.
+    </p>
+
+    <h3>10.4 Sample data</h3>
+    <p>
+      Sample data is optional and clearly flagged. You can load one sample season, explore it, and
+      remove it later without touching real records. Sample seasons are read-only examples. Removing
+      sample data is permanent, and an archived sample season cannot be restored; real seasons can.
+      The included <span class="small">Sample-Backup.json</span> also restores as flagged sample data.
+    </p>
+
+    <h3>10.5 Reset the planner</h3>
+    <p>
+      Reset erases this browser’s planner data. It requires a fresh backup and typing
+      <strong>DELETE</strong>. After a reset, the app returns to first-season setup. Reset is
+      intentionally harder than deleting one record.
+    </p>
+
+    <h2 id="appearance" class="page-break">11. Appearance and currency</h2>
+    <h3>11.1 Themes</h3>
+    <p>
+      Choose Light, Dark, or System in <strong>Settings &gt; Appearance</strong> or from the header
+      toggle. The theme is applied before the page paints, so there is no flash. The choice is saved
+      in this browser.
+    </p>
+    <h3>11.2 Currency display</h3>
+    <p>
+      Currency is <strong>display-only</strong>. Changing the code, symbol, or fraction digits
+      reformats stored amounts; it never converts or rewrites them. If monetary data exists, the app
+      asks for confirmation before reinterpreting the display.
+    </p>
+    <h3>11.3 How typed amounts are read</h3>
+    <p>
+      The amount field accepts an optional symbol, spaces, apostrophes, and grouping separators. A
+      dot or comma is read as a decimal separator only when it is followed by at most the configured
+      number of fraction digits. Otherwise it is treated as a grouping separator.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>You type (USD, 2 fraction digits)</th>
+          <th>Stored as</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>12.50</td>
+          <td>$12.50</td>
+        </tr>
+        <tr>
+          <td>12,50</td>
+          <td>$12.50</td>
+        </tr>
+        <tr>
+          <td>12.345</td>
+          <td>$12,345.00 - three trailing digits are read as grouping</td>
+        </tr>
+        <tr>
+          <td>1,234.56</td>
+          <td>$1,234.56</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="small">
+      Check the money preview before saving. If a separator is ambiguous for the currency you chose,
+      type the amount without grouping separators.
+    </p>
+
+    <h2 id="offline">12. Offline use, updates, and storage</h2>
+    <h3>12.1 Offline status</h3>
+    <p>
+      The footer reports the connection honestly: <strong>“Saved on this device”</strong> when
+      online, and <strong>“Offline”</strong> (all data saved on this device) when offline. Offline
+      mode does not block editing; the local database already works without a network.
+    </p>
+    <h3>12.2 Updates</h3>
+    <p>
+      When a new version is saved, a banner says <strong>“A new version is ready.”</strong> Choose
+      <strong>Reload to update</strong> when convenient, or <strong>Later</strong> to dismiss it. If
+      a dialog or form is open, the reload is refused with a reminder to close it first, so unsaved
+      work is not discarded.
+    </p>
+    <h3>12.3 Persistent storage</h3>
+    <p>
+      <strong>Settings &gt; Storage health</strong> can ask the browser for persistent storage. The app
+      reports whether the request was granted, declined, or unsupported. A grant reduces the chance
+      of eviction under disk pressure; it is not a guarantee. Keep backups.
+    </p>
+    <h3>12.4 Diagnostics</h3>
+    <p>
+      The same section shows counts and integrity issues only - no names, addresses, or notes. It
+      also shows app and schema versions.
+    </p>
+
+    <h2 id="privacy" class="page-break">13. Privacy</h2>
+    <ul>
+      <li>The offline edition stores planner data in this browser’s IndexedDB on this device.</li>
+      <li>There is no account, sign-in, cloud sync, analytics, telemetry, advertising, or third-party runtime asset.</li>
+      <li>Backups and CSV exports are created on this device. They can contain sensitive addresses and notes; protect and delete them according to your own needs.</li>
+      <li>The publisher’s hosting provider may record standard technical request logs when you load or update the app, as any website host does.</li>
+      <li>Purchase and order details are handled by Etsy, not by the app.</li>
+      <li>Clearing site data deletes the planner. No app code path clears records automatically.</li>
+    </ul>
+
+    <h2 id="accessibility">14. Keyboard and accessibility</h2>
+    <ul>
+      <li>All primary actions are reachable by keyboard, with a visible focus ring.</li>
+      <li>Dialogs move focus inside, close with Escape, and return focus to the trigger.</li>
+      <li>Charts have a table alternative, and metric explanations are available by keyboard.</li>
+      <li>Reduced-motion preferences are respected.</li>
+      <li>Targets are sized for touch, and the layout adapts to narrow screens.</li>
+      <li>Form errors are announced and linked to their fields.</li>
+    </ul>
+
+    <h2 id="troubleshooting" class="page-break">15. Troubleshooting</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Problem</th>
+          <th>What to do</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>The app does not open offline.</td>
+          <td>
+            Visit the hosted address once more while online, wait for loading to finish, then try
+            again. Private/incognito windows are not reliable for offline use.
+          </td>
+        </tr>
+        <tr>
+          <td>A storage or quota message appears.</td>
+          <td>
+            Your data has not been deleted. Download a backup first, free browser or disk space, and
+            reload. Follow the steps in the message.
+          </td>
+        </tr>
+        <tr>
+          <td>My data is missing after changing browsers or devices.</td>
+          <td>
+            Data is per browser profile. Open the original browser, or restore a JSON backup from
+            <strong>Seasons &amp; archives</strong>.
+          </td>
+        </tr>
+        <tr>
+          <td>The install option is missing.</td>
+          <td>
+            Some browsers do not offer installation. Bookmark the app; offline use still works after
+            one online visit.
+          </td>
+        </tr>
+        <tr>
+          <td>An amount looks larger than I typed.</td>
+          <td>
+            A single separator followed by more than the fraction digits is read as grouping. See
+            section 11.3 and check the preview before saving.
+          </td>
+        </tr>
+        <tr>
+          <td>I cannot restore an archived sample season.</td>
+          <td>
+            Sample seasons are read-only examples and are not restorable. Real archived seasons can
+            be restored.
+          </td>
+        </tr>
+        <tr>
+          <td>Restore is disabled.</td>
+          <td>
+            Download the current data first, then type <strong>RESTORE</strong> exactly. Both are
+            required.
+          </td>
+        </tr>
+        <tr>
+          <td>A purchase link does not open offline.</td>
+          <td>
+            External links need a connection. The planner stays open; try the link later.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="limitations">16. Known limitations</h2>
+    <ul>
+      <li><strong>Offline setup is required.</strong> One online visit is needed before the first offline launch; installation is per browser.</li>
+      <li><strong>Local data can be cleared.</strong> Clearing site data or resetting the browser profile deletes the planner. Backups are the recovery copy.</li>
+      <li><strong>No cloud sync in this edition.</strong> Data does not move between devices unless you export and restore a backup.</li>
+      <li><strong>Restore is replace-all.</strong> Merging two backups is not supported.</li>
+      <li><strong>Backups are manual.</strong> There is no automatic, scheduled, or cloud backup.</li>
+      <li><strong>Currency does not convert.</strong> It only changes how amounts are displayed.</li>
+      <li><strong>Amount separators can be ambiguous.</strong> A single separator with too many trailing digits is grouping; check the preview.</li>
+      <li><strong>Printing uses the browser dialog.</strong> There is no built-in PDF export.</li>
+      <li><strong>Wrapped progress uses every gift as its denominator.</strong> For digital or retailer-direct gifts that never need wrapping, 100% may not be reachable. Progress is informational.</li>
+      <li><strong>Sample seasons are examples.</strong> Removing sample data is permanent, and an archived sample season cannot be restored.</li>
+      <li><strong>Browser verification is partial.</strong> Offline behavior was verified in Microsoft Edge 156 on Windows. Firefox, Safari, iOS/iPadOS, and Android are documented guidance, not verified here.</li>
+      <li><strong>No standalone HTML edition.</strong> The app is not shipped as a single file opened from disk.</li>
+      <li><strong>Large lists render in one page.</strong> The interface remains usable with the tested large dataset, but very large seasons may scroll a long way; filters and search are the intended tools.</li>
+    </ul>
+
+    <p class="footer-note">
+      Christmas Gift Tracker 1.0.0 | Offline edition | User Guide | 31 October 2026. For terms and
+      support, see <em>License-and-Support.pdf</em>. For setup, see <em>START-HERE.pdf</em>.
+    </p>
+  </body>
+</html>

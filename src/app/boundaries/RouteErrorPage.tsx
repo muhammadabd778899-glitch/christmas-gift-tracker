@@ -10,7 +10,7 @@ export function RouteErrorPage() {
         title={error.status === 404 ? 'This page could not be found.' : 'This page could not load.'}
         description={
           error.status === 404
-            ? 'The route does not exist in this preview. Return to the dashboard to continue.'
+            ? 'The route does not exist in this release. Return to the dashboard to continue.'
             : 'The router returned an error while loading this page. No data was changed. Reload the app or return to the dashboard.'
         }
         detail={import.meta.env.DEV ? `${error.status} ${error.statusText}` : undefined}

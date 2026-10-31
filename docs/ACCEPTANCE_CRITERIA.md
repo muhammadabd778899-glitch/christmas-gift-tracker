@@ -386,6 +386,8 @@
 | AC-12.17 | Listing claims are verified and do not overpromise offline, sync, encryption, or backups. | Review |
 | AC-12.18 | A Git release checkpoint/tag exists for the tested build. | Git |
 
+**Verification status (2026-10-31):** All automated and local manual checks pass for release 1.0.0; evidence is in `docs/MILESTONE_12_REPORT.md`. The customer package uses the install-instructions variant permitted by the Milestone 12 build plan: the ZIP contains `Offline-Edition/INSTALL.txt` while the validated artifact is kept locally at `release/Offline-Edition/` (git-ignored build output) for hosting. Hosting, the public app address, and the Etsy upload remain owner actions (O-13). The live Supabase RLS/cross-account run remains pending and does not block the offline release; AC-11.03, 11.04, 11.09, 11.10, 11.11, and 11.15 are still open until `npm run verify:supabase` succeeds.
+
 ---
 
 ## Manual browser matrix (used from Milestone 4 onward)

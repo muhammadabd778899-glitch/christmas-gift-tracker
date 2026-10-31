@@ -8,7 +8,7 @@ Your seasons, recipients, gifts, ideas, budgets, and notes are stored in your br
 
 ## Before you start
 
-- Use a current version of Chrome, Edge, Safari, or Firefox.
+- Use a current version of Chrome or Edge. Microsoft Edge 156 on Windows is the configuration verified for release 1.0.0. Firefox on a computer works in a tab after the first online visit but does not offer installation. Safari on iPhone/iPad installation steps are included but Safari behavior was not verified for this release.
 - Use a normal browser window. Private/incognito windows may discard your data when they close.
 - Use the same browser and device each time. Data does not move between browsers or devices unless you export a backup and restore it.
 - If you use Firefox on a computer, the app still works offline but Firefox does not offer an app-style install. Keep a bookmark instead.
@@ -58,6 +58,12 @@ Settings also contains these steps under **Install and work offline**, along wit
 4. Everything that matters keeps working: seasons, recipients, gifts, the dashboard, Idea Bank, Shopping List, search and filters, archives, backups, and CSV exports.
 
 Some external purchase links need a connection. Tapping one offline may show the browser’s “no connection” page; the planner itself stays open and your data is unaffected.
+
+---
+
+## Sample season (optional)
+
+The download includes `Sample-Data/Sample-Backup.json`, an optional example with one sample season, two recipients, three gifts, and two ideas. Restore it from **Seasons & archives → Backup and restore**. Restoring replaces the current data, so download a backup first if you already have records. The sample season is flagged and can be removed later without touching real records. The app does not create the sample automatically.
 
 ---
 
@@ -112,8 +118,8 @@ Some browsers do not offer installation. You can still use the planner offline a
 
 ## 8. Verification status
 
-The production build was tested in **Microsoft Edge 156 (Chromium) on Windows** with the network disabled: offline launch and reload, all seven sections, creating and editing records, browser restart, backups, CSV downloads, and the update flow.
+Release 1.0.0 was tested from the validated production artifact in **Microsoft Edge 156 (Chromium) on Windows** with the network disabled: offline launch and reload, all seven sections, creating and editing records, browser restart, backups, CSV downloads, and the update flow. The release run also confirmed service-worker control, 15 cached entries, zero console or page errors, zero failed or foreign-origin requests, the shipped sample backup restored into a clean profile, and a 250-recipient / 1,000-gift / 300-idea restore through the UI.
 
 Firefox, Safari, iOS/iPadOS, and Android were not available on the test machine, so their install flows and storage behavior are documented from browser guidance rather than verified here. Keep backups, especially on iPhone and iPad, where Safari may remove data from unused sites.
 
-For the full technical evidence and limitations, see `docs/MILESTONE_10_REPORT.md`.
+For the full technical evidence and limitations, see `docs/MILESTONE_12_REPORT.md` and `docs/MILESTONE_10_REPORT.md`.

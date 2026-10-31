@@ -1,6 +1,6 @@
 # Christmas Gift Tracker — Decision Log
 
-> Status: Milestones 0–11 approved and implemented; Milestone 12 not started · Version 0.11 · 2026-10-30
+> Status: Milestones 0–12 complete and verified locally; release 1.0.0 packaged · Version 1.0 · 2026-10-31
 > Format: lightweight ADRs. Statuses: **Proposed**, **Accepted**, **Superseded**, **Rejected**.
 > Decisions marked Proposed become binding when the owner approves the milestone that depends on them.
 
@@ -448,6 +448,18 @@
 
 ---
 
+### D-036 — Release 1.0.0 packages the offline edition as a hosted PWA
+
+**Status:** Accepted 2026-10-31 for Milestone 12 · **Milestone:** 12
+
+**Context:** The first Etsy release is the account-free offline edition (O-5). The app is an installable PWA that needs one online visit; it does not run reliably from a `file://` folder. Buyers need setup help, a full guide, license/support terms, and an optional sample season. The public hosting address is not chosen yet, and inventing one in customer documents would be misleading.
+
+**Decision:** Ship version 1.0.0 with schema 2. The customer ZIP contains `START-HERE.pdf`, `User-Guide.pdf`, `License-and-Support.pdf`, `Sample-Data/Sample-Backup.json`, and `Offline-Edition/INSTALL.txt`. Raw build assets are not placed in the buyer ZIP; the validated offline artifact is kept locally at `release/Offline-Edition/` (git-ignored build output, reproducible with `npm run build`) for hosting. Customer documents refer to “the address supplied with your purchase” until the owner records a real HTTPS address. The online edition remains a separate build and is not sold in this release. PDFs are generated from `release/docs-source/` with Chromium `Page.printToPDF` (A4, tagged, document outline, page numbers) and checked for text extraction, links, page size, and content. The shipped sample backup is validated by an automated test and by a clean-profile UI restore. Listing claims are limited to verified behavior; Safari, Firefox installation, mobile installation beyond Android guidance, cloud sync, automatic backup, and native-app behavior are not claimed.
+
+**Consequences:** Buyers receive a hosted installable app with honest setup instructions and a tested sample. Technical buyers are not promised a self-hosted bundle or source. Hosting, the public app address, and the Etsy upload remain owner actions (O-13). The offline build must be re-verified after any hosting or content change.
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Confidence | Impact if wrong |
@@ -485,6 +497,7 @@ Each row states the recommendation. Approving this specification approves the re
 | O-10 | Require actual cost when marking a gift bought? | No; allow and flag missing cost | M4 | Decided 2026-10-28 |
 | O-11 | Add a "does not need wrapping" exemption? | No for launch; document the limitation (D-024) | M5 | Decided 2026-10-28 |
 | O-12 | Support a standalone desktop wrapper for Etsy? | Only if M10 proves PWA delivery insufficient | M10/M12 | Decided 2026-10-30 — no wrapper in M10; revisit only with a separate owner decision |
+| O-13 | Where will the offline edition be hosted, and what is its public address? | Owner-selected HTTPS static host with SPA fallback; use the address in the listing and purchase message | Etsy launch | **Open — owner action.** Docs say “the address supplied with your purchase” until a URL exists |
 
 **Approval needed before Milestone 1:** Resolved 2026-10-26. The owner authorized Milestone 1; D-001, D-013, D-014, and D-022 are accepted. All other decisions can be confirmed before their blocking milestone.
 
@@ -507,6 +520,8 @@ Each row states the recommendation. Approving this specification approves the re
 **Approval needed before Milestone 10:** Resolved 2026-10-30. The owner authorized Milestone 10 and approved D-011 with O-1 (PWA-first plus a standalone spike; ship the file only if it passes the full matrix) and O-12 (no desktop wrapper in M10; revisit only if PWA delivery proves insufficient). D-030 records the user-initiated persistence request.
 
 **Approval needed before Milestone 11:** Resolved 2026-10-30. The owner authorized Milestone 11 and approved D-012 (Supabase) and O-5 (the online edition is not part of the first Etsy release). A dedicated Supabase project was approved as the verification environment. D-031 through D-034 record the edition split, sync model, device linkage, and initial-connection behavior.
+
+**Approval needed before Milestone 12:** Resolved 2026-10-31. The owner authorized Milestone 12 and approved D-036 for release 1.0.0 packaging. The offline edition remains account-free and is the only edition in the first Etsy release. Hosting and the public app address are O-13 and remain owner actions; the live Supabase run remains outside the offline release path.
 
 ---
 
@@ -542,3 +557,4 @@ Each row states the recommendation. Approving this specification approves the re
 | 2026-10-30 | D-011 accepted and O-1/O-12 decided for Milestone 10; D-030 accepted for user-initiated persistent storage; implementation recorded in `MILESTONE_10_REPORT.md` | AI |
 | 2026-10-30 | D-012 accepted and O-5 decided for Milestone 11; D-031–D-034 accepted for the edition split, sync model, device linkage, and initial connection | AI |
 | 2026-10-30 | D-035 accepted for dedicated-project live verification and secret handling; Milestone 11 implementation recorded in `MILESTONE_11_REPORT.md` | AI |
+| 2026-10-31 | D-036 accepted for release 1.0.0 packaging; O-13 opened for the owner-supplied hosting address; Milestone 12 recorded in `MILESTONE_12_REPORT.md` | AI |
