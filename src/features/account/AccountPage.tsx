@@ -506,7 +506,7 @@ function modeCopy(mode: ConnectionPlan['mode']): string {
     case 'download':
       return 'This device has no planner records, so the account’s planner will be downloaded here.';
     case 'merge':
-      return 'Both this device and the account have records. They will be combined. Nothing is deleted or overwritten, and differing records stay listed for you to decide.';
+      return 'This device and the account will be combined. Nothing is deleted or overwritten, and any differing records stay listed for you to decide.';
   }
 }
 

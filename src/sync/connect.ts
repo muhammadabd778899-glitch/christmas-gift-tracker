@@ -138,14 +138,22 @@ async function buildPlan(db: GiftTrackerDatabase, adapter: CloudMirror): Promise
     }
   }
 
+  // Tombstones are not planner records. They still matter for conflicts, but
+  // they must not make an otherwise empty account look populated.
+  const liveCloudRecords = cloudRows.filter((row) => !row.deleted).length;
+
   const mode: ConnectionMode =
-    cloudRows.length === 0 ? 'upload' : localPlans === 0 ? 'download' : 'merge';
+    liveCloudRecords === 0 && conflicts === 0
+      ? 'upload'
+      : localPlans === 0
+        ? 'download'
+        : 'merge';
 
   return {
     plan: {
       mode,
       localRecords: localRecords.length,
-      cloudRecords: cloudRows.length,
+      cloudRecords: liveCloudRecords,
       identical,
       localOnly,
       cloudOnly,

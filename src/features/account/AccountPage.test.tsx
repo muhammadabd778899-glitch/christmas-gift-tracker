@@ -187,9 +187,7 @@ describe('account page', () => {
     await user.click(screen.getByRole('button', { name: 'Connect this device' }));
     const dialog = await screen.findByRole('dialog', { name: 'Connect this device' });
 
-    expect(
-      await within(dialog).findByText(/both this device and the account/i),
-    ).toBeInTheDocument();
+    expect(await within(dialog).findByText(/will be combined/i)).toBeInTheDocument();
 
     await user.type(within(dialog).getByLabelText('Type CONNECT to confirm'), 'CONNECT');
     const connectButton = within(dialog).getByRole('button', { name: 'Connect' });

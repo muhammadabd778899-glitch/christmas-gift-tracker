@@ -42,6 +42,16 @@ async function seedLocal() {
   return { season, recipient, gift };
 }
 
+async function seedTombstone(entityId: string, entity: ReturnType<typeof makeSeason>) {
+  const row = server.seedRow(USER, 'season', entityId, entity, clock.toISOString());
+  await server.adapterFor(USER).delete({
+    entityType: 'season',
+    entityId,
+    baseRevision: row.revision,
+    deletedAt: clock.toISOString(),
+  });
+}
+
 beforeEach(async () => {
   clock = new Date('2026-11-01T10:00:00.000Z');
   storage = await createTestStorage({ now: () => clock });
@@ -85,6 +95,40 @@ describe('connection planning', () => {
     expect(plan.mode).toBe('download');
     expect(plan.cloudOnly).toBe(1);
     expect(plan.localOnly).toBe(1);
+  });
+
+  it('plans an upload when the account only holds tombstones', async () => {
+    await seedLocal();
+    await seedTombstone(
+      '11111111-1111-4111-8111-eeeeeeeeeeee',
+      makeSeason({ id: '11111111-1111-4111-8111-eeeeeeeeeeee' as SeasonId }),
+    );
+
+    const plan = await planConnection(storage.db, server.adapterFor(USER));
+
+    expect(plan).toMatchObject({
+      mode: 'upload',
+      localRecords: 4,
+      cloudRecords: 0,
+      localOnly: 4,
+      cloudOnly: 0,
+      conflicts: 0,
+    });
+  });
+
+  it('still plans a merge when a cloud deletion collides with a local record', async () => {
+    const { season } = await seedLocal();
+    await seedTombstone(season.id, season);
+
+    const plan = await planConnection(storage.db, server.adapterFor(USER));
+
+    expect(plan).toMatchObject({
+      mode: 'merge',
+      cloudRecords: 0,
+      localOnly: 3,
+      cloudOnly: 0,
+      conflicts: 1,
+    });
   });
 
   it('plans a merge when both sides have plans', async () => {
@@ -152,6 +196,26 @@ describe('connectAccount', () => {
     });
     expect(await storage.db.syncOutbox.count()).toBe(0);
     expect((await readSyncLink(storage.db))?.email).toBe('alex@example.com');
+  });
+
+  it('uploads into an account that only holds tombstones without a backup gate', async () => {
+    await seedLocal();
+    await seedTombstone(
+      '11111111-1111-4111-8111-eeeeeeeeeeee',
+      makeSeason({ id: '11111111-1111-4111-8111-eeeeeeeeeeee' as SeasonId }),
+    );
+
+    const result = await connectAccount(context(), {
+      userId: USER,
+      email: 'alex@example.com',
+      confirmation: CONNECT_CONFIRMATION,
+      backupTaken: false,
+    });
+
+    expect(result.plan.mode).toBe('upload');
+    expect(result.plan.cloudRecords).toBe(0);
+    expect(result.summary.pushed).toBe(4);
+    expect(await storage.db.syncOutbox.count()).toBe(0);
   });
 
   it('downloads an account into an empty device', async () => {
