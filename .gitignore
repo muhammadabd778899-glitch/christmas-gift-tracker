@@ -42,3 +42,4 @@ local-backups/
 
 # Validated offline build copy for hosting (reproducible with npm run build)
 /release/Offline-Edition/
+/release/.offline-edition-previous/

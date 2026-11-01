@@ -5,7 +5,7 @@
   "type": "module",
   "description": "A local-first Christmas gift planning application.",
   "engines": {
-    "node": ">=20.19"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "scripts": {
     "dev": "vite",

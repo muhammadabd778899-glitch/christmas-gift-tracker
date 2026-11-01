@@ -460,6 +460,18 @@
 
 ---
 
+### D-037 — Cloudflare Pages hosts the offline edition
+
+**Status:** Accepted 2026-11-01 for Milestone 12 · **Milestone:** 12
+
+**Context:** The offline edition needs an HTTPS static host with SPA fallback for the Etsy release. The owner evaluated the commercial-use terms and selected Cloudflare Pages over Vercel Hobby (non-commercial) and GitHub Pages (not intended for hosting a commercial product). The host must serve a static PWA, allow a custom or stable public address, and keep the account-free bundle free of server secrets.
+
+**Decision:** Deploy the output of `npm run build` to Cloudflare Pages. Repository configuration: `public/_redirects` provides the SPA fallback, `public/_headers` sets immutable hashed-asset caching and no-cache for the HTML, service worker, and manifest plus basic security headers, `.nvmrc` pins Node 22, and the Pages project uses build command `npm run build`, output directory `dist`, production branch `main`, framework preset `None`, and `NODE_VERSION=22`. No Supabase variables and no online-mode build are permitted in this project, because the first Etsy release is the account-free offline edition (O-5). No CSP is added yet because the inline first-paint theme script requires a nonce or hash and separate verification. Deployment uses either Git integration or `wrangler pages deploy`. The public address is recorded when the owner completes deployment.
+
+**Consequences:** The offline edition remains a static, secret-free PWA with correct deep-link and caching behavior on the chosen host. Publishing still requires the owner's Cloudflare account; the repository alone cannot complete it. The offline artifact must be rebuilt and the post-deployment checklist in `docs/HOSTING.md` repeated after hosting, dependency, or content changes. If the Free plan terms or limits change, the decision may be revisited without changing the application build.
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Confidence | Impact if wrong |
@@ -497,7 +509,7 @@ Each row states the recommendation. Approving this specification approves the re
 | O-10 | Require actual cost when marking a gift bought? | No; allow and flag missing cost | M4 | Decided 2026-10-28 |
 | O-11 | Add a "does not need wrapping" exemption? | No for launch; document the limitation (D-024) | M5 | Decided 2026-10-28 |
 | O-12 | Support a standalone desktop wrapper for Etsy? | Only if M10 proves PWA delivery insufficient | M10/M12 | Decided 2026-10-30 — no wrapper in M10; revisit only with a separate owner decision |
-| O-13 | Where will the offline edition be hosted, and what is its public address? | Owner-selected HTTPS static host with SPA fallback; use the address in the listing and purchase message | Etsy launch | **Open — owner action.** Docs say “the address supplied with your purchase” until a URL exists |
+| O-13 | Where will the offline edition be hosted, and what is its public address? | Owner-selected HTTPS static host with SPA fallback; use the address in the listing and purchase message | Etsy launch | **Host selected 2026-11-01: Cloudflare Pages (D-037); configuration verified. Deployment and public address remain owner actions.** Docs say “the address supplied with your purchase” until a URL exists |
 
 **Approval needed before Milestone 1:** Resolved 2026-10-26. The owner authorized Milestone 1; D-001, D-013, D-014, and D-022 are accepted. All other decisions can be confirmed before their blocking milestone.
 
@@ -558,3 +570,4 @@ Each row states the recommendation. Approving this specification approves the re
 | 2026-10-30 | D-012 accepted and O-5 decided for Milestone 11; D-031–D-034 accepted for the edition split, sync model, device linkage, and initial connection | AI |
 | 2026-10-30 | D-035 accepted for dedicated-project live verification and secret handling; Milestone 11 implementation recorded in `MILESTONE_11_REPORT.md` | AI |
 | 2026-10-31 | D-036 accepted for release 1.0.0 packaging; O-13 opened for the owner-supplied hosting address; Milestone 12 recorded in `MILESTONE_12_REPORT.md` | AI |
+| 2026-11-01 | O-13 host chosen: D-037 accepted for Cloudflare Pages; SPA fallback, caching/security headers, and Node version added and verified in the offline artifact; `docs/HOSTING.md` records deployment steps; deployment awaits the owner's account | AI |

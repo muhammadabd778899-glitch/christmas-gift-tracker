@@ -7,3 +7,6 @@ test-results/
 docs/
 *.md
 release/
+.nvmrc
+public/_headers
+public/_redirects

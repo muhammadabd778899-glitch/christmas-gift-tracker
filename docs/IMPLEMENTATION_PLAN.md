@@ -10,11 +10,11 @@
 | Item | State |
 | --- | --- |
 | Repository | Release 1.0.0 React/TypeScript/Vite application with two build editions, tested local storage, and an optional Supabase-backed online edition; customer package prepared |
-| Current milestone | **Milestone 12 - Final QA, packaging, and Etsy launch** (complete locally; hosting, listing upload, and live Supabase verification are owner actions) |
+| Current milestone | **Milestone 12 - Final QA, packaging, and Etsy launch** (complete locally; Cloudflare Pages config ready, deployment, listing upload, and live Supabase verification are owner actions) |
 | Application runnable | Yes - development server, tests, coverage, offline PWA build, and online build pass |
 | Tests | 382 Vitest tests across 44 files passing; no Playwright suite yet |
 | Next milestone | None planned; post-launch maintenance and optional online-edition verification |
-| Next action | Owner hosts `release/Offline-Edition/`, records the HTTPS app address, uploads `release/Christmas-Gift-Tracker-1.0.0.zip` to Etsy, and optionally runs `npm run verify:supabase` against the dedicated test project |
+| Next action | Owner deploys to Cloudflare Pages per `docs/HOSTING.md`, records the HTTPS app address, uploads `release/Christmas-Gift-Tracker-1.0.0.zip` to Etsy, and optionally runs `npm run verify:supabase` against the dedicated test project |
 
 **Release 1.0.0 is prepared and verified locally. Storage mutations must go through the tested repositories; startup must never create a season or sample data. The offline edition stays account-free.**
 
@@ -685,10 +685,10 @@ A milestone is complete only when:
 
 ## 21. Immediate next step
 
-1. Owner chooses an HTTPS static host with SPA fallback and uploads the contents of `release/Offline-Edition/` (or rebuilds from the tagged release commit with `npm run build`).
-2. Owner verifies the hosted app once in a clean Chrome/Edge profile, then records the public app address in the Etsy listing and purchase message. The docs deliberately refer to “the address supplied with your purchase” until that address exists.
+1. Owner deploys the offline edition to Cloudflare Pages (D-037) by following `docs/HOSTING.md`: Git integration with production branch `main`, build command `npm run build`, output directory `dist`, and `NODE_VERSION=22`, with no Supabase variables, or the `wrangler pages deploy` alternative. The SPA fallback, caching/security headers, and Node version are already committed and verified in the built artifact; publishing needs the owner's Cloudflare login.
+2. Owner verifies the hosted app with the `docs/HOSTING.md` checklist, then records the public app address in the Etsy listing and purchase message. The docs deliberately refer to “the address supplied with your purchase” until that address exists.
 3. Owner reviews `release/Listing-Copy.md`, the three customer PDFs, and the ZIP, then uploads `release/Christmas-Gift-Tracker-1.0.0.zip` to Etsy.
 4. Optional for the online edition: create the dedicated Supabase test project, apply `supabase/migrations/20261030000100_online_sync.sql`, supply `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` through the git-ignored `.env.online.local` only, and run `npm run verify:supabase`. AC-11.03, 11.04, 11.09, 11.10, 11.11, and 11.15 remain pending until that run succeeds.
 5. Re-run the release gates and the offline verification after any hosting, copy, or content change.
 
-Release 1.0.0 is prepared locally. No further milestone is authorized; hosting and the Etsy upload are external owner actions.
+Release 1.0.0 is prepared locally and the Cloudflare Pages configuration is complete. No further milestone is authorized; the Pages deployment and the Etsy upload are external owner actions.

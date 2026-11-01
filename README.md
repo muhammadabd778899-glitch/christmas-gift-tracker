@@ -183,7 +183,11 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | `docs/MILESTONE_8_REPORT.md` | Seasons, archives, and data portability milestone report and verification evidence |
 | `docs/MILESTONE_9_REPORT.md` | Professional interface, themes, and accessibility milestone report and verification evidence |
 | `docs/MILESTONE_10_REPORT.md` | Offline delivery milestone report and verification evidence |
+| `docs/MILESTONE_11_REPORT.md` | Online edition and sync milestone report and verification evidence |
+| `docs/MILESTONE_12_REPORT.md` | Final QA, packaging, and Etsy release report |
 | `docs/OFFLINE_SETUP.md` | Customer-facing install and offline setup guide |
+| `docs/HOSTING.md` | Cloudflare Pages deployment guide and post-deployment checklist |
+| `docs/ONLINE_SETUP.md` | Online edition build, Supabase setup, and verification |
 | `AI_DEVELOPMENT_PROTOCOL.md` | Permanent working rules for the AI agent |
 
 **Reading order for a new session:** protocol → product spec → architecture → data model → acceptance criteria → decisions → implementation plan → latest milestone report.
@@ -206,9 +210,9 @@ No runtime CDN assets, remote fonts, analytics, or telemetry are used. The inter
 | 9 | Professional UI, themes, accessibility | Complete — verified |
 | 10 | Offline delivery | Complete — verified |
 | 11 | Online edition and sync | Complete — verified locally; remote RLS run pending test credentials |
-| 12 | QA, packaging, Etsy launch | Complete — 1.0.0 package prepared and verified locally; hosting/listing upload pending |
+| 12 | QA, packaging, Etsy launch | Complete — 1.0.0 package prepared and verified locally; Cloudflare Pages config ready; hosting/listing upload pending |
 
-Milestone 12 is complete locally. Version 1.0.0 passed typecheck, lint, 382 tests in 44 files, both production builds, the offline bundle scan, a clean-profile offline run, the sample-backup restore, and a large-data restore. The validated offline artifact is built locally at `release/Offline-Edition/` (git-ignored); the customer ZIP is `release/Christmas-Gift-Tracker-1.0.0.zip`. The Etsy listing needs an owner-supplied HTTPS hosting URL; the docs deliberately say “the address supplied with your purchase” instead of inventing one. The remote Supabase cross-account run (`npm run verify:supabase`) still requires the owner’s dedicated test project and remains pending; see `docs/ONLINE_SETUP.md` and `docs/MILESTONE_12_REPORT.md`.
+Milestone 12 is complete locally. Version 1.0.0 passed typecheck, lint, 382 tests in 44 files, both production builds, the offline bundle scan, a clean-profile offline run, the sample-backup restore, and a large-data restore. The validated offline artifact is built locally at `release/Offline-Edition/` (git-ignored); the customer ZIP is `release/Christmas-Gift-Tracker-1.0.0.zip`. The owner chose Cloudflare Pages (D-037), and the SPA fallback, caching/security headers, and Node version are committed and verified in the built artifact; deployment awaits the owner’s Cloudflare login. See `docs/HOSTING.md` for the exact steps and verification checklist. The Etsy listing needs the resulting HTTPS hosting URL; the docs deliberately say “the address supplied with your purchase” instead of inventing one. The remote Supabase cross-account run (`npm run verify:supabase`) still requires the owner’s dedicated test project and remains pending; see `docs/ONLINE_SETUP.md` and `docs/MILESTONE_12_REPORT.md`.
 
 ---
 
@@ -233,13 +237,13 @@ The interface copy is intentionally conservative: local downloads are offered, b
 
 ## Current next step
 
-1. Owner chooses an HTTPS static host with SPA fallback for the offline edition and uploads the contents of `release/Offline-Edition/` (or rebuilds from this commit with `npm run build`).
-2. Owner verifies the hosted app once in a clean Chrome/Edge profile, then records the public app address in the Etsy listing and the purchase message. The release docs refer to “the address supplied with your purchase”.
+1. Owner deploys the offline edition to Cloudflare Pages, following `docs/HOSTING.md`: connect the GitHub repository, production branch `main`, build command `npm run build`, output directory `dist`, and environment variable `NODE_VERSION=22` with no Supabase variables. Direct upload with `wrangler` is the alternative.
+2. Owner verifies the hosted app once in a clean Chrome/Edge profile using the checklist in `docs/HOSTING.md`, then records the public app address in the Etsy listing and the purchase message. The release docs refer to “the address supplied with your purchase”.
 3. Owner reviews `release/Listing-Copy.md`, the three PDFs, and `release/Christmas-Gift-Tracker-1.0.0.zip`, then uploads the ZIP to Etsy.
 4. Optional, for the online edition: create the dedicated Supabase test project, apply the migration, supply the URL and anon key through the git-ignored `.env.online.local`, and run `npm run verify:supabase`. This does not block the offline Etsy release.
 5. Keep the offline edition account-free and verify it again after any hosting or content change.
 
-Release 1.0.0 is prepared. Hosting and Etsy upload are the remaining external actions.
+Release 1.0.0 is prepared. The Cloudflare Pages configuration is complete; deploying it and uploading the ZIP to Etsy are the remaining external actions.
 
 ---
 
