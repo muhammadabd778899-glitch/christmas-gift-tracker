@@ -1,6 +1,6 @@
 # Milestone 12 Report — Final QA, packaging, and Etsy launch
 
-**Status:** Complete and verified locally on 2026-10-31; Cloudflare Pages configuration added and verified on 2026-11-01. Deployment, public app address, Etsy upload, and live Supabase verification remain owner actions  
+**Status:** Complete and verified locally on 2026-10-31; Cloudflare Workers static-assets configuration added and verified on 2026-11-01. The first upload failed on a `_redirects` rule; the fix is committed. Deployment retry, public app address, Etsy upload, and live Supabase verification remain owner actions  
 **Version:** 1.0.0  
 **Git checkpoint:** `release: prepare Christmas Gift Tracker`  
 **Tag:** `milestone-12`
@@ -70,17 +70,18 @@ Christmas-Gift-Tracker-1.0.0/
 - `release/Listing-Copy.md` contains the 115-character Etsy title, full description, 13 tags (all ≤20 characters), attributes, and an honest-claims checklist.
 - Hosting URL, Etsy listing URL, and the actual uploaded file remain owner actions.
 
-### 1.6 Hosting configuration (Cloudflare Pages)
+### 1.6 Hosting configuration (Cloudflare Workers static assets)
 
-The owner selected Cloudflare Pages on 2026-11-01 (D-037). Because deployment needs the owner's account login, this report records configuration only; no site has been published.
+The owner selected Cloudflare on 2026-11-01 (D-037). The dashboard connected the repository as a Worker with Workers Builds and deploys with `npx wrangler deploy`. No site has been published yet; the first upload failed on a configuration rule, described below.
 
-- `public/_redirects` adds the SPA fallback `/* /index.html 200`, so deep links such as `/settings` do not 404 on a static host.
-- `public/_headers` sets immutable caching for hashed `/assets/*`, `no-cache` for `index.html`, `sw.js`, and `manifest.webmanifest`, plus `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, and `Permissions-Policy`. No CSP is set because the inline first-paint theme script needs a nonce or hash and its own verification.
-- `.nvmrc` pins Node 22 locally; the Pages project must set `NODE_VERSION=22`. `package.json` engines now match Vite 8's requirement (`^20.19.0 || >=22.12.0`).
-- The offline build was regenerated, both hosting files were confirmed in `dist`, and `release/Offline-Edition/` was refreshed as a byte-identical copy (identical file lists and SHA-256 hashes).
+- The first deployment failed during upload with **Invalid `_redirects` configuration: Infinite loop detected in this rule ... [code: 100324]** for `/* /index.html 200`. Workers static assets rejects that rewrite, so `public/_redirects` was removed (D-038). Deep links use `assets.not_found_handling: "single-page-application"` in the new `wrangler.jsonc` instead.
+- `wrangler.jsonc` declares the worker name `christmas-gift-tracker`, compatibility date `2026-10-23`, asset directory `./dist`, and the SPA fallback.
+- `public/_headers` sets immutable caching for hashed `/assets/*`, `no-cache` for `index.html`, `sw.js`, and `manifest.webmanifest`, plus `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, and `Permissions-Policy`. Wrangler parsed five valid header rules. No CSP is set because the inline first-paint theme script needs a nonce or hash and its own verification.
+- `.nvmrc` pins Node 22 locally; the Worker build sets `NODE_VERSION=22`. `package.json` engines now match Vite 8's requirement (`^20.19.0 || >=22.12.0`).
+- The offline build was regenerated, the hosting files were confirmed in `dist`, and `release/Offline-Edition/` was refreshed as a byte-identical copy (identical file lists and SHA-256 hashes).
 - `npm run verify:bundle` passed (8 scripts scanned, no accounts, sync, privileged keys, or third-party runtime assets).
 - `npm run typecheck` and `npm run lint` pass. The first full test run, executed concurrently with both other gates, had one timing-related failure; an isolated rerun passed all 382 tests in 44 files.
-- Local preview smoke test: `/`, `/recipients`, `/gifts`, `/shopping-list`, `/archives`, `/settings`, `/sw.js`, `/manifest.webmanifest`, `/_redirects`, and `/_headers` all returned 200. The dashboard rendered, the service worker activated after one reload, 15 entries were precached, `/settings` loaded under service-worker control, and the console was clean.
+- Wrangler 4.156.0 verification: `wrangler deploy --dry-run` read 20 files with no validation error; `wrangler dev` served `/`, `/settings`, `/gifts`, `/archives`, and `/shopping-list` as `text/html` with 200 through the SPA fallback; `/sw.js` returned `no-cache` plus the security headers; hashed assets returned immutable caching; the service worker precached 15 entries and controlled the page after one reload; and after the local server was stopped, reloading `/settings` still rendered from the service-worker cache with no console errors.
 - Deployment steps and the post-deployment checklist are in `docs/HOSTING.md`. The project must stay offline-only: no Supabase variables and no `build:online` deployment.
 
 ---
@@ -196,7 +197,7 @@ Known limitations documented for customers: one active season at a time; replace
 
 ## 8. Deployment and next actions
 
-1. **Deploy to Cloudflare Pages (D-037).** Follow `docs/HOSTING.md`: connect the GitHub repository, production branch `main`, build command `npm run build`, output directory `dist`, framework preset `None`, and environment variable `NODE_VERSION=22` with no Supabase variables. The direct-upload alternative uses `npx wrangler pages deploy release/Offline-Edition --project-name christmas-gift-tracker` after `wrangler login`. The repository configuration is complete; the publish step needs the owner's Cloudflare login.
+1. **Retry the Cloudflare deployment (D-037, D-038).** Follow `docs/HOSTING.md`: the project is a Worker with static assets, production branch `main`, build command `npm run build`, deploy command `npx wrangler deploy`, and environment variable `NODE_VERSION=22` with no Supabase variables. `wrangler.jsonc` supplies the SPA fallback; `public/_redirects` must stay removed. The direct-upload alternative is `npm run build && npx wrangler deploy` after `wrangler login`. The publish step needs the owner's Cloudflare session.
 2. **Verify the live install.** Run the post-deployment checklist in `docs/HOSTING.md`: clean Chrome/Edge profile, footer, install prompt, service-worker control, an offline reload across all sections, and no third-party requests.
 3. **Record the public app address (O-13).** Put it in the Etsy listing and the purchase message. The docs intentionally say “the address supplied with your purchase” until this exists.
 4. **Publish the listing.** Review `release/Listing-Copy.md`, upload `release/Christmas-Gift-Tracker-1.0.0.zip`, and keep the three PDFs and sample available through the ZIP.
@@ -208,7 +209,7 @@ Known limitations documented for customers: one active season at a time; replace
 
 | Issue | Impact | Owner action |
 | --- | --- | --- |
-| Deployed site and public hosting address pending | Etsy listing cannot be published with a working app link | Host selected (Cloudflare Pages, D-037); deploy with the owner's login and record the URL (O-13) |
+| Deployed site and public hosting address pending | Etsy listing cannot be published with a working app link | Host selected (Cloudflare, D-037/D-038); retry the deployment after the `_redirects` fix and record the URL (O-13) |
 | No Etsy upload or listing URL | The product is packaged but not on sale | Upload ZIP, publish listing |
 | Live Supabase RLS/cross-account run not executed | Online-edition security claims remain local-only | Supply dedicated project credentials and run `npm run verify:supabase` |
 | No Playwright/browser E2E suite | Regression coverage is Vitest + manual Chromium | Optional future work |
@@ -220,4 +221,4 @@ Known limitations documented for customers: one active season at a time; replace
 
 ## 10. Conclusion
 
-Release 1.0.0 is a tested, documented, account-free offline planner with a real customer package, honest limitations, and a reproducible verification trail. The Cloudflare Pages configuration is ready and verified in the build. The remaining work is external: deploying with the owner's Cloudflare login, publishing the Etsy listing, and optionally completing the live Supabase security run for the separate online edition.
+Release 1.0.0 is a tested, documented, account-free offline planner with a real customer package, honest limitations, and a reproducible verification trail. The Cloudflare Workers static-assets configuration is ready and verified in the build. The remaining work is external: retrying the deployment with the owner's Cloudflare session, publishing the Etsy listing, and optionally completing the live Supabase security run for the separate online edition.

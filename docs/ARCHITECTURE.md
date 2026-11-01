@@ -47,7 +47,7 @@ Online edition: Auth + Postgres + sync adapter; local DB remains the working cop
 
 The default build never imports the online modules; the online build adds the Account route and provider at compile time through an `@edition` alias. The offline bundle scanner fails the build if Supabase, auth, sync RPCs, or privileged-key strings appear in the offline artifact.
 
-External services at launch: none required for application logic. The offline edition is served as static files by Cloudflare Pages (D-037) so the PWA can be installed; the host sees standard request logs and receives no planner data. No fonts, scripts, icons, or analytics are loaded from third parties at runtime. The online build additionally contacts the configured Supabase project only after the user signs in and links the device.
+External services at launch: none required for application logic. The offline edition is served as static assets by a Cloudflare Worker (D-037, D-038) so the PWA can be installed; the host sees standard request logs and receives no planner data. No fonts, scripts, icons, or analytics are loaded from third parties at runtime. The online build additionally contacts the configured Supabase project only after the user signs in and links the device.
 
 ---
 

@@ -669,7 +669,7 @@ These materially affect scope or promise. Recommendations are in `docs/DECISIONS
 | O-10 | Require actual cost when marking a gift bought? | No; allow and flag the missing cost | Milestone 4 |
 | O-11 | Add a "does not need wrapping" exemption? | No for launch; document the progress limitation | Milestone 5 |
 | O-12 | Support a standalone desktop wrapper for Etsy? | Only if Milestone 10 proves PWA delivery insufficient | Decided 2026-10-30 — no wrapper; revisit only with a separate owner decision |
-| O-13 | Where is the offline edition hosted? | Cloudflare Pages (D-037) | Host selected 2026-11-01 and configuration verified; deployment and public address remain owner actions before the Etsy listing is published; docs say “the address supplied with your purchase” until a URL exists |
+| O-13 | Where is the offline edition hosted? | Cloudflare, as a Worker with static assets (D-037, D-038) | Host selected 2026-11-01 and configuration verified; the first upload failed on a `_redirects` rule, the fix is committed, and the deployment retry plus public address remain owner actions before the Etsy listing is published; docs say “the address supplied with your purchase” until a URL exists |
 
 Approval of this specification approves the recommendations unless an item is explicitly changed. Milestone 0 is complete when these are reviewed; Milestone 1 does not depend on O-1, O-2, O-5, O-6, O-11, or O-12.
 

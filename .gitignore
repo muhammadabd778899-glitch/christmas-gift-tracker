@@ -6,6 +6,9 @@ dist-standalone/
 coverage/
 *.tsbuildinfo
 
+# Wrangler local state
+.wrangler/
+
 # Test artifacts
 playwright-report/
 test-results/

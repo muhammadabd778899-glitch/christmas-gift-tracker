@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+.wrangler/
 package-lock.json
 playwright-report/
 test-results/
@@ -9,4 +10,4 @@ docs/
 release/
 .nvmrc
 public/_headers
-public/_redirects
+wrangler.jsonc
